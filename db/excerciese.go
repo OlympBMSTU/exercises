@@ -27,14 +27,18 @@ func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) er
 
 func GetExcerciese(id uint, poll *pgx.ConnPool) (*entities.ExcercieseEntity, error) {
 	var excerciese entities.ExcercieseEntity
-	rows, err := poll.Query(get_excerciese, id) //.Scan(&excerciese)
+	rows, err := poll.Query(get_excerciese, id)
 
 	if err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
+
+	// its fucking crutch
+	idx := 0
 	for rows.Next() {
+		idx += 1
 		rows.Scan(
 			&excerciese.Id,
 			&excerciese.AuthorId,
@@ -43,8 +47,10 @@ func GetExcerciese(id uint, poll *pgx.ConnPool) (*entities.ExcercieseEntity, err
 			&excerciese.FileName,
 			&excerciese.Subject,
 		)
-		// &excerciese.author_id, &excerciese.right_answer,
-		// &excerciese.level, &excerciese.file_name, &excerciese.subject)
+	}
+
+	if idx == 0 {
+		return nil, nil
 	}
 	return &excerciese, nil
 }

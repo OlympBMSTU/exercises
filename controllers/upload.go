@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/HustonMmmavr/excercieses/db"
 
@@ -15,22 +17,26 @@ import (
 )
 
 func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
-	return http.HandlerFunc(func(writer http.ResponseWriter, requset *http.Request) {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 
-		// url path
-		fmt.Println(requset.URL.RequestURI)
-		if requset.Method != "POST" {
+		if request.Method != "POST" {
 			http.Error(writer, "Unsupported method", 404)
 			return
 		}
 
-		if requset.Body == nil {
+		if request.Body == nil {
 			http.Error(writer, "Please send a request body", 400)
 			return
 		}
 
-		body, err := ioutil.ReadAll(requset.Body)
-		defer requset.Body.Close()
+		// also here we got author id
+		// if !AuthUser(cookie) {
+		// 	http.Error(writer, "Please authorize", 403)
+		// 	return
+		// }
+
+		body, err := ioutil.ReadAll(request.Body)
+		defer request.Body.Close()
 
 		if err != nil {
 			http.Error(writer, "Please send a request body", 400)
@@ -53,7 +59,7 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 			return
 		}
 
-		// get file name as fstorage
+		// represent name in file storage
 		newName := fstorage.ComputeName(excerciese.FileName)
 
 		err = fstorage.WriteFile(file, newName, ".pdf")
@@ -80,7 +86,22 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 
 func GetExcerciese(pool *pgx.ConnPool) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		excerciese, err := db.GetExcerciese(14, pool)
+
+		if request.Method != "GET" {
+			http.Error(writer, "Unsopported method", 404)
+			return
+		}
+
+		// Get path variable from path
+		idStr := strings.TrimPrefix(request.URL.Path, "/api/excercieses/get/")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(writer, "Incorrect path variable", 404)
+		}
+
+		uId := uint(id)
+
+		excerciese, err := db.GetExcerciese(uId, pool)
 		writer.Header().Set("Content-Type", "application/json")
 		val, err := json.Marshal(excerciese)
 		fmt.Println(err)

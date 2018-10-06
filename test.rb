@@ -35,7 +35,5 @@ class Generator
 
 end
 
-# def main() 
-    g = Generator.new()
-    g.generate_tables()
-# end
+g = Generator.new()
+g.generate_tables()
