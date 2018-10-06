@@ -7,7 +7,7 @@ import (
 	"math/big"
 	"os"
 
-	"github.com/HustonMmmavr/excercieses/config"
+	"github.com/OlympBMSTU/excericieses/config"
 )
 
 func FileExist(path string) bool {

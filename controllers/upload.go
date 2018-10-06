@@ -9,10 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/HustonMmmavr/excercieses/db"
-
-	"github.com/HustonMmmavr/excercieses/fstorage"
-	"github.com/HustonMmmavr/excercieses/views"
+	"github.com/OlympBMSTU/excericieses/db"
+	"github.com/OlympBMSTU/excericieses/fstorage"
+	"github.com/OlympBMSTU/excericieses/views"
 	"github.com/jackc/pgx"
 )
 
