@@ -12,10 +12,35 @@ import (
 type Config struct {
 	fileStorageDir string
 	listenerPort   string
+	db_host        string
+	db_port        string
+	database       string
+	user           string
+	password       string
 }
 
 func (cfg *Config) GetFileStorageName() string {
 	return cfg.fileStorageDir
+}
+
+func (cfg *Config) GetHost() string {
+	return cfg.db_host
+}
+
+func (cfg *Config) GetPort() string {
+	return cfg.db_host
+}
+
+func (cfg *Config) GetDatabase() string {
+	return cfg.database
+}
+
+func (cfg *Config) GetUser() string {
+	return cfg.user
+}
+
+func (cfg *Config) GetPassword() string {
+	return cfg.password
 }
 
 // it works but need to get path to dir
@@ -40,6 +65,11 @@ func Init() (*Config, error) {
 	return &Config{
 		configs[0],
 		configs[1],
+		configs[2],
+		configs[3],
+		configs[4],
+		configs[5],
+		configs[6],
 	}, nil
 }
 

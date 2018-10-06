@@ -24,18 +24,12 @@ func Init() (*pgx.ConnPool, error) {
 		return nil, err
 	}
 
-	pg_conf, err := config.GetPgConfigInstance()
-	if err != nil {
-		fmt.Println("eroor read pg_conf file")
-		return nil, err
-	}
-
 	connPoolConfig := pgx.ConnPoolConfig{
 		ConnConfig: pgx.ConnConfig{
-			Host:     pg_conf.GetHost(),
-			User:     pg_conf.GetUser(),
-			Password: pg_conf.GetPassword(),
-			Database: pg_conf.GetDatabase(),
+			Host:     conf.GetHost(),
+			User:     conf.GetUser(),
+			Password: conf.GetPassword(),
+			Database: conf.GetDatabase(),
 		},
 		MaxConnections: 5,
 	}
