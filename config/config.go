@@ -7,10 +7,11 @@ import (
 	"strings"
 )
 
+// config - one file
+
 type Config struct {
 	fileStorageDir string
 	listenerPort   string
-	dbPath         string
 }
 
 func (cfg *Config) GetFileStorageName() string {
@@ -39,7 +40,6 @@ func Init() (*Config, error) {
 	return &Config{
 		configs[0],
 		configs[1],
-		configs[2],
 	}, nil
 }
 
