@@ -156,10 +156,8 @@ func GetExcercieses(pool *pgx.ConnPool) http.HandlerFunc {
 		offsetArr := query["offset"]
 		offset := -1
 		if len(offsetArr) > 0 {
-			offset, _ = strconv.Atoi(limitArr[0])
+			offset, _ = strconv.Atoi(offsetArr[0])
 		}
-
-		fmt.Println(limit, offset)
 
 		// its fucking crutch maybe, todo refactor !!!!!!!!!
 

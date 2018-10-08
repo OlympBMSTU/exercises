@@ -5,7 +5,7 @@ const (
 
 	get_excerciese = "SELECT * FROM EXCERCIESE WHERE id = $1"
 
-	get_by_subject = "select * from Excerciese WHERE subject = '%s' "
+	get_by_subject = "select * from Excerciese ex WHERE subject = '%s' "
 	// limit offset order by
 
 	get_by_subject_tag = "SELECT ex.* FROM (SELECT * FROM Excerciese WHERE subject='%s') ex join " +
