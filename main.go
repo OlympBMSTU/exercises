@@ -46,6 +46,7 @@ func Init() (*pgx.ConnPool, error) {
 func InitRouter(pool *pgx.ConnPool) {
 	http.HandleFunc("/api/excercieses/upload_excerciese", controllers.UploadExcercieseHandler(pool))
 	http.HandleFunc("/api/excercieses/get/", controllers.GetExcerciese(pool))
+	http.HandleFunc("/api/excercieses/list/", controllers.GetExcercieses(pool))
 }
 
 func main() {

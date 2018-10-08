@@ -12,6 +12,7 @@ class Generator
     end
     
     def generate_tables() 
+        rnd = Random.new()
         p @subjects
         # @subjects.each()  do |subject|
         #     p 'a'
@@ -21,9 +22,20 @@ class Generator
         #     @conn.exec("INSERT INTO TAG(name) VALUES('#{tag}')")
         # end
 
-        0.upto(10000) do |i|
-            @conn.exec("insert into exceriese(author_id, right_answer, level, file_name, subject) VALUES(3, #{i}, #{i}, '242', 'math')")
-            @conn.exec("insert into tag_excerciese(tag_id, excerciese_id) values(4, #{i+2})")
+        0.upto(10) do |i|
+            tags_arr = "'{"
+            count_tags = rnd.rand(1..@tags.size)
+            0.upto(count_tags) do |j|
+                id = rnd.rand(0..(@tags.size() - 1))
+                tags_arr += "\"" + @tags[id] + "\"" + ","
+            end
+            tags_arr = tags_arr.chomp(",") + "}'"
+            # tags_arr += "}" 
+            subject = "'" + @subjects[rnd.rand(0..(@subjects.size()-1))] + "'"
+            p tags_arr
+            p subject
+
+            @conn.exec("select add_excerciese(#{rnd.rand(0..100)}, 'b', #{rnd.rand(0..5)}, 'f_', #{subject}, #{tags_arr})")
         end
 
 

@@ -10,7 +10,8 @@ create table if not exists excerciese (
 create table if not exists tag (
     id serial,
     subject varchar(255),
-    name varchar(255)
+    name varchar(255),
+    CONSTRAINT subjec_tag UNIQUE (subject, name)
 );
 
 create table if not exists tag_excerciese(
@@ -31,7 +32,9 @@ select * from (SELECT * FROM Exceriese WHERE subject=$1) ex  join ((SELECT * FRO
 select * from tag t join tag_excerciese tg on (t.id = tg.tag_id) join excerciese_id ex on (ex.id = tg.excerciese_id) 
 WHERE t.name = 'equations'
 
-CREATE OR REPLACE FUNCTION add_excerciese(auth_id integer, r_answer varchar(255), lev integer, f_name varchar(255), subj varchar(255), tags text[])
+
+-- todo ON CONFLCIT делать и проверка на id tag 
+CREATE OR REPLACE FUNCTION add_excerciese(auth_id integer, r_answer varchar(255), lev integer, f_name varchar(255), subj varchar(255), tags varchar(255)[])
 RETURNS integer AS $$
 DECLARE ex_id integer;
 DECLARE t_id INTEGER;
@@ -40,7 +43,14 @@ DECLARE data text;
 BEGIN
     INSERT INTO EXCERCIESE(author_id, file_name, right_answer, level, subject) VALUES(auth_id, f_name, r_answer, lev, subj) RETURNING id INTO ex_id;
     FOR i IN 1..array_length(tags, 1) LOOP
-        INSERT INTO TAG(subject, name) VALUES(subj, tags[i]) RETURNING id INTO t_id;
+        -- INSERT INTO TAG(subject, name) VALUES(subj, tags[i]) RETURNING id INTO t_id
+        SELECT id from tag where subject = subj and name = tags[i] into t_id;
+        raise notice '%', t_id;
+        if t_id IS null then 
+            INSERT INTO TAG(subject, name) VALUES(subj, tags[i]) RETURNING id INTO t_id;
+        end if;
+        -- ON CONLICT 
+        --     DO SELECT id from tag where subject = subj and name = tags[i] into t_id;
         INSERT INTO TAG_EXCERCIESE(tag_id, excerciese_id) VALUES(t_id, ex_id);
     END LOOP;
 
