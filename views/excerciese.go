@@ -9,7 +9,7 @@ type ExcercieseView struct {
 	Subject    string   `json:"subject"`
 	Tags       []string `json:"tags"`
 	Level      uint     `json:"level"`
-	author     uint64
+	Author     uint
 }
 
 func (view *ExcercieseView) ToEntity() entities.ExcercieseEntity {
@@ -19,4 +19,16 @@ func (view *ExcercieseView) ToEntity() entities.ExcercieseEntity {
 		view.Level,
 		view.Subject,
 	)
+}
+
+func ExcercieseViewFrom(entity entities.ExcercieseEntity, tags []string) ExcercieseView {
+	return ExcercieseView{
+		entity.GetRightAnswer(),
+		"",
+		entity.GetFileName(),
+		entity.GetSubject(),
+		tags,
+		entity.GetLevel(),
+		entity.GetAuthorId(),
+	}
 }

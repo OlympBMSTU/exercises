@@ -180,6 +180,30 @@ func GetExcercieses(pool *pgx.ConnPool) http.HandlerFunc {
 		val, err := json.Marshal(entities)
 		fmt.Println(err)
 		writer.Write([]byte(val))
+	})
+}
 
+// jwt -> admin
+
+func GetSubjects(pool *pgx.ConnPool) http.HandlerFunc {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.Method != "GET" {
+			http.Error(writer, "Unsupported method", 404)
+			return
+		}
+
+		subs, err := db.GetSubjects(pool)
+		if err != nil {
+			http.Error(writer, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		val, err := json.Marshal(subs)
+		if err != nil {
+			http.Error(writer, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		writer.Write([]byte(val))
 	})
 }
