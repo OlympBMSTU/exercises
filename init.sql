@@ -3,10 +3,6 @@
 -- tag index - name, subject name
 -- 
 
-create table if not exists subject (
-    id serial,
-    name varchar(255) 
-);
 
 create table if not exists excerciese (
     id serial, 
@@ -72,28 +68,3 @@ BEGIN
     RETURN 0;
 END;
 $$ LANGUAGE plpgsql;
-
--- SELECT add_excerciese(1, 'dg', 3, 'fdfd', 'mathematic', ARRAY['data', 'nj'])
-
-
-
--- по уму сначала уменьшаем таблицу просредника 
--- select * from (SELECT * FROM Exceriese WHERE subject=$1) ex  join ((SELECT * FROM tag WHERE name=$2) t join tag_excerciese tg on (tg.tag_id = t.id)) tt on (tt.excerciese_id = ex.id)
-
--- select * from tag t join tag_excerciese tg on (t.id = tg.tag_id) join excerciese_id ex on (ex.id = tg.excerciese_id) 
--- WHERE t.name = 'equations'
-
-        -- raise notice '%', t_id;
-
-        -- ON CONLICT 
-        --     DO SELECT id from tag where subject = subj and name = tags[i] into t_id;
-
-        -- INSERT INTO TAG(subject, name) VALUES(subj, tags[i]) RETURNING id INTO t_id
-
-
-    -- SELECT pg_typeof(tags) INTO data;
-    -- raise notice '%', data;
-    -- FOREACH tag SLICE 1 in ARRAY tags LOOP
-    --     INSERT INTO TAG(subject, name) VALUES(subject, tag) RETURNING id INTO t_id;
-    --     INSERT INTO TAG_EXCERCIESE(tag_id, excerciese_id) VALUES(t_id, ex_id);
-    -- END LOOP;

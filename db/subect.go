@@ -27,3 +27,7 @@ func GetSubjects(pool *pgx.ConnPool) (*[]string, error) {
 
 	return &subjects, nil
 }
+
+func GetTgasBySubect(subject string, pool *pgx.ConnPool) (*[]string, error) {
+	return getTags(GET_TAGS_BY_SUBJECT, pool, subject)
+}

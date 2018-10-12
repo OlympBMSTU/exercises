@@ -1,3 +1,5 @@
+
+
 // get_by_subject_tag = "select * from (SELECT * FROM Exceriese WHERE subject=$1) ex  join " +
 // 	"((SELECT * FROM tag WHERE name=$2) t join tag_excerciese tg on (tg.tag_id = t.id)) tt on (tt.excerciese_id = ex.id) "
 
@@ -5,3 +7,91 @@
 
 // subquery for excerciese on tags -> 1
 // get_excercise = "SELECT * FROM EXCERCIESES ex JOIN TAG_EXCERCIESE tg ON ex.id = tg.excerciese_id JOIN TAG t ON (t.id = tg.excerciese_id) WHERE id = $1"
+
+
+	// http.HandleFunc("/api/excercieses/subjects/")
+	// http.HandleFunc("/api/excercieses/") tag
+	// count
+
+
+    -- SELECT add_excerciese(1, 'dg', 3, 'fdfd', 'mathematic', ARRAY['data', 'nj'])
+
+
+
+-- по уму сначала уменьшаем таблицу просредника 
+-- select * from (SELECT * FROM Exceriese WHERE subject=$1) ex  join ((SELECT * FROM tag WHERE name=$2) t join tag_excerciese tg on (tg.tag_id = t.id)) tt on (tt.excerciese_id = ex.id)
+
+-- select * from tag t join tag_excerciese tg on (t.id = tg.tag_id) join excerciese_id ex on (ex.id = tg.excerciese_id) 
+-- WHERE t.name = 'equations'
+
+        -- raise notice '%', t_id;
+
+        -- ON CONLICT 
+        --     DO SELECT id from tag where subject = subj and name = tags[i] into t_id;
+
+        -- INSERT INTO TAG(subject, name) VALUES(subj, tags[i]) RETURNING id INTO t_id
+
+
+    -- SELECT pg_typeof(tags) INTO data;
+    -- raise notice '%', data;
+    -- FOREACH tag SLICE 1 in ARRAY tags LOOP
+    --     INSERT INTO TAG(subject, name) VALUES(subject, tag) RETURNING id INTO t_id;
+    --     INSERT INTO TAG_EXCERCIESE(tag_id, excerciese_id) VALUES(t_id, ex_id);
+    -- END LOOP;
+
+    create table if not exists subject (
+    id serial,
+    name varchar(255) 
+);
+
+
+		// var subject string
+		// if len(request.URL.Query()["subject"]) < 1 {
+		// 	http.Error(writer, "Incorrect request", 403)
+		// 	return
+		// }
+
+		// subject = request.URL.Query()["subject"][0]
+
+
+
+
+        // type Error interface {
+// 	Value
+// }
+
+// type Data interface {
+// 	GetData()
+// }
+
+// type ScalarData struct {
+// 	data interface{}
+// 	err Error
+// }
+
+// func (scData *ScalarData) GetData() interface{} {
+// 	return scData.data
+// }
+
+// type Result interface {
+// 	Unwrap()
+// }
+
+// type RowsResult struct {
+// 	data []interface{}
+// 	err
+// }
+
+	// insert_excerciese       = "SELECT add_excerciese($1, $2, $3, $4, $5, $6)"
+
+	// get_excerciese = "SELECT * FROM EXCERCIESE ex WHERE id = $1"
+
+	// get_tags_for_excerciese = "SELECT tg.name FROM (SELECT * FROM tag_excerciese WHERE excerciese_id = $1) t join tag tg on (t.tag_id = tg.id)"
+	// get_by_subject = "select * from Excerciese ex WHERE subject = '%s' "
+
+	// get_by_subject_tag = "SELECT ex.* FROM (SELECT * FROM Excerciese WHERE subject='%s') ex join " +
+	// "((SELECT id as t_id FROM tag WHERE name='%s' AND subject='%s') t join tag_excerciese tg on (tg.tag_id = t.t_id)) tgt on tgt.excerciese_id = ex.id "
+
+	// get_tags = "SELECT name FROM TAG WHERE subject=$1"
+
+	// get_tags_by_subject = "SELECT name FROM tag WHERE subject = $1"

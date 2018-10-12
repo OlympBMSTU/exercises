@@ -10,32 +10,6 @@ import (
 	"github.com/lib/pq"
 )
 
-// type Error interface {
-// 	Value
-// }
-
-// type Data interface {
-// 	GetData()
-// }
-
-// type ScalarData struct {
-// 	data interface{}
-// 	err Error
-// }
-
-// func (scData *ScalarData) GetData() interface{} {
-// 	return scData.data
-// }
-
-// type Result interface {
-// 	Unwrap()
-// }
-
-// type RowsResult struct {
-// 	data []interface{}
-// 	err
-// }
-
 const (
 	UNIQUE_CONSTRAINT = "2305"
 	DEFAULT_LIMIT     = 20
@@ -44,7 +18,7 @@ const (
 
 // finally works
 func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) error {
-	_, err := pool.Exec(insert_excerciese,
+	_, err := pool.Exec(INSERT_EXCERCIESE,
 		excerciese.GetAuthorId(),
 		excerciese.GetRightAnswer(),
 		excerciese.GetLevel(),
@@ -59,47 +33,9 @@ func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) er
 	return nil
 }
 
-func scanExcerciese(rows *pgx.Rows) (*entities.ExcercieseEntity, error) {
-	var excerciese entities.ExcercieseEntity
-	err := rows.Scan(
-		&excerciese.Id,
-		&excerciese.AuthorId,
-		&excerciese.RightAnswer,
-		&excerciese.Level,
-		&excerciese.FileName,
-		&excerciese.Subject,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &excerciese, nil
-}
-
-func getTags(query string, pool *pgx.ConnPool, args ...interface{}) (*[]string, error) {
-	rows, err := pool.Query(query, args[0])
-	defer rows.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	var tags []string
-
-	for rows.Next() {
-		var tag string
-		err := rows.Scan(&tag)
-		if err != nil {
-			continue
-		}
-		tags = append(tags, tag)
-	}
-
-	return &tags, nil
-
-}
-
 func GetExcerciese(id uint, pool *pgx.ConnPool) (*views.ExcercieseView, error) {
 	var excerciese entities.ExcercieseEntity
-	row := pool.QueryRow(get_excerciese, id)
+	row := pool.QueryRow(GET_EXCERCIESE_BY_ID, id)
 
 	// excerciese, err := scanExcerciese(row)
 	err := row.Scan(
@@ -118,7 +54,7 @@ func GetExcerciese(id uint, pool *pgx.ConnPool) (*views.ExcercieseView, error) {
 		return nil, err
 	}
 
-	tags, err := getTags(get_tags_for_excerciese, pool, id)
+	tags, err := getTags(GET_TAGS_FOR_EXCERCIESE, pool, id)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +73,7 @@ func GetExcercieseList(tag string, subject string, level int,
 		args = append(args, subject, tag, subject)
 	} else {
 		args = append(args, subject)
-		query.WriteString(GET_BY_SUBJECT)
+		query.WriteString(GET_EXCERCIESES_BY_SUBJECT)
 	}
 
 	if level != -1 {
@@ -183,8 +119,4 @@ func GetExcercieseList(tag string, subject string, level int,
 		entities = append(entities, *excerciese)
 	}
 	return &entities, nil
-}
-
-func GetTgasBySubect(subject string, pool *pgx.ConnPool) (*[]string, error) {
-	return getTags(get_tags_by_subject, pool, subject)
 }

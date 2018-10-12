@@ -49,9 +49,6 @@ func InitRouter(pool *pgx.ConnPool) {
 	http.HandleFunc("/api/excercieses/list/", controllers.GetExcercieses(pool))
 	http.HandleFunc("/api/excercieses/subjects/", controllers.GetSubjects(pool))
 	http.HandleFunc("/api/excercieses/tags/", controllers.GetTags(pool))
-	// http.HandleFunc("/api/excercieses/subjects/")
-	// http.HandleFunc("/api/excercieses/") tag
-	// count
 }
 
 func main() {

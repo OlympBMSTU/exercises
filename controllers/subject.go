@@ -40,14 +40,6 @@ func GetTags(pool *pgx.ConnPool) http.HandlerFunc {
 			return
 		}
 
-		// var subject string
-		// if len(request.URL.Query()["subject"]) < 1 {
-		// 	http.Error(writer, "Incorrect request", 403)
-		// 	return
-		// }
-
-		// subject = request.URL.Query()["subject"][0]
-
 		subject := strings.TrimPrefix(request.URL.Path, "/api/excercieses/tags/")
 		// str = strings.TrimRight(str, "/tags")
 		fmt.Print(subject)
