@@ -10,6 +10,12 @@ class Generator
         @conn = conn = PG.connect(:dbname => 'excercieses')
 
     end
+
+    def generate_subjects() 
+        @subjects.each() do |subject|
+            @conn.exec("INSERT INTO subject(name) values('#{subject}')")
+        end
+    end
     
     def generate_tables() 
         rnd = Random.new()
@@ -48,4 +54,5 @@ class Generator
 end
 
 g = Generator.new()
+# g.generate_subjects()
 g.generate_tables()

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/OlympBMSTU/excericieses/entities"
@@ -58,9 +59,9 @@ func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) er
 	return nil
 }
 
-func scanExcerciese(row *pgx.Rows) (*entities.ExcercieseEntity, error) {
+func scanExcerciese(rows *pgx.Rows) (*entities.ExcercieseEntity, error) {
 	var excerciese entities.ExcercieseEntity
-	err := row.Scan(
+	err := rows.Scan(
 		&excerciese.Id,
 		&excerciese.AuthorId,
 		&excerciese.RightAnswer,
@@ -76,6 +77,7 @@ func scanExcerciese(row *pgx.Rows) (*entities.ExcercieseEntity, error) {
 
 func getTags(query string, pool *pgx.ConnPool, args ...interface{}) (*[]string, error) {
 	rows, err := pool.Query(query, args[0])
+	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +101,7 @@ func GetExcerciese(id uint, pool *pgx.ConnPool) (*views.ExcercieseView, error) {
 	var excerciese entities.ExcercieseEntity
 	row := pool.QueryRow(get_excerciese, id)
 
+	// excerciese, err := scanExcerciese(row)
 	err := row.Scan(
 		&excerciese.Id,
 		&excerciese.AuthorId,
@@ -107,6 +110,9 @@ func GetExcerciese(id uint, pool *pgx.ConnPool) (*views.ExcercieseView, error) {
 		&excerciese.FileName,
 		&excerciese.Subject,
 	)
+
+	// todo parse error to my errors
+	// or map error
 
 	if err != nil {
 		return nil, err
@@ -123,23 +129,24 @@ func GetExcerciese(id uint, pool *pgx.ConnPool) (*views.ExcercieseView, error) {
 
 func GetExcercieseList(tag string, subject string, level int,
 	limit int, offset int, order_level bool, poll *pgx.ConnPool) (*[]entities.ExcercieseEntity, error) {
-	query := ""
+	var query bytes.Buffer
+
 	var args []interface{}
-	idx_args := 4
 	if tag != "" {
-		query = GET_EXCERCIESE_BY_SUBJECT_AND_TAG //fmt.Sprintf(//get_by_subject_tag, subject, tag, subject)
+		query.WriteString(GET_EXCERCIESE_BY_SUBJECT_AND_TAG)
 		args = append(args, subject, tag, subject)
 	} else {
-		query = fmt.Sprintf(get_by_subject, subject)
+		args = append(args, subject)
+		query.WriteString(GET_BY_SUBJECT)
 	}
 
 	if level != -1 {
-		query += fmt.Sprintf("AND ex.level = $%d ", idx_args)
-		idx_args += 1
+		args = append(args, level)
+		query.WriteString(fmt.Sprintf("AND ex.level = $%d ", len(args)))
 	} else {
-		query += "ORDER BY ex.level "
+		query.WriteString("ORDER BY ex.level ")
 		if order_level {
-			query += "DESC "
+			query.WriteString("DESC ")
 		}
 	}
 
@@ -147,24 +154,27 @@ func GetExcercieseList(tag string, subject string, level int,
 		limit = DEFAULT_LIMIT
 	}
 
-	query += fmt.Sprintf("LIMIT $%d ", idx_args) //limit)
-	idx_args += 1
+	args = append(args, limit)
+	query.WriteString(fmt.Sprintf("LIMIT $%d ", len(args)))
 
 	if offset == -1 {
 		offset = DEFAULT_OFFSET
 	}
 
-	query += fmt.Sprintf("OFFSET $%d ", idx_args) //offset)
-	fmt.Println(query)
+	args = append(args, offset)
+	query.WriteString(fmt.Sprintf("OFFSET $%d ", len(args)))
+	fmt.Println(query.String())
 
-	rows, err := poll.Query(query, args)
+	rows, err := poll.Query(query.String(), args...)
 
+	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
 
 	var entities []entities.ExcercieseEntity
 	for rows.Next() {
+		// row := (*pgx.Row)(rows)
 		excerciese, err := scanExcerciese(rows)
 		// wtf
 		if err != nil {
@@ -176,25 +186,5 @@ func GetExcercieseList(tag string, subject string, level int,
 }
 
 func GetTgasBySubect(subject string, pool *pgx.ConnPool) (*[]string, error) {
-	// rows, err := pool.Query(get_tags_by_subject, subject)
-
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	tags, err := getTags(get_tags_by_subject, pool, subject)
-
-	return tags, err
-
+	return getTags(get_tags_by_subject, pool, subject)
 }
-
-// var rows pgx.Rows
-// var err error
-// if tag == "" {
-// 	rows, err := poll.Query(query, subject)
-// } else {
-// 	rows, err := poll.Query(query, subject, tag, subject)
-// }
-// // fmt.Println(query)
-
-// rows, err := poll.Query(query, subject, tag, subject)

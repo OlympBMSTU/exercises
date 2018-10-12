@@ -3,6 +3,11 @@
 -- tag index - name, subject name
 -- 
 
+create table if not exists subject (
+    id serial,
+    name varchar(255) 
+);
+
 create table if not exists excerciese (
     id serial, 
     author_id integer,
@@ -28,19 +33,29 @@ create table if not exists tag_excerciese(
 
 
 -- index lower name
-create table if not exists subjects(
+create table if not exists subject(
     id serial,
     name varchar(255) UNIQUE
-)
+);
 
+
+-- lower
 -- todo ON CONFLCIT делать и проверка на id tag 
 CREATE OR REPLACE FUNCTION add_excerciese(auth_id integer, r_answer varchar(255), lev integer, f_name varchar(255), subj varchar(255), tags varchar(255)[])
 RETURNS integer AS $$
 DECLARE ex_id integer;
 DECLARE t_id INTEGER;
 DECLARE tag text;
+DECLARE subj_id INTEGER;
+DECLARE tag_ex_id INTEGER;
 DECLARE data text;
 BEGIN
+    -- check that this subject exists
+    SELECT id FROM SUBJECT WHERE lower(name)=lower(subj) INTO subj_id;
+    IF subj_id IS NULL THEN
+        RETURN -1;
+    END IF;
+
     INSERT INTO EXCERCIESE(author_id, file_name, right_answer, level, subject) VALUES(auth_id, f_name, r_answer, lev, subj) RETURNING id INTO ex_id;
     FOR i IN 1..array_length(tags, 1) LOOP
         SELECT id from tag where subject = subj and name = tags[i] into t_id;
