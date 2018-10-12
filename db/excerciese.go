@@ -27,9 +27,16 @@ func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) er
 		pq.Array(excerciese.GetTags()),
 	)
 
+	// parseError(err)
+
 	if err != nil {
 		return err
 	}
+
+	// if res == -1 {
+	// 	return nil, NO_SUBJECT_ERROR
+	// }
+
 	return nil
 }
 
@@ -65,6 +72,7 @@ func GetExcerciese(id uint, pool *pgx.ConnPool) (*views.ExcercieseView, error) {
 
 func GetExcercieseList(tag string, subject string, level int,
 	limit int, offset int, order_level bool, poll *pgx.ConnPool) (*[]entities.ExcercieseEntity, error) {
+
 	var query bytes.Buffer
 
 	var args []interface{}

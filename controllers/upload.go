@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/OlympBMSTU/excericieses/auth"
 	"github.com/OlympBMSTU/excericieses/db"
 	"github.com/OlympBMSTU/excericieses/fstorage"
 	"github.com/OlympBMSTU/excericieses/views"
@@ -28,11 +29,13 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 			return
 		}
 
+		cookies := request.Cookie()
+
 		// also here we got author id
-		// if !AuthUser(cookie) {
-		// 	http.Error(writer, "Please authorize", 403)
-		// 	return
-		// }
+		if !auth.AuthUser(cookie) {
+			http.Error(writer, "Please authorize", 403)
+			return
+		}
 
 		body, err := ioutil.ReadAll(request.Body)
 		defer request.Body.Close()

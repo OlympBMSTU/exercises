@@ -1,5 +1,6 @@
 package db
 
+// value, string for http
 const (
 	NO_ERROR         = 0
 	PARSE_ERROR      = 1
@@ -9,3 +10,11 @@ const (
 	CONSTRAINT_ERROR = 5
 	NO_SUBJECT_ERROR = 6
 )
+
+// type DbError {
+
+// }wd
+
+func parseError(err error) {
+
+}

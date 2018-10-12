@@ -9,3 +9,5 @@
     return result
 5) Routing needs refactor!!!
 6) Also mapping db errors, fstorage errors, auth errors, json errors to http errors
+7) Config file todo:: detect which os, or env variable and get config file from 
+    env, or argv
