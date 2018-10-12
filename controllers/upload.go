@@ -29,10 +29,16 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 			return
 		}
 
-		cookies := request.Cookie()
+		cookie, err := request.Cookie("bmstuOlympAuth")
+		// unauth
+		if err != nil {
+			return
+		}
 
+		id, auth := auth.AuthUser(cookie.Value)
+		fmt.Println(id)
 		// also here we got author id
-		if !auth.AuthUser(cookie) {
+		if !auth {
 			http.Error(writer, "Please authorize", 403)
 			return
 		}
