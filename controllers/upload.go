@@ -32,14 +32,14 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 		cookie, err := request.Cookie("bmstuOlympAuth")
 		// unauth
 		if err != nil {
+			http.Error(writer, "Unauthorized", 403)
 			return
 		}
 
-		id, auth := auth.AuthUser(cookie.Value)
-		fmt.Println(id)
 		// also here we got author id
+		user_id, auth := auth.AuthUser(cookie.Value)
 		if !auth {
-			http.Error(writer, "Please authorize", 403)
+			http.Error(writer, "Unauthorized", 403)
 			return
 		}
 
@@ -60,6 +60,7 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 		}
 
 		excercieseEntity := excerciese.ToEntity()
+		excercieseEntity.SetAuthor(user_id)
 
 		file, err := base64.StdEncoding.DecodeString(excerciese.FileBase64)
 		if err != nil {
@@ -70,18 +71,25 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 		// represent name in file storage
 		newName := fstorage.ComputeName(excerciese.FileName)
 
-		err = fstorage.WriteFile(file, newName, ".pdf")
 		excercieseEntity.SetFileName(newName)
-
-		/////// ----- //////
 		excercieseEntity.SetAuthor(0)
-
-		db.SaveExcerciese(excercieseEntity, pool)
-
+		err = db.SaveExcerciese(excercieseEntity, pool)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
+
+		err = fstorage.WriteFile(file, newName, ".pdf")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		// ex_id := 0
+		// err = sender.SendAnswer(ex_id, excerciese.Answer)
+		// if err != nil {
+		// clear created data and return error
+		// }
 
 		if err != nil {
 			http.Error(writer, "Error save file", 500)
@@ -153,7 +161,6 @@ func GetExcercieses(pool *pgx.ConnPool) http.HandlerFunc {
 				if err != nil {
 					http.Error(writer, "INCORRECT PATH", 404)
 				}
-
 			}
 		}
 

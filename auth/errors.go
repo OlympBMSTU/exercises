@@ -1,6 +1,7 @@
 package auth
 
 const (
-	ERROR_PARSE_JWT = 0
-	NO_AUTHROIZED   = 1
+	NO_ERROR        = 0
+	ERROR_PARSE_JWT = 1
+	NO_AUTHROIZED   = 2
 )

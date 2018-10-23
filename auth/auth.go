@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"strings"
+	"time"
 )
 
 type JWTHeader struct {
@@ -63,5 +64,11 @@ func AuthUser(jwt string) (uint, bool) {
 		return 0, false
 	}
 
-	return jwt_payload.Id, false
+	v := time.Now().Nanosecond()
+
+	// maybe wrong
+	if jwt_payload.Exp < uint(v) {
+		return 0, false
+	}
+	return jwt_payload.Id, true
 }
