@@ -40,5 +40,6 @@ func getTags(query string, pool *pgx.ConnPool, args ...interface{}) (*[]string, 
 	}
 
 	return &tags, nil
-
 }
+
+// func scanExcerciese
