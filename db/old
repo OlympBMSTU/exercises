@@ -1,0 +1,51 @@
+// returns id
+// finally works
+// func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) error {
+// 	// var result DbResult
+// 	row := pool.QueryRow(INSERT_EXCERCIESE,
+// 		excerciese.GetAuthorId(),
+// 		excerciese.GetRightAnswer(),
+// 		excerciese.GetLevel(),
+// 		excerciese.GetFileName(),
+// 		excerciese.GetSubject(),
+// 		pq.Array(excerciese.GetTags()),
+// 	)
+
+// 	var returnCode int
+// 	err := row.Scan(&returnCode)
+
+// 	// if res == -1 {
+// 	// 	return DbResult{
+// 	// 		nil,
+// 	// 		DbError{NO_SUBJECT_ERROR},
+// 	// 	}
+// 	// }
+
+// 	result := parseError(err)
+// 	if result.IsError() {
+// 		return result
+// 	}
+// 	result.code = CREATED
+// 	return result
+// 	// if err != nil {
+// 	// 	return DbResult{
+// 	// 		nil,
+// 	// 		parseError(err),
+// 	// 	}
+// 	// }
+
+// 	// parseError(err)
+
+// 	if err != nil || returnCode == -1 {
+// 		return err
+// 	}
+
+// 	// if res == -1 {
+// 	// 	return nil, NO_SUBJECT_ERROR
+// 	// }
+// 	// return DbResult{
+// 	// 	nil,
+// 	// 	DbError{NO_ERROR},
+// 	// }
+// 	return nil
+// }

@@ -17,41 +17,7 @@ const (
 )
 
 // finally works
-// func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) DbResult {
-// 	// var result DbResult
-// 	_, err := pool.Exec(INSERT_EXCERCIESE,
-// 		excerciese.GetAuthorId(),
-// 		excerciese.GetRightAnswer(),
-// 		excerciese.GetLevel(),
-// 		excerciese.GetFileName(),
-// 		excerciese.GetSubject(),
-// 		pq.Array(excerciese.GetTags()),
-// 	)
-
-// 	if res == -1 {
-// 		return DbResult{
-// 			nil,
-// 			DbError{NO_SUBJECT_ERROR},
-// 		}
-// 	}
-
-// 	if err != nil {
-// 		return DbResult{
-// 			nil,
-// 			parseError(err),
-// 		}
-// 	}
-
-// 	return DbResult{
-// 		nil,
-// 		DbError{NO_ERROR},
-// 	}
-// }
-
-// returns id
-// finally works
-func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) error {
-	// var result DbResult
+func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) DbResult {
 	row := pool.QueryRow(INSERT_EXCERCIESE,
 		excerciese.GetAuthorId(),
 		excerciese.GetRightAnswer(),
@@ -64,37 +30,32 @@ func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) er
 	var returnCode int
 	err := row.Scan(&returnCode)
 
-	// if res == -1 {
-	// 	return DbResult{
-	// 		nil,
-	// 		DbError{NO_SUBJECT_ERROR},
-	// 	}
-	// }
-
-	// if err != nil {
-	// 	return DbResult{
-	// 		nil,
-	// 		parseError(err),
-	// 	}
-	// }
-
-	// parseError(err)
-
-	if err != nil || returnCode == -1 {
-		return err
+	status := parseError(err)
+	if status.IsError() {
+		return DbResult{
+			DbData{nil},
+			status,
+		}
 	}
 
-	// if res == -1 {
-	// 	return nil, NO_SUBJECT_ERROR
-	// }
-	// return DbResult{
-	// 	nil,
-	// 	DbError{NO_ERROR},
-	// }
-	return nil
+	if returnCode == -1 {
+		return DbResult{
+			DbData{nil},
+			DbStatus{
+				NO_SUBJECT_ERROR,
+				"There is no subject in db",
+			},
+		}
+	}
+
+	status.code = CREATED
+	return DbResult{
+		DbData{nil},
+		status,
+	}
 }
 
-func GetExcerciese(id uint, pool *pgx.ConnPool) (*views.ExcercieseView, error) {
+func GetExcerciese(id uint, pool *pgx.ConnPool) DbResult { //(*views.ExcercieseView, error) {
 	var excerciese entities.ExcercieseEntity
 	row := pool.QueryRow(GET_EXCERCIESE_BY_ID, id)
 	// excerciese, err := scanExcerciese(row)
@@ -107,30 +68,28 @@ func GetExcerciese(id uint, pool *pgx.ConnPool) (*views.ExcercieseView, error) {
 		&excerciese.Subject,
 	)
 
-	parseError(err)
-	// type fundamential - No data
-	// type PGError - DB_ERROR
-
-	// todo parse error to my errors
-	// or map error
-	// if err != nil {
-	// 	return nil, DbResult{
-	// 		nil,
-	// 		parseError(err),
-	// 	}
-	// }
-
-	if err != nil {
-		return nil, err
+	status := parseError(err)
+	if status.IsError() {
+		return DbResult{
+			DbData{nil},
+			status,
+		}
 	}
 
 	tags, err := getTags(GET_TAGS_FOR_EXCERCIESE, pool, id)
-	if err != nil {
-		return nil, err
+	status = parseError(err)
+	if status.IsError() {
+		return DbResult{
+			DbData{nil},
+			status,
+		}
 	}
 
-	view := views.ExcercieseViewFrom(excerciese, *tags)
-	return &view, nil
+	data := CreateDbData(views.ExcercieseViewFrom(excerciese, *tags))
+	return DbResult{
+		data,
+		status,
+	}
 }
 
 func GetExcercieseList(tag string, subject string, level int,

@@ -48,7 +48,7 @@ func (cfg *Config) GetPassword() string {
 // check
 
 func Init() (*Config, error) {
-	iniPath := "/home/mavr/conf" //"/etc/serv"
+	iniPath := "/etc/serv"
 
 	file, err := os.Open(iniPath)
 

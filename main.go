@@ -18,7 +18,7 @@ type ExcercieseUpload struct {
 
 func Init() (*pgx.ConnPool, error) {
 	conf, err := config.GetConfigInstance()
-	fmt.Println(conf.GetFileStorageName())
+	// fmt.Println(conf.GetFileStorageName())
 	if err != nil {
 		fmt.Println("Error in config file")
 		return nil, err
@@ -40,7 +40,6 @@ func Init() (*pgx.ConnPool, error) {
 		return nil, err
 	}
 	return pool, nil
-
 }
 
 func InitRouter(pool *pgx.ConnPool) {
