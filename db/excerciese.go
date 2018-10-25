@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/OlympBMSTU/excericieses/db/result"
 	"github.com/OlympBMSTU/excericieses/entities"
-	"github.com/OlympBMSTU/excericieses/views"
+	"github.com/OlympBMSTU/excericieses/views" // "github.com/OlympBMSTU/excericieses/db/result"
 	"github.com/jackc/pgx"
 	"github.com/lib/pq"
 )
@@ -15,7 +16,7 @@ const (
 	DEFAULT_OFFSET = 0
 )
 
-func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) DbResult {
+func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) result.DbResult {
 	row := pool.QueryRow(INSERT_EXCERCIESE,
 		excerciese.GetAuthorId(),
 		excerciese.GetRightAnswer(),
@@ -29,48 +30,49 @@ func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) Db
 	err := row.Scan(&returnCode)
 
 	if err != nil {
-		return errorResult(err)
+		return result.ErrorResult(err)
 	}
 
 	if returnCode == -1 {
-		return errorResult(NO_SUBJECT_ERROR, "There is no subject in db")
+		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
 	}
 
-	return okResult(nil, CREATED)
+	return result.OkResult(nil, result.CREATED)
 }
 
-func GetExcerciese(id uint, pool *pgx.ConnPool) DbResult {
+func GetExcerciese(id uint, pool *pgx.ConnPool) result.DbResult {
 	rows, err := pool.Query(GET_EXCERCIESE_BY_ID, id)
 	defer rows.Close()
 
 	if err != nil {
-		return errorResult(err)
+		return result.ErrorResult(err)
 	}
 
-	// todo scan ex returns also dbres
 	var excerciese *entities.ExcercieseEntity
 	for rows.Next() {
 		excerciese, err = scanExcerciese(rows)
 	}
 
 	if err != nil {
-		return errorResult(err)
+		return result.ErrorResult(err)
 	}
 
 	if excerciese == nil {
-		return errorResult(EMPTY_RESULT, "")
+		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
 
 	tags, err := getTags(GET_TAGS_FOR_EXCERCIESE, pool, id)
+
+	// can tags be empyt ?
 	if err != nil {
-		return errorResult(err)
+		return result.ErrorResult(err)
 	}
 
-	return okResult(views.ExcercieseViewFrom(*excerciese, *tags))
+	return result.OkResult(views.ExcercieseViewFrom(*excerciese, *tags))
 }
 
 func GetExcercieseList(tag string, subject string, level int,
-	limit int, offset int, order_level bool, poll *pgx.ConnPool) DbResult {
+	limit int, offset int, order_level bool, poll *pgx.ConnPool) result.DbResult {
 
 	var query bytes.Buffer
 
@@ -111,45 +113,24 @@ func GetExcercieseList(tag string, subject string, level int,
 	defer rows.Close()
 
 	if err != nil {
-		return errorResult(err)
+		return result.ErrorResult(err)
 	}
 
+	// need to send tags with excercieses,
+	// or front will do request for this
 	var entities []entities.ExcercieseEntity
 	for rows.Next() {
 		excerciese, err := scanExcerciese(rows)
 
 		if err != nil {
-			return errorResult(err)
+			return result.ErrorResult(err)
 		}
 		entities = append(entities, *excerciese)
 	}
 
-	return okResult(entities)
+	if len(entities) == 0 {
+		return result.ErrorResult(result.EMPTY_RESULT, "")
+	}
+
+	return result.OkResult(entities)
 }
-
-// status := parseError(err)
-// if status.IsError() {
-// 	return DbResult{
-// 		DbData{nil},
-// 		status,
-// 	}
-// }
-
-// status = parseError(err)
-// if status.IsError() {
-// 	return DbResult{
-// 		DbData{nil},
-// 		status,
-// 	}
-// }
-
-// return DbResult{
-// 	DbData{entities},
-// 	status,
-// }
-// data := CreateDbData(views.ExcercieseViewFrom(*excerciese, *tags))
-
-// return DbResult{
-// 	DbData{nil},
-// 	DbStatus{EMPTY_RESULT, ""},
-// }

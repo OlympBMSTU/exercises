@@ -1,23 +1,19 @@
 package db
 
-import "github.com/jackc/pgx"
+import (
+	"github.com/OlympBMSTU/excericieses/db/result"
+	"github.com/jackc/pgx"
+)
 
-func AddSubject(subject string, pool *pgx.ConnPool) DbResult {
+func AddSubject(subject string, pool *pgx.ConnPool) result.DbResult {
 	_, err := pool.Exec(ADD_SUBJECT, subject)
-	return DbResult{
-		DbData{nil},
-		parseError(err),
-	}
+	return result.CreateResult(nil, err)
 }
 
-func GetSubjects(pool *pgx.ConnPool) DbResult {
+func GetSubjects(pool *pgx.ConnPool) result.DbResult {
 	rows, err := pool.Query(GET_SUBJECTS)
-	status := parseError(err)
-	if status.IsError() {
-		return DbResult{
-			DbData{nil},
-			status,
-		}
+	if err != nil {
+		return result.ErrorResult(err)
 	}
 
 	var subjects []string
@@ -32,24 +28,26 @@ func GetSubjects(pool *pgx.ConnPool) DbResult {
 		subjects = append(subjects, subject)
 	}
 
-	status = parseError(err)
-	if status.IsError() {
-		return DbResult{
-			DbData{nil},
-			status,
-		}
+	if err != nil {
+		return result.ErrorResult(err)
 	}
 
-	return DbResult{
-		DbData{subjects},
-		status,
+	if len(subjects) == 0 {
+		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
+
+	return result.OkResult(subjects)
 }
 
-func GetTgasBySubect(subject string, pool *pgx.ConnPool) DbResult {
+func GetTgasBySubect(subject string, pool *pgx.ConnPool) result.DbResult {
 	data, err := getTags(GET_TAGS_BY_SUBJECT, pool, subject)
-	return DbResult{
-		DbData{data},
-		parseError(err),
+	if err != nil {
+		return result.ErrorResult(err)
 	}
+
+	if len(*data) == 0 {
+		return result.ErrorResult(result.EMPTY_RESULT, "")
+	}
+
+	return result.OkResult(data)
 }

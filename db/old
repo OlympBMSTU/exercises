@@ -188,3 +188,74 @@
 // 		data = nil
 // 	}
 // }
+
+
+
+// status := parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
+// 	}
+// }
+
+// status = parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
+// 	}
+// }
+
+// return DbResult{
+// 	DbData{entities},
+// 	status,
+// }
+// data := CreateDbData(views.ExcercieseViewFrom(*excerciese, *tags))
+
+// return DbResult{
+// 	DbData{nil},
+// 	DbStatus{EMPTY_RESULT, ""},
+// }
+
+
+
+// return DbResult{
+// 	DbData{subjects},
+// 	status,
+// }
+
+// status = parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
+// 	}
+// }
+
+// status := parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
+// 	}
+// }
+
+
+// 1-2 ok
+// 3,5 is one error
+// 6 ?
+// 7 pg error UNIQUE_CONSTRAINT
+// 8 custom my error
+// value, string for http
+
+// todo create result which gets data, err if err return err res err else
+// return DbResult{
+// 	DbData{data},
+// 	parseError(err),
+// }
+
+// return DbResult{
+// 	DbData{nil},
+// 	parseError(err),
+// }

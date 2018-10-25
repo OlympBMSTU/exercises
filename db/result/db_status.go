@@ -1,15 +1,9 @@
-package db
+package result
 
 import (
 	"github.com/jackc/pgx"
 )
 
-// 1-2 ok
-// 3,5 is one error
-// 6 ?
-// 7 pg error UNIQUE_CONSTRAINT
-// 8 custom my error
-// value, string for http
 const (
 	NO_ERROR         = 0 // Ok
 	CREATED          = 1 // Ok
@@ -23,64 +17,6 @@ const (
 
 const PG_UNIQUE_CONSTRAINT_CODE = "23505"
 const FUNDAMENTAL_QUERY_EMPTY_ERROR = "no rows in result set"
-
-func okResult(data interface{}, params ...interface{}) DbResult { //data interface{}, code int) DbResult {
-	if len(params) == 0 {
-		return DbResult{
-			DbData{data},
-			DbStatus{NO_ERROR, ""},
-		}
-	} else {
-		return DbResult{
-			DbData{data},
-			DbStatus{params[0].(int), ""},
-		}
-	}
-}
-
-func errorResult(params ...interface{}) DbResult {
-	if len(params) == 1 {
-		return DbResult{
-			DbData{nil},
-			parseError(params[0].(error)),
-		}
-	} else {
-		return DbResult{
-			DbData{nil},
-			DbStatus{
-				params[0].(int),
-				params[1].(string),
-			},
-		}
-	}
-}
-
-type DbData struct {
-	data interface{}
-}
-
-func CreateDbData(data interface{}) DbData {
-	return DbData{
-		data,
-	}
-}
-
-func (dat *DbData) GetData() interface{} {
-	return dat.data
-}
-
-type DbResult struct {
-	data DbData
-	err  DbStatus
-}
-
-func (res *DbResult) SetResult(data DbData) {
-	res.data = data
-}
-
-func (res *DbResult) SetError(err DbStatus) {
-	res.err = err
-}
 
 type DbStatus struct {
 	code  int
