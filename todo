@@ -1,6 +1,6 @@
-1) Rows scan as row -> one fucntion for scan excerciese
-2) Maybe scan simple data as one function, simply send query
-3) Return not (data error), but return result {Error, Data}
+1) Rows scan as row -> one fucntion for scan excerciese +
+2) Maybe scan simple data as one function, simply send query ?
+3) Return not (data error), but return result {Error, Data} +-
     where Error - interface for (Ok, Constraint, NotFound, DbError)
     Data - innterface for result
 4) Also need refactor fstorage: 

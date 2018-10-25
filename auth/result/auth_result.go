@@ -1,30 +1,11 @@
-package auth
-
-const (
-	NO_ERROR        = 0
-	ERROR_PARSE_JWT = 1
-	NO_AUTHROIZED   = 2
-)
+package result
 
 type AuthResult struct {
 	data   AuthData
 	status AuthStatus
 }
 
-type AuthData struct {
-	data interface{}
-}
-
-type AuthStatus struct {
-	code  int
-	descr string
-}
-
-func parseError(err error) AuthStatus {
-	return AuthStatus{}
-}
-
-func errroResult(params ...interface{}) AuthResult {
+func ErrroResult(params ...interface{}) AuthResult {
 	if len(params) == 1 {
 		return AuthResult{
 			AuthData{nil},
@@ -41,7 +22,7 @@ func errroResult(params ...interface{}) AuthResult {
 	}
 }
 
-func okResult(id uint) AuthResult {
+func OkResult(id uint) AuthResult {
 	return AuthResult{
 		AuthData{id},
 		AuthStatus{NO_ERROR, ""},

@@ -1,4 +1,4 @@
-package fstorage
+package result
 
 const (
 	NO_ERROR          = 0
@@ -7,12 +7,7 @@ const (
 	ERROR_WRITE_FILE  = 3
 )
 
-type FStorageError struct {
+type FSStatus struct {
 	code  int
 	descr string
-}
-
-type FStagereRes struct {
-	err  FStorageError
-	data interface{}
 }

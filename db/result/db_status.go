@@ -58,7 +58,7 @@ func parseError(err error) DbStatus {
 		// other errors, also fundamental from pkg/errors
 		default:
 			// its fucking crutch, but pgx returns fundamental error
-			// which is private when row.Scan fails
+			// which is prizvate when row.Scan fails
 			// fundamental - is a private package type of package pkg/error
 			// also fundamental returns, when there is not enough sended
 			// parameters to query
