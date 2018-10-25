@@ -10,6 +10,6 @@ func CreateDbData(data interface{}) DbData {
 	}
 }
 
-func (dat *DbData) GetData() interface{} {
+func (dat DbData) GetData() interface{} {
 	return dat.data
 }

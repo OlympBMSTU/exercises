@@ -15,6 +15,6 @@ func OkResult(data interface{}) FSResult {
 func ErrorResult(err error) FSResult {
 	return FSResult{
 		FSData{nil},
-		FSStatus{NO_ERROR, ""},
+		FSStatus{ERROR_CREATE_FILE, ""},
 	}
 }

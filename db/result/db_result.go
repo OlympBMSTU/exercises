@@ -19,15 +19,26 @@ func OkResult(data interface{}, params ...interface{}) DbResult {
 	}
 }
 
-func CreateResult(data interface{}, err error) DbResult {
+func CreateResult(data interface{}, err error, params ...interface{}) DbResult {
 	if err != nil {
 		return ErrorResult(err)
+	}
+	if len(params) == 1 {
+		return OkResult(data, params[0])
 	}
 	return OkResult(data)
 }
 
-func (res *DbResult) IsError() bool {
+func (res DbResult) GetData() interface{} {
+	return res.data.GetData()
+}
+
+func (res DbResult) IsError() bool {
 	return res.status.IsError()
+}
+
+func (res DbResult) GetStatusCode() int {
+	return res.status.code
 }
 
 func ErrorResult(params ...interface{}) DbResult {
@@ -47,10 +58,10 @@ func ErrorResult(params ...interface{}) DbResult {
 	}
 }
 
-func (res *DbResult) SetResult(data DbData) {
+func (res DbResult) SetResult(data DbData) {
 	res.data = data
 }
 
-func (res *DbResult) SetError(status DbStatus) {
+func (res DbResult) SetError(status DbStatus) {
 	res.status = status
 }

@@ -7,7 +7,7 @@ import (
 
 func AddSubject(subject string, pool *pgx.ConnPool) result.DbResult {
 	_, err := pool.Exec(ADD_SUBJECT, subject)
-	return result.CreateResult(nil, err)
+	return result.CreateResult(nil, err, result.CREATED)
 }
 
 func GetSubjects(pool *pgx.ConnPool) result.DbResult {

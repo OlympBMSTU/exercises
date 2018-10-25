@@ -1,5 +1,8 @@
 package entities
 
+// todo is active хранить инфу о о битом задании
+// написать Диме Кузнецову на какую почту что слать
+// слать заголовок задание и данные
 type ExcercieseEntity struct {
 	Id          uint
 	AuthorId    uint

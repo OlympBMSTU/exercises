@@ -1,7 +1,7 @@
 package db
 
 const (
-	ADD_SUBJECT  = "INTSERT INTO SUBJECT(name) VALUES($1)"
+	ADD_SUBJECT  = "INSERT INTO SUBJECT(name) VALUES($1)"
 	GET_SUBJECTS = "SELECT name FROM SUBJECT"
 
 	GET_EXCERCIESES_BY_SUBJECT = "select * from Excerciese ex WHERE subject = $1 "

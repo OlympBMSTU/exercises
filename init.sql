@@ -10,7 +10,8 @@ create table if not exists excerciese (
     right_answer varchar(255),
     level integer,
     file_name varchar(255),
-    subject varchar(255)
+    subject varchar(255),
+    is_wrong boolean default false
 );
 
 create table if not exists tag (

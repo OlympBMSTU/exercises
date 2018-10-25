@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/OlympBMSTU/excericieses/config"
-	"github.com/OlympBMSTU/excericieses/db"
-	"github.com/OlympBMSTU/excericieses/entities"
+	"github.com/OlympBMSTU/excericieses/controllers"
 	"github.com/jackc/pgx"
 )
 
@@ -42,13 +42,13 @@ func Init() (*pgx.ConnPool, error) {
 	return pool, nil
 }
 
-// func InitRouter(pool *pgx.ConnPool) {
-// 	http.HandleFunc("/api/excercieses/upload_excerciese", controllers.UploadExcercieseHandler(pool))
-// 	http.HandleFunc("/api/excercieses/get/", controllers.GetExcerciese(pool))
-// 	http.HandleFunc("/api/excercieses/list/", controllers.GetExcercieses(pool))
-// 	http.HandleFunc("/api/excercieses/subjects/", controllers.GetSubjects(pool))
-// 	http.HandleFunc("/api/excercieses/tags/", controllers.GetTags(pool))
-// }
+func InitRouter(pool *pgx.ConnPool) {
+	// http.HandleFunc("/api/excercieses/upload_excerciese", controllers.UploadExcercieseHandler(pool))
+	// http.HandleFunc("/api/excercieses/get/", controllers.GetExcerciese(pool))
+	// http.HandleFunc("/api/excercieses/list/", controllers.GetExcercieses(pool))
+	http.HandleFunc("/api/excercieses/subjects/", controllers.GetSubjects(pool))
+	// http.HandleFunc("/api/excercieses/tags/", controllers.GetTags(pool))
+}
 
 func main() {
 	pool, err := Init()
@@ -57,7 +57,7 @@ func main() {
 		panic("Error start server")
 	}
 
-	// InitRouter(pool)
+	InitRouter(pool)
 
 	// type ExcercieseEntity struct {
 	// 	Id          uint
@@ -71,23 +71,23 @@ func main() {
 
 	// dt := [1,2]
 
-	ex := entities.ExcercieseEntity{
-		0,
-		1,
-		"sdfd",
-		"dsf",
-		[]string{"array", "data"},
-		3,
-		"mathematic",
-	}
+	// ex := entities.ExcercieseEntity{
+	// 	0,
+	// 	1,
+	// 	"sdfd",
+	// 	"dsf",
+	// 	[]string{"array", "data"},
+	// 	3,
+	// 	"mathematic",
+	// }
 
-	res := db.SaveExcerciese(ex, pool)
+	// res := db.SaveExcerciese(ex, pool)
 
 	// res := db.GetExcerciese(1, pool)
 
-	fmt.Print(res)
+	// fmt.Print(res)
 
-	// http.ListenAndServe("localhost:5469", nil)
+	http.ListenAndServe("localhost:5469", nil)
 }
 
 // tests

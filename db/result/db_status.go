@@ -30,11 +30,11 @@ func DefaultStatus() DbStatus {
 	}
 }
 
-func (status *DbStatus) SetCode(code int) {
+func (status DbStatus) SetCode(code int) {
 	status.code = code
 }
 
-func (status *DbStatus) IsError() bool {
+func (status DbStatus) IsError() bool {
 	return !(status.code == NO_ERROR || status.code == CREATED)
 }
 
