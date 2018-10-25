@@ -11,3 +11,15 @@ type FSStatus struct {
 	code  int
 	descr string
 }
+
+func (status FSStatus) IsError() bool {
+	return !(status.code == NO_ERROR)
+}
+
+func (status FSStatus) GetCode() int {
+	return status.code
+}
+
+func (status FSStatus) GetDescription() string {
+	return status.descr
+}

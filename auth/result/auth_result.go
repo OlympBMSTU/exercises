@@ -5,6 +5,10 @@ type AuthResult struct {
 	status AuthStatus
 }
 
+func (res AuthResult) GetData() interface{} {
+	return res.data.GetData()
+}
+
 func ErrroResult(params ...interface{}) AuthResult {
 	if len(params) == 1 {
 		return AuthResult{

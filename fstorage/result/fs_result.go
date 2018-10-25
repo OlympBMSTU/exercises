@@ -5,6 +5,14 @@ type FSResult struct {
 	status FSStatus
 }
 
+func (res FSResult) GetData() interface{} {
+	return res.data.GetData()
+}
+
+func (res FSResult) IsError() bool {
+	return res.status.IsError()
+}
+
 func OkResult(data interface{}) FSResult {
 	return FSResult{
 		FSData{data},
