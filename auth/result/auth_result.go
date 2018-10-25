@@ -9,6 +9,14 @@ func (res AuthResult) GetData() interface{} {
 	return res.data.GetData()
 }
 
+func (res AuthResult) IsError() bool {
+	return res.status.IsError()
+}
+
+func (res AuthResult) GetStatus() AuthStatus {
+	return res.status
+}
+
 func ErrroResult(params ...interface{}) AuthResult {
 	if len(params) == 1 {
 		return AuthResult{

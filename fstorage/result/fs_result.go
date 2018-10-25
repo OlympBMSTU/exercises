@@ -9,6 +9,10 @@ func (res FSResult) GetData() interface{} {
 	return res.data.GetData()
 }
 
+func (res FSResult) GetStatus() FSStatus {
+	return res.status
+}
+
 func (res FSResult) IsError() bool {
 	return res.status.IsError()
 }

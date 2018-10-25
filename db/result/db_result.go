@@ -1,8 +1,34 @@
 package result
 
+import "github.com/OlympBMSTU/excericieses/result"
+
 type DbResult struct {
 	data   DbData
 	status DbStatus
+}
+
+func (res DbResult) GetData() interface{} {
+	return res.data.GetData()
+}
+
+func (res DbResult) IsError() bool {
+	return res.status.IsError()
+}
+
+func (res DbResult) GetStatus() result.Status {
+	return res.status
+}
+
+func (res DbResult) GetStatusCode() int {
+	return res.status.code
+}
+
+func (res DbResult) SetResult(data DbData) {
+	res.data = data
+}
+
+func (res DbResult) SetError(status DbStatus) {
+	res.status = status
 }
 
 func OkResult(data interface{}, params ...interface{}) DbResult {
@@ -29,18 +55,6 @@ func CreateResult(data interface{}, err error, params ...interface{}) DbResult {
 	return OkResult(data)
 }
 
-func (res DbResult) GetData() interface{} {
-	return res.data.GetData()
-}
-
-func (res DbResult) IsError() bool {
-	return res.status.IsError()
-}
-
-func (res DbResult) GetStatusCode() int {
-	return res.status.code
-}
-
 func ErrorResult(params ...interface{}) DbResult {
 	if len(params) == 1 {
 		return DbResult{
@@ -56,12 +70,4 @@ func ErrorResult(params ...interface{}) DbResult {
 			},
 		}
 	}
-}
-
-func (res DbResult) SetResult(data DbData) {
-	res.data = data
-}
-
-func (res DbResult) SetError(status DbStatus) {
-	res.status = status
 }

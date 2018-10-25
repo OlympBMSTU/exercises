@@ -34,6 +34,14 @@ func (status DbStatus) SetCode(code int) {
 	status.code = code
 }
 
+func (status DbStatus) GetCode() int {
+	return status.code
+}
+
+func (status DbStatus) GetDescription() string {
+	return status.descr
+}
+
 func (status DbStatus) IsError() bool {
 	return !(status.code == NO_ERROR || status.code == CREATED)
 }

@@ -20,27 +20,6 @@ func GetSubjects(pool *pgx.ConnPool) http.HandlerFunc {
 		res = db.GetSubjects(pool)
 		val, err := json.Marshal(res.GetData())
 
-		// res := db.GetSubjects(pool)
-		// res.GetResponseData() // структура подобна http response
-		// res.Data, res.Code, res.Descr
-		// маршиализация там же
-		// Если маршализация отвалилась то возвр 500 Internal server error
-
-		// res.unwrap()
-		// if res.Error() {
-		// 	err := res.GetError()
-
-		// 	descr, code = res.GetHttpResponse() //ErrorMatcher(err)
-
-		// }
-
-		//  := db.GetSubjects(pool)
-		// if err != nil {
-		// 	http.Error(writer, "Internal server error", http.StatusInternalServerError)
-		// 	return
-		// }
-
-		// val, err := json.Marshal(subs)
 		if err != nil {
 			http.Error(writer, "Internal server error", http.StatusInternalServerError)
 			return
