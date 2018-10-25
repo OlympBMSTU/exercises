@@ -4,6 +4,11 @@ import (
 	"github.com/jackc/pgx"
 )
 
+// 1-2 ok
+// 3,5 is one error
+// 6 ?
+// 7 pg error UNIQUE_CONSTRAINT
+// 8 custom my error
 // value, string for http
 const (
 	NO_ERROR         = 0 // Ok
@@ -19,11 +24,37 @@ const (
 const PG_UNIQUE_CONSTRAINT_CODE = "23505"
 const FUNDAMENTAL_QUERY_EMPTY_ERROR = "no rows in result set"
 
-// 1-2 ok
-// 3,5 is one error
-// 6 ?
-// 7 pg error UNIQUE_CONSTRAINT
-// 8 custom my error
+func okResult(data interface{}, params ...interface{}) DbResult { //data interface{}, code int) DbResult {
+	if len(params) == 0 {
+		return DbResult{
+			DbData{data},
+			DbStatus{NO_ERROR, ""},
+		}
+	} else {
+		return DbResult{
+			DbData{data},
+			DbStatus{params[0].(int), ""},
+		}
+	}
+}
+
+func errorResult(params ...interface{}) DbResult {
+	if len(params) == 1 {
+		return DbResult{
+			DbData{nil},
+			parseError(params[0].(error)),
+		}
+	} else {
+		return DbResult{
+			DbData{nil},
+			DbStatus{
+				params[0].(int),
+				params[1].(string),
+			},
+		}
+	}
+}
+
 type DbData struct {
 	data interface{}
 }
@@ -51,8 +82,6 @@ func (res *DbResult) SetError(err DbStatus) {
 	res.err = err
 }
 
-// func (res *DbR)
-//
 type DbStatus struct {
 	code  int
 	descr string
@@ -70,7 +99,7 @@ func (status *DbStatus) SetCode(code int) {
 }
 
 func (status *DbStatus) IsError() bool {
-	return status.code == NO_ERROR || status.code == CREATED
+	return !(status.code == NO_ERROR || status.code == CREATED)
 }
 
 func parseError(err error) DbStatus {

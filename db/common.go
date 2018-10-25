@@ -7,6 +7,9 @@ import (
 
 func scanExcerciese(rows *pgx.Rows) (*entities.ExcercieseEntity, error) {
 	var excerciese entities.ExcercieseEntity
+	// cnt := 0
+
+	// for rows.Next() {
 	err := rows.Scan(
 		&excerciese.Id,
 		&excerciese.AuthorId,
@@ -18,6 +21,13 @@ func scanExcerciese(rows *pgx.Rows) (*entities.ExcercieseEntity, error) {
 	if err != nil {
 		return nil, err
 	}
+	// cnt += 1
+	// }
+
+	// if cnt == 0 {
+	// return nil, nil
+	// }
+
 	return &excerciese, nil
 }
 
@@ -41,5 +51,3 @@ func getTags(query string, pool *pgx.ConnPool, args ...interface{}) (*[]string, 
 
 	return &tags, nil
 }
-
-// func scanExcerciese

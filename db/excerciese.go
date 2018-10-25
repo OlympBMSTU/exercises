@@ -11,14 +11,10 @@ import (
 )
 
 const (
-	UNIQUE_CONSTRAINT = "2305"
-	DEFAULT_LIMIT     = 20
-	DEFAULT_OFFSET    = 0
+	DEFAULT_LIMIT  = 20
+	DEFAULT_OFFSET = 0
 )
 
-// todo
-
-// finally works
 func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) DbResult {
 	row := pool.QueryRow(INSERT_EXCERCIESE,
 		excerciese.GetAuthorId(),
@@ -32,78 +28,45 @@ func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) Db
 	var returnCode int
 	err := row.Scan(&returnCode)
 
-	status := parseError(err)
-	if status.IsError() {
-		return DbResult{
-			DbData{nil},
-			status,
-		}
+	if err != nil {
+		return errorResult(err)
 	}
 
 	if returnCode == -1 {
-		return DbResult{
-			DbData{nil},
-			DbStatus{
-				NO_SUBJECT_ERROR,
-				"There is no subject in db",
-			},
-		}
+		return errorResult(NO_SUBJECT_ERROR, "There is no subject in db")
 	}
 
-	status.code = CREATED
-	return DbResult{
-		DbData{nil},
-		status,
-	}
+	return okResult(nil, CREATED)
 }
 
-// var excerciese entities.ExcercieseEntity
-
-// excerciese, err := scanExcerciese(row)
-// err := row.Scan(
-// 	&excerciese.Id,
-// 	&excerciese.AuthorId,
-// 	&excerciese.RightAnswer,
-// 	&excerciese.Level,
-// 	&excerciese.FileName,
-// 	&excerciese.Subject,
-// )
-
-func GetExcerciese(id uint, pool *pgx.ConnPool) DbResult { //(*views.ExcercieseView, error) {
+func GetExcerciese(id uint, pool *pgx.ConnPool) DbResult {
 	rows, err := pool.Query(GET_EXCERCIESE_BY_ID, id)
 	defer rows.Close()
-	status := parseError(err)
-	if status.IsError() {
-		return DbResult{
-			DbData{nil},
-			status,
-		}
+
+	if err != nil {
+		return errorResult(err)
 	}
 
-	excerciese, err := scanExcerciese(rows)
+	// todo scan ex returns also dbres
+	var excerciese *entities.ExcercieseEntity
+	for rows.Next() {
+		excerciese, err = scanExcerciese(rows)
+	}
 
-	status = parseError(err)
-	if status.IsError() {
-		return DbResult{
-			DbData{nil},
-			status,
-		}
+	if err != nil {
+		return errorResult(err)
+	}
+
+	if excerciese == nil {
+		return errorResult(EMPTY_RESULT, "")
 	}
 
 	tags, err := getTags(GET_TAGS_FOR_EXCERCIESE, pool, id)
-	status = parseError(err)
-	if status.IsError() {
-		return DbResult{
-			DbData{nil},
-			status,
-		}
+	if err != nil {
+		return errorResult(err)
 	}
 
-	data := CreateDbData(views.ExcercieseViewFrom(*excerciese, *tags))
-	return DbResult{
-		data,
-		status,
-	}
+	return okResult(views.ExcercieseViewFrom(*excerciese, *tags))
 }
 
 func GetExcercieseList(tag string, subject string, level int,
@@ -146,98 +109,47 @@ func GetExcercieseList(tag string, subject string, level int,
 
 	rows, err := poll.Query(query.String(), args...)
 	defer rows.Close()
-	status := parseError(err)
 
-	if status.IsError() {
-		return DbResult{
-			DbData{nil},
-			status,
-		}
+	if err != nil {
+		return errorResult(err)
 	}
 
 	var entities []entities.ExcercieseEntity
 	for rows.Next() {
-		// var excerciese entities.ExcercieseEntity
 		excerciese, err := scanExcerciese(rows)
 
-		// wtf
 		if err != nil {
-			break
-			// continue
+			return errorResult(err)
 		}
 		entities = append(entities, *excerciese)
 	}
-	// if err != nil {
-	status = parseError(err)
-	if status.IsError() {
-		return DbResult{
-			DbData{nil},
-			status,
-		}
-	}
-	// }
-	return DbResult{
-		DbData{entities},
-		status,
-	}
+
+	return okResult(entities)
 }
 
-// func GetExcercieseList(tag string, subject string, level int,
-// 	limit int, offset int, order_level bool, poll *pgx.ConnPool) (*[]entities.ExcercieseEntity, error) {
-
-// 	var query bytes.Buffer
-
-// 	var args []interface{}
-// 	if tag != "" {
-// 		query.WriteString(GET_EXCERCIESE_BY_SUBJECT_AND_TAG)
-// 		args = append(args, subject, tag, subject)
-// 	} else {
-// 		args = append(args, subject)
-// 		query.WriteString(GET_EXCERCIESES_BY_SUBJECT)
+// status := parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
 // 	}
+// }
 
-// 	if level != -1 {
-// 		args = append(args, level)
-// 		query.WriteString(fmt.Sprintf("AND ex.level = $%d ", len(args)))
-// 	} else {
-// 		query.WriteString("ORDER BY ex.level ")
-// 		if order_level {
-// 			query.WriteString("DESC ")
-// 		}
+// status = parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
 // 	}
+// }
 
-// 	if limit == -1 {
-// 		limit = DEFAULT_LIMIT
-// 	}
+// return DbResult{
+// 	DbData{entities},
+// 	status,
+// }
+// data := CreateDbData(views.ExcercieseViewFrom(*excerciese, *tags))
 
-// 	args = append(args, limit)
-// 	query.WriteString(fmt.Sprintf("LIMIT $%d ", len(args)))
-
-// 	if offset == -1 {
-// 		offset = DEFAULT_OFFSET
-// 	}
-
-// 	args = append(args, offset)
-// 	query.WriteString(fmt.Sprintf("OFFSET $%d ", len(args)))
-// 	fmt.Println(query.String())
-
-// 	rows, err := poll.Query(query.String(), args...)
-
-// 	defer rows.Close()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	var entities []entities.ExcercieseEntity
-// 	for rows.Next() {
-// 		// row := (*pgx.Row)(rows)
-// 		excerciese, err := scanExcerciese(rows)
-// 		// wtf
-// 		if err != nil {
-// 			return nil, err
-// 			// continue
-// 		}
-// 		entities = append(entities, *excerciese)
-// 	}
-// 	return &entities, nil
+// return DbResult{
+// 	DbData{nil},
+// 	DbStatus{EMPTY_RESULT, ""},
 // }
