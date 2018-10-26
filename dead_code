@@ -1,4 +1,336 @@
 
+// func NewHttpResult() HttpResult {
+// 	return HttpResult{
+// 		nil,
+// 		"",
+// 		http.StatusOK,
+// 	}
+// }
+
+// var code int
+// switch status.GetCode() {
+// case db.NO_ERROR:
+// 	code = http.StatusOK
+// case db.CREATED:
+// 	code = http.StatusCreated
+// case db.CONSTRAINT_ERROR:
+// 	code = http.StatusBadRequest
+// case db.QUERY_ERROR, db.EMPTY_RESULT:
+// 	code = http.StatusNotFound
+// case db.PARSE_ERROR, db.DB_CONN_ERROR:
+// 	code = http.StatusInternalServerError
+// case db.NO_SUBJECT_ERROR:
+// 	code = http.StatusBadRequest
+// default:
+// 	code = http.StatusOK
+// }
+
+
+// // jwt -> admin
+
+// entities, err := db.GetExcercieseList(tag, subject, level, limit, offset, is_desc, pool)
+// if err != nil {
+// http.Error(writer, "Internal server err", 500)
+// return
+// }
+
+// val, err := json.Marshal(entities)
+// fmt.Println(err)
+
+// // func getDataFromParameter(param []string) (bool, *string) {
+// // 	if len(param) > 0 &&
+// // }
+// excerciese, err := db.GetExcerciese(uId, pool)
+// writer.Header().Set("Content-Type", "application/json")
+// val, err := json.Marshal(excerciese)
+// fmt.Println(err)
+// writer.Write([]byte(val))
+
+
+// val, err := json.Marshal(res.GetData())
+
+// if err != nil {
+// 	http.Error(writer, "Internal server error", http.StatusInternalServerError)
+// 	return
+// }
+
+// writer.WriteHeader
+
+
+// if err != nil {
+// 	http.Error(writer, "Internal server error", 500)
+// 	return
+// }
+
+// val, err := json.Marshal(tags)
+// if err != nil {
+// 	http.Error(writer, "Internal server error", 500)
+// 	return
+// }
+
+
+// returns id
+// finally works
+// func SaveExcerciese(excerciese entities.ExcercieseEntity, pool *pgx.ConnPool) error {
+// 	// var result DbResult
+// 	row := pool.QueryRow(INSERT_EXCERCIESE,
+// 		excerciese.GetAuthorId(),
+// 		excerciese.GetRightAnswer(),
+// 		excerciese.GetLevel(),
+// 		excerciese.GetFileName(),
+// 		excerciese.GetSubject(),
+// 		pq.Array(excerciese.GetTags()),
+// 	)
+
+// 	var returnCode int
+// 	err := row.Scan(&returnCode)
+
+// 	// if res == -1 {
+// 	// 	return DbResult{
+// 	// 		nil,
+// 	// 		DbError{NO_SUBJECT_ERROR},
+// 	// 	}
+// 	// }
+
+// 	result := parseError(err)
+// 	if result.IsError() {
+// 		return result
+// 	}
+// 	result.code = CREATED
+// 	return result
+// 	// if err != nil {
+// 	// 	return DbResult{
+// 	// 		nil,
+// 	// 		parseError(err),
+// 	// 	}
+// 	// }
+
+// 	// parseError(err)
+
+// 	if err != nil || returnCode == -1 {
+// 		return err
+// 	}
+
+// 	// if res == -1 {
+// 	// 	return nil, NO_SUBJECT_ERROR
+// 	// }
+// 	// return DbResult{
+// 	// 	nil,
+// 	// 	DbError{NO_ERROR},
+// 	// }
+// 	return nil
+// }
+
+
+
+// func GetExcercieseList(tag string, subject string, level int,
+// 	limit int, offset int, order_level bool, poll *pgx.ConnPool) (*[]entities.ExcercieseEntity, error) {
+
+// 	var query bytes.Buffer
+
+// 	var args []interface{}
+// 	if tag != "" {
+// 		query.WriteString(GET_EXCERCIESE_BY_SUBJECT_AND_TAG)
+// 		args = append(args, subject, tag, subject)
+// 	} else {
+// 		args = append(args, subject)
+// 		query.WriteString(GET_EXCERCIESES_BY_SUBJECT)
+// 	}
+
+// 	if level != -1 {
+// 		args = append(args, level)
+// 		query.WriteString(fmt.Sprintf("AND ex.level = $%d ", len(args)))
+// 	} else {
+// 		query.WriteString("ORDER BY ex.level ")
+// 		if order_level {
+// 			query.WriteString("DESC ")
+// 		}
+// 	}
+
+// 	if limit == -1 {
+// 		limit = DEFAULT_LIMIT
+// 	}
+
+// 	args = append(args, limit)
+// 	query.WriteString(fmt.Sprintf("LIMIT $%d ", len(args)))
+
+// 	if offset == -1 {
+// 		offset = DEFAULT_OFFSET
+// 	}
+
+// 	args = append(args, offset)
+// 	query.WriteString(fmt.Sprintf("OFFSET $%d ", len(args)))
+// 	fmt.Println(query.String())
+
+// 	rows, err := poll.Query(query.String(), args...)
+
+// 	defer rows.Close()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	var entities []entities.ExcercieseEntity
+// 	for rows.Next() {
+// 		// row := (*pgx.Row)(rows)
+// 		excerciese, err := scanExcerciese(rows)
+// 		// wtf
+// 		if err != nil {
+// 			return nil, err
+// 			// continue
+// 		}
+// 		entities = append(entities, *excerciese)
+// 	}
+// 	return &entities, nil
+// }
+
+
+// if err != nil {
+// return nil, err
+// }
+
+// return nil, err
+
+// (*[]string, error) {
+
+// return
+// return getTags(GET_TAGS_BY_SUBJECT, pool, subject)
+
+// return &subjects, nil
+
+
+
+// func errorResult(err error) DbResult {
+// 	return DbResult{
+// 		DbData{nil},
+// 		parseError(err),
+// 	}
+// }
+
+// func errorResult(code int, descr string) DbResult {
+// 	return DbResult{
+// 		DbData{nil},
+// 		DbStatus{code, descr},
+// 	}
+// }
+
+// status := parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
+// 	}
+// }
+
+// 	DbResult{
+// 		DbData{nil},
+// 		DbStatus{
+// 			NO_SUBJECT_ERROR,
+// 			"There is no subject in db",
+// 		},
+// 	}
+// }
+
+// status.code = CREATED
+// return DbResult{
+// 	DbData{nil},
+// 	status,
+// }
+
+// func createResult(err error, res interface{}) DbResult {
+// 	var data interface{}
+// 	var code int
+// 	data = nil
+// 	code = NO_ERROR
+// 	descr := ""
+
+// 	if err != nil {
+// 		switch res.(type) {
+// 		case int:
+// 			if res.(int) == -1 {
+// 				code = NO_SUBJECT_ERROR
+// 			} else {
+// 				code = CREATED
+// 			}
+// 		default:
+// 			data = res
+// 		}
+// 	} else {
+// 		status = parseError(err)
+// 		data = nil
+// 	}
+// }
+
+
+
+// status := parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
+// 	}
+// }
+
+// status = parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
+// 	}
+// }
+
+// return DbResult{
+// 	DbData{entities},
+// 	status,
+// }
+// data := CreateDbData(views.ExcercieseViewFrom(*excerciese, *tags))
+
+// return DbResult{
+// 	DbData{nil},
+// 	DbStatus{EMPTY_RESULT, ""},
+// }
+
+
+
+// return DbResult{
+// 	DbData{subjects},
+// 	status,
+// }
+
+// status = parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
+// 	}
+// }
+
+// status := parseError(err)
+// if status.IsError() {
+// 	return DbResult{
+// 		DbData{nil},
+// 		status,
+// 	}
+// }
+
+
+// 1-2 ok
+// 3,5 is one error
+// 6 ?
+// 7 pg error UNIQUE_CONSTRAINT
+// 8 custom my error
+// value, string for http
+
+// todo create result which gets data, err if err return err res err else
+// return DbResult{
+// 	DbData{data},
+// 	parseError(err),
+// }
+
+// return DbResult{
+// 	DbData{nil},
+// 	parseError(err),
+// }
+
 
 // get_by_subject_tag = "select * from (SELECT * FROM Exceriese WHERE subject=$1) ex  join " +
 // 	"((SELECT * FROM tag WHERE name=$2) t join tag_excerciese tg on (tg.tag_id = t.id)) tt on (tt.excerciese_id = ex.id) "

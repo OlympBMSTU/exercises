@@ -70,7 +70,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION del_excerciese(id integer) 
+RETURNS INTEGER AS $$
+BEGIN 
 
+END;
+$$ LANGUAGE plpgsql;
 -- todo deete funcntion that checks eist query for tag delete tag if no delete tag_ids
 -- CREATE OR REPLACE FUNCTION del_excerciese(ex_id integer) 
 -- RETURNS INTEGER AS $$

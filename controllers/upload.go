@@ -1,110 +1,104 @@
 package controllers
 
 // import (
-// 	"encoding/base64"
-// 	"encoding/json"
-// 	"fmt"
-// 	"io/ioutil"
 // 	"net/http"
 // 	"strconv"
 // 	"strings"
 
-// 	"github.com/OlympBMSTU/excericieses/auth"
+// 	matcher "github.com/OlympBMSTU/excericieses/controllers/matcher_result"
 // 	"github.com/OlympBMSTU/excericieses/db"
-// 	"github.com/OlympBMSTU/excericieses/fstorage"
-// 	"github.com/OlympBMSTU/excericieses/views"
 // 	"github.com/jackc/pgx"
 // )
 
-// func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
-// 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+// // func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
+// // 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 
-// 		if request.Method != "POST" {
-// 			http.Error(writer, "Unsupported method", 404)
-// 			return
-// 		}
+// // 		if request.Method != "POST" {
+// // 			http.Error(writer, "Unsupported method", 404)
+// // 			return
+// // 		}
 
-// 		if request.Body == nil {
-// 			http.Error(writer, "Please send a request body", 400)
-// 			return
-// 		}
+// // 		if request.Body == nil {
+// // 			http.Error(writer, "Please send a request body", 400)
+// // 			return
+// // 		}
 
-// 		cookie, err := request.Cookie("bmstuOlympAuth")
-// 		// unauth
-// 		if err != nil {
-// 			http.Error(writer, "Unauthorized", 403)
-// 			return
-// 		}
+// // 		cookie, err := request.Cookie("bmstuOlympAuth")
+// // 		// unauth
+// // 		if err != nil {
+// // 			http.Error(writer, "Unauthorized", 403)
+// // 			return
+// // 		}
 
-// 		// also here we got author id
-// 		user_id, auth := auth.AuthUser(cookie.Value)
-// 		if !auth {
-// 			http.Error(writer, "Unauthorized", 403)
-// 			return
-// 		}
+// // 		// also here we got author id
+// // 		user_id, auth := auth.AuthUser(cookie.Value)
+// // 		if !auth {
+// // 			http.Error(writer, "Unauthorized", 403)
+// // 			return
+// // 		}
 
-// 		body, err := ioutil.ReadAll(request.Body)
-// 		defer request.Body.Close()
+// // 		body, err := ioutil.ReadAll(request.Body)
+// // 		defer request.Body.Close()
 
-// 		if err != nil {
-// 			http.Error(writer, "Please send a request body", 400)
-// 			return
-// 		}
+// // 		if err != nil {
+// // 			http.Error(writer, "Please send a request body", 400)
+// // 			return
+// // 		}
 
-// 		var excerciese views.ExcercieseView
-// 		err = json.Unmarshal(body, &excerciese)
+// // 		var excerciese views.ExcercieseView
+// // 		err = json.Unmarshal(body, &excerciese)
 
-// 		if err != nil {
-// 			http.Error(writer, "Error json", 400)
-// 			return
-// 		}
+// // 		if err != nil {
+// // 			http.Error(writer, "Error json", 400)
+// // 			return
+// // 		}
 
-// 		excercieseEntity := excerciese.ToEntity()
-// 		excercieseEntity.SetAuthor(user_id)
+// // 		excercieseEntity := excerciese.ToEntity()
+// // 		excercieseEntity.SetAuthor(user_id)
 
-// 		file, err := base64.StdEncoding.DecodeString(excerciese.FileBase64)
-// 		if err != nil {
-// 			http.Error(writer, "Incorrect file", 400)
-// 			return
-// 		}
+// // 		file, err := base64.StdEncoding.DecodeString(excerciese.FileBase64)
+// // 		if err != nil {
+// // 			http.Error(writer, "Incorrect file", 400)
+// // 			return
+// // 		}
 
-// 		// represent name in file storage
-// 		newName := fstorage.ComputeName(excerciese.FileName)
+// // 		// represent name in file storage
+// // 		newName := fstorage.ComputeName(excerciese.FileName)
 
-// 		excercieseEntity.SetFileName(newName)
-// 		excercieseEntity.SetAuthor(0)
-// 		err = db.SaveExcerciese(excercieseEntity, pool)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return
-// 		}
+// // 		excercieseEntity.SetFileName(newName)
+// // 		excercieseEntity.SetAuthor(0)
+// // 		err = db.SaveExcerciese(excercieseEntity, pool)
+// // 		if err != nil {
+// // 			fmt.Println(err)
+// // 			return
+// // 		}
 
-// 		err = fstorage.WriteFile(file, newName, ".pdf")
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return
-// 		}
+// // 		err = fstorage.WriteFile(file, newName, ".pdf")
+// // 		if err != nil {
+// // 			fmt.Println(err)
+// // 			return
+// // 		}
 
-// 		// ex_id := 0
-// 		// err = sender.SendAnswer(ex_id, excerciese.Answer)
-// 		// if err != nil {
-// 		// clear created data and return error
-// 		// }
+// // 		// ex_id := 0
+// // 		// err = sender.SendAnswer(ex_id, excerciese.Answer)
+// // 		// if err != nil {
+// // 		// clear created data and return error
+// // 		// }
 
-// 		if err != nil {
-// 			http.Error(writer, "Error save file", 500)
-// 			return
-// 		}
+// // 		if err != nil {
+// // 			http.Error(writer, "Error save file", 500)
+// // 			return
+// // 		}
 
-// 		writer.Write([]byte("SUCCESS"))
-// 	})
-// }
+// // 		writer.Write([]byte("SUCCESS"))
+// // 	})
+// // }
 
 // func GetExcerciese(pool *pgx.ConnPool) http.HandlerFunc {
 // 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 
 // 		if request.Method != "GET" {
-// 			http.Error(writer, "Unsopported method", 404)
+// 			http.Error(writer, "Unsopported method", 405)
 // 			return
 // 		}
 
@@ -112,29 +106,24 @@ package controllers
 // 		idStr := strings.TrimPrefix(request.URL.Path, "/api/excercieses/get/")
 // 		id, err := strconv.Atoi(idStr)
 // 		if err != nil {
-// 			http.Error(writer, "Incorrect path variable", 404)
+// 			http.Error(writer, "Incorrect path variable", http.StatusBadRequest)
 // 		}
-
 // 		uId := uint(id)
 
-// 		excerciese, err := db.GetExcerciese(uId, pool)
-// 		writer.Header().Set("Content-Type", "application/json")
-// 		val, err := json.Marshal(excerciese)
-// 		fmt.Println(err)
-// 		writer.Write([]byte(val))
+// 		res := db.GetExcerciese(uId, pool)
+// 		httpRes := matcher.MatchResult(res)
+// 		writer.WriteHeader(httpRes.GetStatus())
+// 		writer.Write(httpRes.GetData())
 // 	})
 // }
-
-// // func getDataFromParameter(param []string) (bool, *string) {
-// // 	if len(param) > 0 &&
-// // }
 
 // func GetExcercieses(pool *pgx.ConnPool) http.HandlerFunc {
 // 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 // 		if request.Method != "GET" {
-// 			http.Error(writer, "Unsopported method", 404)
+// 			http.Error(writer, "Unsopported method", 405)
 // 			return
 // 		}
+
 // 		query := request.URL.Query()
 // 		pathVariablesStr := strings.TrimPrefix(request.URL.Path, "/api/excercieses/list/")
 // 		vars := strings.Split(pathVariablesStr, "/")
@@ -150,10 +139,10 @@ package controllers
 // 		// its very scary !!!!!
 // 		for i, data := range vars {
 // 			if i == 0 {
-// 				subject = vars[0]
+// 				subject = vars[i]
 // 			}
 // 			if i == 1 {
-// 				tag = vars[1]
+// 				tag = vars[i]
 // 			}
 // 			if i == 2 && data != "" {
 // 				var err error
@@ -187,16 +176,9 @@ package controllers
 // 		// 1 - subject 2 - tag 3 - level
 // 		// query 1 - limit 2 - offset 3 - order
 
-// 		entities, err := db.GetExcercieseList(tag, subject, level, limit, offset, is_desc, pool)
-// 		if err != nil {
-// 			http.Error(writer, "Internal server err", 500)
-// 			return
-// 		}
-
-// 		val, err := json.Marshal(entities)
-// 		fmt.Println(err)
+// 		res := db.GetExcercieseList(tag, subject, level, limit, offset, is_desc, pool)
+// 		httpRes := matcher.MatchResult(res)
+// 		writer.WriteHeader(httpRes.GetStatus())
 // 		writer.Write([]byte(val))
 // 	})
 // }
-
-// // jwt -> admin

@@ -1,13 +1,16 @@
 1) Rows scan as row -> one fucntion for scan excerciese +
-2) Maybe scan simple data as one function, simply send query ?
+2) Maybe scan simple data as one function, simply send query (no need now)
 3) Return not (data error), but return result {Error, Data} +-
     where Error - interface for (Ok, Constraint, NotFound, DbError)
     Data - innterface for result
-4) Also need refactor fstorage: 
+4) Also need refactor fstorage:  
     creating file,
     creating folders,
     return result
 5) Routing needs refactor!!!
-6) Also mapping db errors, fstorage errors, auth errors, json errors to http errors
+6) Also mapping to http errors: db errors,          +
+                                fstorage errors,    -
+                                auth errors,        -
+                                json errors         -
 7) Config file todo:: detect which os, or env variable and get config file from 
     env, or argv
