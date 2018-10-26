@@ -1,12 +1,13 @@
 package matcher_result
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	http_res "github.com/OlympBMSTU/excericieses/controllers/http_result"
 	db "github.com/OlympBMSTU/excericieses/db/result"
 	"github.com/OlympBMSTU/excericieses/result"
+	"github.com/OlympBMSTU/excericieses/views/output"
 )
 
 // json: {
@@ -15,28 +16,45 @@ import (
 // "data": data
 // }
 
-var mapHttpDbStatuses = map[int]http_res.HttpResult{
-	db.NO_ERROR:         http_res.CreateHttpResult(http.StatusOK, "OK"),
-	db.CREATED:          http_res.CreateHttpResult(http.StatusCreated, "Created"),
-	db.QUERY_ERROR:      http_res.ResultNotFound(),
-	db.EMPTY_RESULT:     http_res.ResultNotFound(),
-	db.DB_CONN_ERROR:    http_res.ResultInernalSreverError(),
-	db.PARSE_ERROR:      http_res.ResultInernalSreverError(),
-	db.CONSTRAINT_ERROR: http_res.CreateHttpResult(http.StatusConflict, "Conflict"),
-	db.NO_SUBJECT_ERROR: http_res.CreateHttpResult(http.StatusBadRequest, ""),
+var mapHttpDbStatuses = map[int]ResultInfo{
+	db.NO_ERROR:         NewResultInfo("Ok", http.StatusOK, statusOK), //, "OK"),
+	db.CREATED:          NewResultInfo("Created", http.StatusCreated, statusOK),
+	db.QUERY_ERROR:      NewResultInfo("Not found", http.StatusNotFound, statusError),
+	db.EMPTY_RESULT:     NewResultInfo("Not found", http.StatusNotFound, statusError),
+	db.DB_CONN_ERROR:    NewResultInfo("Internal server error", http.StatusInternalServerError, statusError),
+	db.PARSE_ERROR:      NewResultInfo("Internal server error", http.StatusInternalServerError, statusError),
+	db.CONSTRAINT_ERROR: NewResultInfo("Connflict", http.StatusConflict, statusError),
+	db.NO_SUBJECT_ERROR: NewResultInfo("Please use correct subject", http.StatusBadRequest, statusSubjectError),
 }
 
 func MatchDbResult(res result.Result) http_res.HttpResult {
-	status := res.GetStatus()
-	outHttpRes := mapHttpDbStatuses[status.GetCode()]
-	// if outHttpRes == nil {
+	var jsonRes output.ResultView
+	info := mapHttpDbStatuses[res.GetStatus().GetCode()]
+	if res.IsError() {
+		jsonRes.SetData(nil)
+	} else {
+		jsonRes.SetData(res.GetData())
+	}
+	jsonRes.SetStatus(info.Status)
+	jsonRes.SetMessage(info.Message)
 
-	// }
-	fmt.Print(outHttpRes)
+	val, err := json.Marshal(jsonRes)
+	code := info.HttpCode
+	var outHttpRes http_res.HttpResult
 
-	return http_res.ResultInernalSreverError()
-	// if status.IsError() {
+	if err != nil {
+		code = http.StatusInternalServerError
+	} else {
+		outHttpRes.SetBody(val)
+	}
 
-	// }
-
+	outHttpRes.SetStatus(code)
+	return outHttpRes
 }
+
+// fmt.Print(outHttpRes)
+
+//http_res.ResultInernalSreverError()
+// if status.IsError() {
+
+// }

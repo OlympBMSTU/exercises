@@ -1,5 +1,7 @@
 package result
 
+import "github.com/OlympBMSTU/excericieses/result"
+
 type AuthResult struct {
 	data   AuthData
 	status AuthStatus
@@ -13,7 +15,7 @@ func (res AuthResult) IsError() bool {
 	return res.status.IsError()
 }
 
-func (res AuthResult) GetStatus() AuthStatus {
+func (res AuthResult) GetStatus() result.Status {
 	return res.status
 }
 

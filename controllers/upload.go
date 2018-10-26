@@ -1,98 +1,85 @@
 package controllers
 
-// import (
-// 	"net/http"
-// 	"strconv"
-// 	"strings"
+// func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
+// 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 
-// 	matcher "github.com/OlympBMSTU/excericieses/controllers/matcher_result"
-// 	"github.com/OlympBMSTU/excericieses/db"
-// 	"github.com/jackc/pgx"
-// )
+// 		if request.Method != "POST" {
+// 			http.Error(writer, "Unsupported method", 405)
+// 			return
+// 		}
+// 		// move to auth
+// 		cookie, err := request.Cookie("bmstuOlympAuth")
+// 		// unauth
+// 		if err != nil {
+// 			http.Error(writer, "Unauthorized", 403)
+// 			return
+// 		}
 
-// // func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
-// // 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+// 		auth_res := auth.AuthUser(cookie.Value)
+// 		if auth_res.IsError() {
+// 			return
+// 		}
+// 		// also here we got author id
+// 		user_id, auth := auth.AuthUser(cookie.Value)
+// 		// if !auth {
+// 		// 	http.Error(writer, "Unauthorized", 403)
+// 		// 	return
+// 		// }
 
-// // 		if request.Method != "POST" {
-// // 			http.Error(writer, "Unsupported method", 404)
-// // 			return
-// // 		}
+// 		if request.Body == nil {
+// 			http.Error(writer, "Please send a request body", 400)
+// 			return
+// 		}
+// 		body, err := ioutil.ReadAll(request.Body)
+// 		defer request.Body.Close()
+// 		if err != nil {
+// 			http.Error(writer, "Please send a request body", 400)
+// 			return
+// 		}
 
-// // 		if request.Body == nil {
-// // 			http.Error(writer, "Please send a request body", 400)
-// // 			return
-// // 		}
+// 		var excerciese views.ExcercieseView
+// 		err = json.Unmarshal(body, &excerciese)
 
-// // 		cookie, err := request.Cookie("bmstuOlympAuth")
-// // 		// unauth
-// // 		if err != nil {
-// // 			http.Error(writer, "Unauthorized", 403)
-// // 			return
-// // 		}
+// 		if err != nil {
+// 			http.Error(writer, "Error json", 400)
+// 			return
+// 		}
 
-// // 		// also here we got author id
-// // 		user_id, auth := auth.AuthUser(cookie.Value)
-// // 		if !auth {
-// // 			http.Error(writer, "Unauthorized", 403)
-// // 			return
-// // 		}
+// 		excercieseEntity := excerciese.ToEntity()
+// 		excercieseEntity.SetAuthor(user_id)
 
-// // 		body, err := ioutil.ReadAll(request.Body)
-// // 		defer request.Body.Close()
+// 		file, err := base64.StdEncoding.DecodeString(excerciese.FileBase64)
+// 		if err != nil {
+// 			http.Error(writer, "Incorrect file", 400)
+// 			return
+// 		}
 
-// // 		if err != nil {
-// // 			http.Error(writer, "Please send a request body", 400)
-// // 			return
-// // 		}
+// 		// represent name in file storage
+// 		newName := fstorage.ComputeName(excerciese.FileName)
 
-// // 		var excerciese views.ExcercieseView
-// // 		err = json.Unmarshal(body, &excerciese)
+// 		excercieseEntity.SetFileName(newName)
+// 		err = db.SaveExcerciese(excercieseEntity, pool)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 			return
+// 		}
 
-// // 		if err != nil {
-// // 			http.Error(writer, "Error json", 400)
-// // 			return
-// // 		}
+// 		err = fstorage.WriteFile(file, newName, ".pdf")
+// 		if err != nil {
+// 			http.Error(writer, "Error save file", 500)
+// 			return
+// 		}
 
-// // 		excercieseEntity := excerciese.ToEntity()
-// // 		excercieseEntity.SetAuthor(user_id)
+// 		err := sender.SendAnswer(0, "hi")
+// 		if err := nil {
+// 			// db.RemoveExcerciese(excercieseEntity.Id)
+// 			// fs.RemoveFile(newName)
+// 			return
+//  		}
 
-// // 		file, err := base64.StdEncoding.DecodeString(excerciese.FileBase64)
-// // 		if err != nil {
-// // 			http.Error(writer, "Incorrect file", 400)
-// // 			return
-// // 		}
-
-// // 		// represent name in file storage
-// // 		newName := fstorage.ComputeName(excerciese.FileName)
-
-// // 		excercieseEntity.SetFileName(newName)
-// // 		excercieseEntity.SetAuthor(0)
-// // 		err = db.SaveExcerciese(excercieseEntity, pool)
-// // 		if err != nil {
-// // 			fmt.Println(err)
-// // 			return
-// // 		}
-
-// // 		err = fstorage.WriteFile(file, newName, ".pdf")
-// // 		if err != nil {
-// // 			fmt.Println(err)
-// // 			return
-// // 		}
-
-// // 		// ex_id := 0
-// // 		// err = sender.SendAnswer(ex_id, excerciese.Answer)
-// // 		// if err != nil {
-// // 		// clear created data and return error
-// // 		// }
-
-// // 		if err != nil {
-// // 			http.Error(writer, "Error save file", 500)
-// // 			return
-// // 		}
-
-// // 		writer.Write([]byte("SUCCESS"))
-// // 	})
-// // }
+// 		writer.Write([]byte("SUCCESS")) //
+// 	})
+// }
 
 // func GetExcerciese(pool *pgx.ConnPool) http.HandlerFunc {
 // 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {

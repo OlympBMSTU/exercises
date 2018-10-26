@@ -1,5 +1,9 @@
 package result
 
+import (
+	"github.com/OlympBMSTU/excericieses/result"
+)
+
 type FSResult struct {
 	data   FSData
 	status FSStatus
@@ -9,7 +13,7 @@ func (res FSResult) GetData() interface{} {
 	return res.data.GetData()
 }
 
-func (res FSResult) GetStatus() FSStatus {
+func (res FSResult) GetStatus() result.Status {
 	return res.status
 }
 

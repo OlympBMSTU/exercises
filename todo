@@ -14,3 +14,7 @@
                                 json errors         -
 7) Config file todo:: detect which os, or env variable and get config file from 
     env, or argv
+
+8) TODO trim answer, change , for .
+9) Refactor work with error handling in http_result
+10) OutputExView

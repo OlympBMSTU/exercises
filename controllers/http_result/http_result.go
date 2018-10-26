@@ -16,7 +16,7 @@ func NewHttpResult(code int, body []byte) HttpResult {
 	}
 }
 
-func (http_res HttpResult) SetStatus(status int) {
+func (http_res *HttpResult) SetStatus(status int) {
 	http_res.status = status
 }
 
@@ -24,7 +24,7 @@ func (http_res HttpResult) GetStatus() int {
 	return http_res.status
 }
 
-func (http_res HttpResult) SetBody(body []byte) {
+func (http_res *HttpResult) SetBody(body []byte) {
 	http_res.body = body
 }
 

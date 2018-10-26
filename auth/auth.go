@@ -34,14 +34,14 @@ func AuthUser(jwt string) result.AuthResult {
 	jwt_data := strings.Split(jwt, ".")
 
 	if len(jwt_data) != 3 {
-		return result.ErrroResult(ERROR_PARSE_JWT, "")
+		return ErrorResult(result.ERROR_PARSE_JWT, "")
 	}
 
 	header, err := base64.StdEncoding.DecodeString(jwt_data[0])
 	payload, err := base64.StdEncoding.DecodeString(jwt_data[1])
 	hash, err := base64.StdEncoding.DecodeString(jwt_data[2])
 	if err != nil {
-		return result.ErrroResult(ERROR_PARSE_JWT, "")
+		return result.ErrroResult(result.ERROR_PARSE_JWT, "")
 	}
 
 	var jwt_header JWTHeader
