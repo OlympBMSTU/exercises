@@ -6,6 +6,12 @@ type ResultView struct {
 	Status  string
 }
 
+// json: {
+// "status": Ok,
+// "message": error,
+// "data": data
+// }
+
 func (res ResultView) GetData() interface{} {
 	return res.Data
 }
@@ -29,9 +35,3 @@ func (res *ResultView) GetStatus() string {
 func (res *ResultView) SetStatus(status string) {
 	res.Status = status
 }
-
-// json: {
-// "status": Ok,
-// "message": error,
-// "data": data
-// }
