@@ -66,7 +66,7 @@ BEGIN
         END IF;
     END LOOP;
 
-    RETURN 0;
+    RETURN ex_id;
 END;
 $$ LANGUAGE plpgsql;
 

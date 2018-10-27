@@ -16,6 +16,7 @@ func GetSubjects(pool *pgx.ConnPool) http.HandlerFunc {
 			http.Error(writer, "Unsupported method", 405)
 			return
 		}
+		writer.Header().Set("Content-Type", "application/json")
 
 		var res result.Result
 		res = db.GetSubjects(pool)
@@ -32,8 +33,9 @@ func GetTags(pool *pgx.ConnPool) http.HandlerFunc {
 			http.Error(writer, "Unsupported method", 405)
 			return
 		}
+		writer.Header().Set("Content-Type", "application/json")
 
-		subject := strings.TrimPrefix(request.URL.Path, "/api/excercieses/tags/")
+		subject := strings.TrimPrefix(request.URL.Path, "/api/excercises/tags/")
 		res := db.GetTgasBySubect(subject, pool)
 
 		httpRes := matcher.MatchResult(res)

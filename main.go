@@ -42,11 +42,11 @@ func Init() (*pgx.ConnPool, error) {
 }
 
 func InitRouter(pool *pgx.ConnPool) {
-	http.HandleFunc("/api/excercieses/upload_excerciese", controllers.UploadExcercieseHandler(pool))
-	// http.HandleFunc("/api/excercieses/get/", controllers.GetExcerciese(pool))
-	// http.HandleFunc("/api/excercieses/list/", controllers.GetExcercieses(pool))
-	http.HandleFunc("/api/excercieses/subjects/", controllers.GetSubjects(pool))
-	// http.HandleFunc("/api/excercieses/tags/", controllers.GetTags(pool))
+	http.HandleFunc("/api/exercises/upload_exercise", controllers.UploadExcercieseHandler(pool))
+	http.HandleFunc("/api/exercises/get/", controllers.GetExcerciese(pool))
+	http.HandleFunc("/api/exercises/list/", controllers.GetExcercieses(pool))
+	http.HandleFunc("/api/exercises/subjects/", controllers.GetSubjects(pool))
+	http.HandleFunc("/api/exercises/tags/", controllers.GetTags(pool))
 }
 
 func main() {

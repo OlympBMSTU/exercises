@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 
-	"github.com/OlympBMSTU/excericieses/auth"
 	matcher "github.com/OlympBMSTU/excericieses/controllers/matcher_result"
 	"github.com/OlympBMSTU/excericieses/db"
 	"github.com/OlympBMSTU/excericieses/entities"
@@ -14,34 +14,47 @@ import (
 	"github.com/jackc/pgx"
 )
 
-func m(d map[string][]string) {
-	fmt.Print(d)
+// func m(d map[string][]string) {
+// 	fmt.Print(d)
+// }
+
+func OptionsCredentials(writer http.ResponseWriter) {
+	writer.Header().Set("Access-Control-Allow-Method", "POST, OPTIONS")
+	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-controll-request-method,x-requested-with")
+	writer.Header().Set("Access-Control-Allow-Credentials", "true")
 }
 
 func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-
-		if request.Method != "POST" {
-			http.Error(writer, "Unsupported method", 405)
+		OptionsCredentials(writer)
+		if request.Method == "OPTIONS" {
+			writer.Write([]byte("hi"))
 			return
 		}
+		writer.Header().Set("Content-Type", "application/json")
+
+		// if request.Method != "POST" {
+		// 	http.Error(writer, "Unsupported method", 405)
+		// 	return
+		// }
 
 		var err error
 
-		cookie, err := request.Cookie("bmstuOlympAuth")
-		// unauth
-		if err != nil {
-			http.Error(writer, "Unauthorized", 403)
-			return
-		}
+		// cookie, err := request.Cookie("bmstuOlympAuth")
+		// // unauth
+		// if err != nil {
+		// 	http.Error(writer, "Unauthorized", 403)
+		// 	return
+		// }
 
-		auth_res := auth.AuthUser(cookie.Value)
-		if auth_res.IsError() {
-			httpRes := matcher.MatchResult(auth_res)
-			writer.WriteHeader(httpRes.GetStatus())
-			writer.Write(httpRes.GetData())
-			return
-		}
+		// auth_res := auth.AuthUser(cookie.Value)
+		// if auth_res.IsError() {
+		// 	httpRes := matcher.MatchResult(auth_res)
+		// 	writer.WriteHeader(httpRes.GetStatus())
+		// 	writer.Write(httpRes.GetData())
+		// 	return
+		// }
 
 		if err = request.ParseMultipartForm(-1); err != nil {
 			http.Error(writer, "Incorrect body", http.StatusBadRequest)
@@ -51,10 +64,17 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 		answer := request.Form["answer"]
 		subject := request.Form["subject"]
 		level_str := request.Form["level"]
-		tags := request.Form["tags"]
+		tags_arr := request.Form["tags"]
 
-		if len(answer) < 1 || len(subject) < 1 || len(level_str) < 1 || len(tags) < 1 {
+		if len(answer) < 1 || len(subject) < 1 || len(level_str) < 1 || len(tags_arr) < 1 {
 			http.Error(writer, "Incorrect body", http.StatusBadRequest)
+			return
+		}
+
+		var tags []string
+		err = json.Unmarshal([]byte(tags_arr[0]), &tags)
+		if err != nil {
+			http.Error(writer, "Incorrect tags in body", http.StatusBadRequest)
 			return
 		}
 
@@ -96,172 +116,96 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 	})
 }
 
-// func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
-// 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+func GetExcerciese(pool *pgx.ConnPool) http.HandlerFunc {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 
-// 		if request.Method != "POST" {
-// 			http.Error(writer, "Unsupported method", 405)
-// 			return
-// 		}
-// 		// move to auth
-// 		cookie, err := request.Cookie("bmstuOlympAuth")
-// 		// unauth
-// 		if err != nil {
-// 			http.Error(writer, "Unauthorized", 403)
-// 			return
-// 		}
+		if request.Method != "GET" {
+			http.Error(writer, "Unsopported method", 405)
+			return
+		}
 
-// 		auth_res := auth.AuthUser(cookie.Value)
-// 		if auth_res.IsError() {
-// 			return
-// 		}
-// 		// also here we got author id
-// 		user_id, auth := auth.AuthUser(cookie.Value)
-// 		// if !auth {
-// 		// 	http.Error(writer, "Unauthorized", 403)
-// 		// 	return
-// 		// }
+		writer.Header().Set("Content-Type", "application/json")
 
-// 		if request.Body == nil {
-// 			http.Error(writer, "Please send a request body", 400)
-// 			return
-// 		}
-// 		body, err := ioutil.ReadAll(request.Body)
-// 		defer request.Body.Close()
-// 		if err != nil {
-// 			http.Error(writer, "Please send a request body", 400)
-// 			return
-// 		}
+		// Get path variable from path
+		idStr := strings.TrimPrefix(request.URL.Path, "/api/exercises/get/")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(writer, "Incorrect path variable", http.StatusBadRequest)
+			return
+		}
+		uId := uint(id)
 
-// 		var excerciese views.ExcercieseView
-// 		err = json.Unmarshal(body, &excerciese)
+		res := db.GetExcerciese(uId, pool)
+		httpRes := matcher.MatchResult(res)
+		writer.WriteHeader(httpRes.GetStatus())
+		writer.Write(httpRes.GetData())
+	})
+}
 
-// 		if err != nil {
-// 			http.Error(writer, "Error json", 400)
-// 			return
-// 		}
+func GetExcercieses(pool *pgx.ConnPool) http.HandlerFunc {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.Method != "GET" {
+			http.Error(writer, "Unsopported method", 405)
+			return
+		}
 
-// 		excercieseEntity := excerciese.ToEntity()
-// 		excercieseEntity.SetAuthor(user_id)
+		writer.Header().Set("Content-Type", "application/json")
 
-// 		file, err := base64.StdEncoding.DecodeString(excerciese.FileBase64)
-// 		if err != nil {
-// 			http.Error(writer, "Incorrect file", 400)
-// 			return
-// 		}
+		query := request.URL.Query()
+		pathVariablesStr := strings.TrimPrefix(request.URL.Path, "/api/exercises/list/")
+		vars := strings.Split(pathVariablesStr, "/")
+		subject := ""
+		tag := ""
+		level := -1
 
-// 		// represent name in file storage
-// 		newName := fstorage.ComputeName(excerciese.FileName)
+		if len(vars) == 0 {
+			http.Error(writer, "Not enough parameter", 404)
+			return
+		}
 
-// 		excercieseEntity.SetFileName(newName)
-// 		err = db.SaveExcerciese(excercieseEntity, pool)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return
-// 		}
+		// its very scary !!!!!
+		for i, data := range vars {
+			if i == 0 {
+				subject = vars[i]
+			}
+			if i == 1 {
+				tag = vars[i]
+			}
+			if i == 2 && data != "" {
+				var err error
+				level, err = strconv.Atoi(data)
+				if err != nil {
+					http.Error(writer, "INCORRECT PATH", 404)
+				}
+			}
+		}
 
-// 		err = fstorage.WriteFile(file, newName, ".pdf")
-// 		if err != nil {
-// 			http.Error(writer, "Error save file", 500)
-// 			return
-// 		}
+		limitArr := query["limit"]
+		limit := -1
+		if len(limitArr) > 0 {
+			limit, _ = strconv.Atoi(limitArr[0])
+		}
+		offsetArr := query["offset"]
+		offset := -1
+		if len(offsetArr) > 0 {
+			offset, _ = strconv.Atoi(offsetArr[0])
+		}
 
-// 		err := sender.SendAnswer(0, "hi")
-// 		if err := nil {
-// 			// db.RemoveExcerciese(excercieseEntity.Id)
-// 			// fs.RemoveFile(newName)
-// 			return
-//  		}
+		// its fucking crutch maybe, todo refactor !!!!!!!!!
 
-// 		writer.Write([]byte("SUCCESS")) //
-// 	})
-// }
+		// check order for quer
+		order := query["order"]
+		is_desc := false
+		if len(order) > 0 && order[0] == "desc" {
+			is_desc = true
+		}
 
-// func GetExcerciese(pool *pgx.ConnPool) http.HandlerFunc {
-// 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		// 1 - subject 2 - tag 3 - level
+		// query 1 - limit 2 - offset 3 - order
 
-// 		if request.Method != "GET" {
-// 			http.Error(writer, "Unsopported method", 405)
-// 			return
-// 		}
-
-// 		// Get path variable from path
-// 		idStr := strings.TrimPrefix(request.URL.Path, "/api/excercieses/get/")
-// 		id, err := strconv.Atoi(idStr)
-// 		if err != nil {
-// 			http.Error(writer, "Incorrect path variable", http.StatusBadRequest)
-// 		}
-// 		uId := uint(id)
-
-// 		res := db.GetExcerciese(uId, pool)
-// 		httpRes := matcher.MatchResult(res)
-// 		writer.WriteHeader(httpRes.GetStatus())
-// 		writer.Write(httpRes.GetData())
-// 	})
-// }
-
-// func GetExcercieses(pool *pgx.ConnPool) http.HandlerFunc {
-// 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-// 		if request.Method != "GET" {
-// 			http.Error(writer, "Unsopported method", 405)
-// 			return
-// 		}
-
-// 		query := request.URL.Query()
-// 		pathVariablesStr := strings.TrimPrefix(request.URL.Path, "/api/excercieses/list/")
-// 		vars := strings.Split(pathVariablesStr, "/")
-// 		subject := ""
-// 		tag := ""
-// 		level := -1
-
-// 		if len(vars) == 0 {
-// 			http.Error(writer, "Not enough parameter", 404)
-// 			return
-// 		}
-
-// 		// its very scary !!!!!
-// 		for i, data := range vars {
-// 			if i == 0 {
-// 				subject = vars[i]
-// 			}
-// 			if i == 1 {
-// 				tag = vars[i]
-// 			}
-// 			if i == 2 && data != "" {
-// 				var err error
-// 				level, err = strconv.Atoi(data)
-// 				if err != nil {
-// 					http.Error(writer, "INCORRECT PATH", 404)
-// 				}
-// 			}
-// 		}
-
-// 		limitArr := query["limit"]
-// 		limit := -1
-// 		if len(limitArr) > 0 {
-// 			limit, _ = strconv.Atoi(limitArr[0])
-// 		}
-// 		offsetArr := query["offset"]
-// 		offset := -1
-// 		if len(offsetArr) > 0 {
-// 			offset, _ = strconv.Atoi(offsetArr[0])
-// 		}
-
-// 		// its fucking crutch maybe, todo refactor !!!!!!!!!
-
-// 		// check order for quer
-// 		order := query["order"]
-// 		is_desc := false
-// 		if len(order) > 0 && order[0] == "desc" {
-// 			is_desc = true
-// 		}
-
-// 		// 1 - subject 2 - tag 3 - level
-// 		// query 1 - limit 2 - offset 3 - order
-
-// 		res := db.GetExcercieseList(tag, subject, level, limit, offset, is_desc, pool)
-// 		httpRes := matcher.MatchResult(res)
-// 		writer.WriteHeader(httpRes.GetStatus())
-// 		writer.Write([]byte(val))
-// 	})
-// }
+		res := db.GetExcercieseList(tag, subject, level, limit, offset, is_desc, pool)
+		httpRes := matcher.MatchResult(res)
+		writer.WriteHeader(httpRes.GetStatus())
+		writer.Write(httpRes.GetData())
+	})
+}
