@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
-	matcher "github.com/OlympBMSTU/excericieses/controllers/matcher_result"
-	"github.com/OlympBMSTU/excericieses/result"
+	matcher "github.com/OlympBMSTU/exercises/controllers/matcher_result"
+	"github.com/OlympBMSTU/exercises/result"
 )
 
 func WriteResponse(writer *http.ResponseWriter, res result.Result) {

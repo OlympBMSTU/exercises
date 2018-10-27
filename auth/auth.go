@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OlympBMSTU/excericieses/auth/result"
+	"github.com/OlympBMSTU/exercises/auth/result"
 )
 
 type JWTHeader struct {

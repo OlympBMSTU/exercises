@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/OlympBMSTU/excericieses/entities"
+	"github.com/OlympBMSTU/exercises/entities"
 	"github.com/jackc/pgx"
 )
 

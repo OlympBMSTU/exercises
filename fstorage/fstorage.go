@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/OlympBMSTU/excericieses/config"
-	"github.com/OlympBMSTU/excericieses/fstorage/result"
+	"github.com/OlympBMSTU/exercises/config"
+	"github.com/OlympBMSTU/exercises/fstorage/result"
 )
 
 func FileExist(path string) bool {

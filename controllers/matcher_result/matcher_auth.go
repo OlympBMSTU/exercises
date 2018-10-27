@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	auth_res "github.com/OlympBMSTU/excericieses/auth/result"
-	http_res "github.com/OlympBMSTU/excericieses/controllers/http_result"
-	"github.com/OlympBMSTU/excericieses/result"
-	"github.com/OlympBMSTU/excericieses/views/output"
+	auth_res "github.com/OlympBMSTU/exercises/auth/result"
+	http_res "github.com/OlympBMSTU/exercises/controllers/http_result"
+	"github.com/OlympBMSTU/exercises/result"
+	"github.com/OlympBMSTU/exercises/views/output"
 )
 
 var mapHttpAuthStatuses = map[int]ResultInfo{

@@ -1,6 +1,6 @@
 package result
 
-import "github.com/OlympBMSTU/excericieses/result"
+import "github.com/OlympBMSTU/exercises/result"
 
 type AuthResult struct {
 	data   AuthData

@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/OlympBMSTU/excericieses/db/result"
-	"github.com/OlympBMSTU/excericieses/entities"
-	"github.com/OlympBMSTU/excericieses/views" // "github.com/OlympBMSTU/excericieses/db/result"
+	"github.com/OlympBMSTU/exercises/db/result"
+	"github.com/OlympBMSTU/exercises/entities"
+	"github.com/OlympBMSTU/exercises/views"
 	"github.com/jackc/pgx"
 	"github.com/lib/pq"
 )

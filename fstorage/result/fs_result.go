@@ -1,7 +1,7 @@
 package result
 
 import (
-	"github.com/OlympBMSTU/excericieses/result"
+	"github.com/OlympBMSTU/exercises/result"
 )
 
 type FSResult struct {

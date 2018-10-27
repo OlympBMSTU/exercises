@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/OlympBMSTU/excericieses/db"
+	"github.com/OlympBMSTU/exercises/db"
 	"github.com/jackc/pgx"
 )
 

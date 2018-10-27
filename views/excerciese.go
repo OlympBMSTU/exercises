@@ -1,6 +1,6 @@
 package views
 
-import "github.com/OlympBMSTU/excericieses/entities"
+import "github.com/OlympBMSTU/exercises/entities"
 
 type ExerciseView struct {
 	Answer     string   `json:"answer"`

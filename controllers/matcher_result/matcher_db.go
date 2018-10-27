@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	http_res "github.com/OlympBMSTU/excericieses/controllers/http_result"
-	db "github.com/OlympBMSTU/excericieses/db/result"
-	"github.com/OlympBMSTU/excericieses/result"
-	"github.com/OlympBMSTU/excericieses/views/output"
+	http_res "github.com/OlympBMSTU/exercises/controllers/http_result"
+	db "github.com/OlympBMSTU/exercises/db/result"
+	"github.com/OlympBMSTU/exercises/result"
+	"github.com/OlympBMSTU/exercises/views/output"
 )
 
 var mapHttpDbStatuses = map[int]ResultInfo{

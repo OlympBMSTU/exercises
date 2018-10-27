@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/OlympBMSTU/excericieses/config"
-	"github.com/OlympBMSTU/excericieses/controllers"
+	"github.com/OlympBMSTU/exercises/config"
+	"github.com/OlympBMSTU/exercises/controllers"
 	"github.com/jackc/pgx"
 )
 

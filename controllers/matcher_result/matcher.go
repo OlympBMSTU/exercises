@@ -1,11 +1,11 @@
 package matcher_result
 
 import (
-	auth_result "github.com/OlympBMSTU/excericieses/auth/result"
-	http "github.com/OlympBMSTU/excericieses/controllers/http_result"
-	db_result "github.com/OlympBMSTU/excericieses/db/result"
-	fs_result "github.com/OlympBMSTU/excericieses/fstorage/result"
-	root_result "github.com/OlympBMSTU/excericieses/result"
+	auth_result "github.com/OlympBMSTU/exercises/auth/result"
+	http "github.com/OlympBMSTU/exercises/controllers/http_result"
+	db_result "github.com/OlympBMSTU/exercises/db/result"
+	fs_result "github.com/OlympBMSTU/exercises/fstorage/result"
+	root_result "github.com/OlympBMSTU/exercises/result"
 )
 
 func MatchResult(res root_result.Result) http.HttpResult {

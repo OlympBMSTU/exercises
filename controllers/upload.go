@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OlympBMSTU/excericieses/auth"
-	"github.com/OlympBMSTU/excericieses/db"
-	"github.com/OlympBMSTU/excericieses/entities"
-	"github.com/OlympBMSTU/excericieses/fstorage"
-	"github.com/OlympBMSTU/excericieses/result"
+	"github.com/OlympBMSTU/exercises/auth"
+	"github.com/OlympBMSTU/exercises/db"
+	"github.com/OlympBMSTU/exercises/entities"
+	"github.com/OlympBMSTU/exercises/fstorage"
+	"github.com/OlympBMSTU/exercises/result"
 	"github.com/jackc/pgx"
 )
 
