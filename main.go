@@ -9,13 +9,6 @@ import (
 	"github.com/jackc/pgx"
 )
 
-type ExcercieseUpload struct {
-	Answer     string `json:"answer"`
-	FileBase64 string `json:"file"`
-	FileName   string `json:"file_name"`
-	author     uint64
-}
-
 func Init() (*pgx.ConnPool, error) {
 	conf, err := config.GetConfigInstance()
 	if err != nil {
@@ -42,9 +35,9 @@ func Init() (*pgx.ConnPool, error) {
 }
 
 func InitRouter(pool *pgx.ConnPool) {
-	http.HandleFunc("/api/exercises/upload_exercise", controllers.UploadExcercieseHandler(pool))
-	http.HandleFunc("/api/exercises/get/", controllers.GetExcerciese(pool))
-	http.HandleFunc("/api/exercises/list/", controllers.GetExcercieses(pool))
+	http.HandleFunc("/api/exercises/upload_exercise", controllers.UploadExerciseHandler(pool))
+	http.HandleFunc("/api/exercises/get/", controllers.GetExercise(pool))
+	http.HandleFunc("/api/exercises/list/", controllers.GetExercises(pool))
 	http.HandleFunc("/api/exercises/subjects/", controllers.GetSubjects(pool))
 	http.HandleFunc("/api/exercises/tags/", controllers.GetTags(pool))
 }
@@ -58,66 +51,5 @@ func main() {
 
 	InitRouter(pool)
 
-	// type ExcercieseEntity struct {
-	// 	Id          uint
-	// 	AuthorId    uint
-	// 	FileName    string
-	// 	RightAnswer string
-	// 	Tags        []string
-	// 	Level       uint
-	// 	Subject     string
-	// }
-
-	// dt := [1,2]
-
-	// ex := entities.ExcercieseEntity{
-	// 	0,
-	// 	1,
-	// 	"sdfd",
-	// 	"dsf",
-	// 	[]string{"array", "data"},
-	// 	3,
-	// 	"mathematic",
-	// }
-
-	// res := db.SaveExcerciese(ex, pool)
-
-	// res := db.GetExcerciese(1, pool)
-
-	// fmt.Print(res)
-
 	http.ListenAndServe("localhost:5469", nil)
 }
-
-// tests
-// test create subjects correct
-
-// create 3 subjects
-// create ex ok
-// create ex no subject
-// drop table
-// drop db
-// drop connect
-
-// test get tags by ex
-
-// test get one ex ok
-//   			not exist
-//	maybe check tags for correct
-
-// get excercises
-
-// init db -> create
-//
-
-// ex := entities.ExcercieseEntity{
-// 	0,
-// 	1,
-// 	"sdfd",
-// 	"dsf",
-// 	[]string{"array", "data"},
-// 	3,
-// 	"mathematics",
-// }
-
-// res := db.SaveExcerciese(ex, pool)

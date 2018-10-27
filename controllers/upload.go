@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	matcher "github.com/OlympBMSTU/excericieses/controllers/matcher_result"
+	"github.com/OlympBMSTU/excericieses/auth"
 	"github.com/OlympBMSTU/excericieses/db"
 	"github.com/OlympBMSTU/excericieses/entities"
 	"github.com/OlympBMSTU/excericieses/fstorage"
@@ -14,48 +14,27 @@ import (
 	"github.com/jackc/pgx"
 )
 
-// func m(d map[string][]string) {
-// 	fmt.Print(d)
-// }
-
-func OptionsCredentials(writer http.ResponseWriter) {
-	writer.Header().Set("Access-Control-Allow-Method", "POST, OPTIONS")
-	writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-controll-request-method,x-requested-with")
-	writer.Header().Set("Access-Control-Allow-Credentials", "true")
-}
-
-func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
+func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		OptionsCredentials(writer)
+		OptionsCredentials(&writer)
 		if request.Method == "OPTIONS" {
 			writer.Write([]byte("hi"))
 			return
 		}
+
+		if request.Method != "POST" {
+			http.Error(writer, "Unsupported method", 405)
+			return
+		}
+
+		authRes := auth.AuthByUserCookie(request, "bmstuOlympAuth")
+		if authRes.IsError() {
+			WriteResponse(&writer, authRes)
+			return
+		}
 		writer.Header().Set("Content-Type", "application/json")
 
-		// if request.Method != "POST" {
-		// 	http.Error(writer, "Unsupported method", 405)
-		// 	return
-		// }
-
 		var err error
-
-		// cookie, err := request.Cookie("bmstuOlympAuth")
-		// // unauth
-		// if err != nil {
-		// 	http.Error(writer, "Unauthorized", 403)
-		// 	return
-		// }
-
-		// auth_res := auth.AuthUser(cookie.Value)
-		// if auth_res.IsError() {
-		// 	httpRes := matcher.MatchResult(auth_res)
-		// 	writer.WriteHeader(httpRes.GetStatus())
-		// 	writer.Write(httpRes.GetData())
-		// 	return
-		// }
-
 		if err = request.ParseMultipartForm(-1); err != nil {
 			http.Error(writer, "Incorrect body", http.StatusBadRequest)
 			return
@@ -89,9 +68,7 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 			for _, hdr := range fheaders {
 				fsRes = fstorage.WriteFile(hdr)
 				if fsRes.IsError() {
-					http_res := matcher.MatchResult(fsRes)
-					writer.WriteHeader(http_res.GetStatus())
-					writer.Write(http_res.GetData())
+					WriteResponse(&writer, fsRes)
 					return
 				}
 			}
@@ -99,7 +76,7 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 
 		filename := fsRes.GetData().(string)
 		author_id := 0
-		dbExcerciese := entities.NewExcercieseEntity(uint(author_id), filename, answer[0],
+		dbExcerciese := entities.NewExerciseEntity(uint(author_id), filename, answer[0],
 			tags, uint(level), subject[0])
 
 		// err := sender.SendAnswer(0, "hi")
@@ -109,21 +86,18 @@ func UploadExcercieseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 		// 	return
 		// }
 
-		dbRes := db.SaveExcerciese(dbExcerciese, pool)
-		http_res := matcher.MatchResult(dbRes)
-		writer.WriteHeader(http_res.GetStatus())
-		writer.Write(http_res.GetData())
+		dbRes := db.SaveExercise(dbExcerciese, pool)
+		WriteResponse(&writer, dbRes)
 	})
 }
 
-func GetExcerciese(pool *pgx.ConnPool) http.HandlerFunc {
+func GetExercise(pool *pgx.ConnPool) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 
 		if request.Method != "GET" {
 			http.Error(writer, "Unsopported method", 405)
 			return
 		}
-
 		writer.Header().Set("Content-Type", "application/json")
 
 		// Get path variable from path
@@ -133,16 +107,14 @@ func GetExcerciese(pool *pgx.ConnPool) http.HandlerFunc {
 			http.Error(writer, "Incorrect path variable", http.StatusBadRequest)
 			return
 		}
-		uId := uint(id)
+		exId := uint(id)
 
-		res := db.GetExcerciese(uId, pool)
-		httpRes := matcher.MatchResult(res)
-		writer.WriteHeader(httpRes.GetStatus())
-		writer.Write(httpRes.GetData())
+		dbRes := db.GetExercise(exId, pool)
+		WriteResponse(&writer, dbRes)
 	})
 }
 
-func GetExcercieses(pool *pgx.ConnPool) http.HandlerFunc {
+func GetExercises(pool *pgx.ConnPool) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		if request.Method != "GET" {
 			http.Error(writer, "Unsopported method", 405)
@@ -163,7 +135,7 @@ func GetExcercieses(pool *pgx.ConnPool) http.HandlerFunc {
 			return
 		}
 
-		// its very scary !!!!!
+		// its very scary !!!!!  // use reflect and refactor level
 		for i, data := range vars {
 			if i == 0 {
 				subject = vars[i]
@@ -203,9 +175,7 @@ func GetExcercieses(pool *pgx.ConnPool) http.HandlerFunc {
 		// 1 - subject 2 - tag 3 - level
 		// query 1 - limit 2 - offset 3 - order
 
-		res := db.GetExcercieseList(tag, subject, level, limit, offset, is_desc, pool)
-		httpRes := matcher.MatchResult(res)
-		writer.WriteHeader(httpRes.GetStatus())
-		writer.Write(httpRes.GetData())
+		dbRes := db.GetExerciseList(tag, subject, level, limit, offset, is_desc, pool)
+		WriteResponse(&writer, dbRes)
 	})
 }

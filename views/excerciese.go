@@ -2,7 +2,7 @@ package views
 
 import "github.com/OlympBMSTU/excericieses/entities"
 
-type ExcercieseView struct {
+type ExerciseView struct {
 	Answer     string   `json:"answer"`
 	FileBase64 string   `json:"file"`
 	FileName   string   `json:"file_name"`
@@ -21,8 +21,8 @@ type ExcercieseView struct {
 // 	)
 // }
 
-func ExcercieseViewFrom(entity entities.ExcercieseEntity, tags []string) ExcercieseView {
-	return ExcercieseView{
+func ExcercieseViewFrom(entity entities.ExerciseEntity, tags []string) ExerciseView {
+	return ExerciseView{
 		entity.GetRightAnswer(),
 		"",
 		entity.GetFileName(),

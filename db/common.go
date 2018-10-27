@@ -5,23 +5,23 @@ import (
 	"github.com/jackc/pgx"
 )
 
-func scanExcerciese(rows *pgx.Rows) (*entities.ExcercieseEntity, error) {
-	var excerciese entities.ExcercieseEntity
+func scanExercise(rows *pgx.Rows) (*entities.ExerciseEntity, error) {
+	var exercise entities.ExerciseEntity
 
 	err := rows.Scan(
-		&excerciese.Id,
-		&excerciese.AuthorId,
-		&excerciese.RightAnswer,
-		&excerciese.Level,
-		&excerciese.FileName,
-		&excerciese.Subject,
+		&exercise.Id,
+		&exercise.AuthorId,
+		&exercise.RightAnswer,
+		&exercise.Level,
+		&exercise.FileName,
+		&exercise.Subject,
 	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &excerciese, nil
+	return &exercise, nil
 }
 
 func getTags(query string, pool *pgx.ConnPool, args ...interface{}) (*[]string, error) {

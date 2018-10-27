@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"net/http"
 	"strings"
 	"time"
 
@@ -28,9 +29,19 @@ type JWTPayload struct {
 
 const HASH_SECRET = "Любовь измеряется мерой прощения."
 
-func AuthUser(jwt string) result.AuthResult {
-	return result.OkResult(1)
+// http.Error(writer, "Unauthorized", 403)
 
+func AuthByUserCookie(request *http.Request, cookieName string) result.AuthResult {
+	// return result.OkResult(1)
+	cookie, err := request.Cookie(cookieName)
+	if err != nil {
+		return result.ErrorResult(result.NO_COOKIE, "No cookie")
+	}
+
+	return authUser(cookie.Value)
+}
+
+func authUser(jwt string) result.AuthResult {
 	jwt_data := strings.Split(jwt, ".")
 
 	if len(jwt_data) != 3 {

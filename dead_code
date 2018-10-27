@@ -1,4 +1,30 @@
+	// type ExcercieseEntity struct {
+	// 	Id          uint
+	// 	AuthorId    uint
+	// 	FileName    string
+	// 	RightAnswer string
+	// 	Tags        []string
+	// 	Level       uint
+	// 	Subject     string
+	// }
 
+	// dt := [1,2]
+
+	// ex := entities.ExcercieseEntity{
+	// 	0,
+	// 	1,
+	// 	"sdfd",
+	// 	"dsf",
+	// 	[]string{"array", "data"},
+	// 	3,
+	// 	"mathematic",
+	// }
+
+	// res := db.SaveExcerciese(ex, pool)
+
+	// res := db.GetExcerciese(1, pool)
+
+	// fmt.Print(res)
 
 // func MatchOkResult() {
 

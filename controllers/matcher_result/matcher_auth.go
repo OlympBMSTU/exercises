@@ -14,6 +14,7 @@ var mapHttpAuthStatuses = map[int]ResultInfo{
 	auth_res.NO_ERROR:        NewResultInfo("Ok", http.StatusOK, statusOK),
 	auth_res.NO_AUTHROIZED:   NewResultInfo("Unauthorized", http.StatusUnauthorized, statusError),
 	auth_res.ERROR_PARSE_JWT: NewResultInfo("Unauthorized", http.StatusUnauthorized, statusError),
+	auth_res.NO_COOKIE:       NewResultInfo("Unauthorized", http.StatusUnauthorized, statusError),
 }
 
 func MatchAuthResult(res result.Result) http_res.HttpResult {
