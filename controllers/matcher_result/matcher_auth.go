@@ -1,26 +1,36 @@
 package matcher_result
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	auth_res "github.com/OlympBMSTU/excericieses/auth/result"
 	http_res "github.com/OlympBMSTU/excericieses/controllers/http_result"
 	"github.com/OlympBMSTU/excericieses/result"
+	"github.com/OlympBMSTU/excericieses/views/output"
 )
 
-// const fs_http_codes = map[int]
+var mapHttpAuthStatuses = map[int]ResultInfo{
+	auth_res.NO_ERROR:        NewResultInfo("Ok", http.StatusOK, statusOK),
+	auth_res.NO_AUTHROIZED:   NewResultInfo("Unauthorized", http.StatusUnauthorized, statusError),
+	auth_res.ERROR_PARSE_JWT: NewResultInfo("Unauthorized", http.StatusUnauthorized, statusError),
+}
 
 func MatchAuthResult(res result.Result) http_res.HttpResult {
-	status := res.GetStatus()
-	var code int
-	switch status.GetCode() {
-	case auth_res.NO_ERROR:
-		code = http.StatusOK
-	default:
-		code = http.StatusUnauthorized
-	}
-	fmt.Print(code)
+	var jsonRes output.ResultView
+	info := mapHttpAuthStatuses[res.GetStatus().GetCode()]
+	jsonRes.SetStatus(info.Status)
+	jsonRes.SetMessage(info.Message)
+	code := info.HttpCode
 
-	return http_res.ResultInernalSreverError()
+	var outHttpRes http_res.HttpResult
+	val, err := json.Marshal(jsonRes)
+	if err != nil {
+		code = http.StatusInternalServerError
+	} else {
+		outHttpRes.SetBody(val)
+	}
+	outHttpRes.SetStatus(code)
+
+	return outHttpRes
 }

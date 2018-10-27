@@ -1,30 +1,39 @@
 package matcher_result
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	http_res "github.com/OlympBMSTU/excericieses/controllers/http_result"
 	fs "github.com/OlympBMSTU/excericieses/fstorage/result"
 	"github.com/OlympBMSTU/excericieses/result"
+	"github.com/OlympBMSTU/excericieses/views/output"
 )
 
-var mapHttpFsStatuses = map[int]http_res.HttpResult{
-	fs.NO_ERROR:          http_res.CreateHttpResult(http.StatusOK, "OK"),
-	fs.ERROR_CREATE_DIRS: http_res.ResultInernalSreverError(),
-	fs.ERROR_CREATE_FILE: http_res.ResultInernalSreverError(),
-	fs.ERROR_WRITE_FILE:  http_res.ResultInernalSreverError(),
+var mapHttpFsStatuses = map[int]ResultInfo{
+	fs.NO_ERROR:          NewResultInfo("Ok", http.StatusOK, statusOK), //, "
+	fs.ERROR_CREATE_DIRS: NewResultInfo("Internal server error", http.StatusInternalServerError, statusError),
+	fs.ERROR_CREATE_FILE: NewResultInfo("Internal server error", http.StatusInternalServerError, statusError),
+	fs.ERROR_WRITE_FILE:  NewResultInfo("Internal server error", http.StatusInternalServerError, statusError),
 }
 
 func MatchFSResult(res result.Result) http_res.HttpResult {
-	var code int
-	status := res.GetStatus()
-	switch status.GetCode() {
-	case fs.NO_ERROR:
-		code = http.StatusOK
-	default:
+	var jsonRes output.ResultView
+	info := mapHttpDbStatuses[res.GetStatus().GetCode()]
+
+	jsonRes.SetStatus(info.Status)
+	jsonRes.SetMessage(info.Message)
+
+	val, err := json.Marshal(jsonRes)
+	code := info.HttpCode
+	var outHttpRes http_res.HttpResult
+
+	if err != nil {
 		code = http.StatusInternalServerError
+	} else {
+		outHttpRes.SetBody(val)
 	}
-	fmt.Print(code)
-	return http_res.ResultInernalSreverError()
+
+	outHttpRes.SetStatus(code)
+	return outHttpRes
 }

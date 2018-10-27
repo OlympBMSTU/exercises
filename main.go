@@ -18,7 +18,6 @@ type ExcercieseUpload struct {
 
 func Init() (*pgx.ConnPool, error) {
 	conf, err := config.GetConfigInstance()
-	// fmt.Println(conf.GetFileStorageName())
 	if err != nil {
 		fmt.Println("Error in config file")
 		return nil, err
@@ -43,7 +42,7 @@ func Init() (*pgx.ConnPool, error) {
 }
 
 func InitRouter(pool *pgx.ConnPool) {
-	// http.HandleFunc("/api/excercieses/upload_excerciese", controllers.UploadExcercieseHandler(pool))
+	http.HandleFunc("/api/excercieses/upload_excerciese", controllers.UploadExcercieseHandler(pool))
 	// http.HandleFunc("/api/excercieses/get/", controllers.GetExcerciese(pool))
 	// http.HandleFunc("/api/excercieses/list/", controllers.GetExcercieses(pool))
 	http.HandleFunc("/api/excercieses/subjects/", controllers.GetSubjects(pool))

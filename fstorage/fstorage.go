@@ -1,13 +1,17 @@
 package fstorage
 
 import (
-	"bufio"
 	"crypto/md5"
 	"fmt"
+	"io"
 	"math/big"
+	"mime/multipart"
 	"os"
+	"path/filepath"
+	"strconv"
 
 	"github.com/OlympBMSTU/excericieses/config"
+	"github.com/OlympBMSTU/excericieses/fstorage/result"
 )
 
 func FileExist(path string) bool {
@@ -33,44 +37,48 @@ func ComputeName(filename string) string {
 	return newPath
 }
 
-func WriteFile(fileData []byte, name string, ext string) error {
-	dirs := name[:6]
+// todo refactor close open work eith strings
+func WriteFile(fileHdr *multipart.FileHeader) result.FSResult {
 	conf, _ := config.GetConfigInstance()
 
-	dirPath := conf.GetFileStorageName() + dirs
-	err := os.MkdirAll(dirPath, 0777)
-	if err != nil {
-		// clear dirs
-		return err
-	}
+	ext := filepath.Ext(fileHdr.Filename)
+	newNamePart := ComputeName(fileHdr.Filename)
+	staticPath := conf.GetFileStorageName() + "/"
+	newDirsPath := staticPath + newNamePart[:6]
 
-	filePath := conf.GetFileStorageName() + name
-	filePathWithExt := filePath + ext
+	filePathWithExt := staticPath + newNamePart + ext
 	idx := 1
 	for {
 		if FileExist(filePathWithExt) {
-			filePath += string(idx)
-			filePathWithExt = filePath + ext
+			newNamePart += strconv.Itoa(idx)
+			filePathWithExt = staticPath + newNamePart + ext
 		} else {
 			break
 		}
 		idx++
 	}
 
+	inFile, err := fileHdr.Open()
+	defer inFile.Close()
+
+	if err != nil {
+		return result.ErrorResult(err)
+	}
+
+	err = os.MkdirAll(newDirsPath, 0777)
+	if err != nil {
+		// clear dirs
+		return result.ErrorResult(err)
+	}
+
 	f, err := os.Create(filePathWithExt)
-	defer f.Close()
+	defer f.Close() // ? is it
 	if err != nil {
-		return err
+		return result.ErrorResult(err)
 	}
-
-	writer := bufio.NewWriter(f)
-	_, err = writer.Write(fileData)
-
+	_, err = io.Copy(f, inFile)
 	if err != nil {
-		return err
+		return result.ErrorResult(err)
 	}
-
-	writer.Flush()
-
-	return nil
+	return result.OkResult(newNamePart + ext)
 }

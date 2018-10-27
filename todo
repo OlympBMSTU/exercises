@@ -18,3 +18,6 @@
 8) TODO trim answer, change , for .
 9) Refactor work with error handling in http_result
 10) OutputExView
+
+		// form := request.Form //.(map[string][]string)
+		// m(form)

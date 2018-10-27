@@ -19,7 +19,7 @@ func (res AuthResult) GetStatus() result.Status {
 	return res.status
 }
 
-func ErrroResult(params ...interface{}) AuthResult {
+func ErrorResult(params ...interface{}) AuthResult {
 	if len(params) == 1 {
 		return AuthResult{
 			AuthData{nil},

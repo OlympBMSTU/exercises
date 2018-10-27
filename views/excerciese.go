@@ -12,14 +12,14 @@ type ExcercieseView struct {
 	Author     uint
 }
 
-func (view *ExcercieseView) ToEntity() entities.ExcercieseEntity {
-	return entities.NewExcercieseEntity(
-		view.Answer,
-		view.Tags,
-		view.Level,
-		view.Subject,
-	)
-}
+// func (view *ExcercieseView) ToEntity() entities.ExcercieseEntity {
+// 	return entities.NewExcercieseEntity(
+// 		view.Answer,
+// 		view.Tags,
+// 		view.Level,
+// 		view.Subject,
+// 	)
+// }
 
 func ExcercieseViewFrom(entity entities.ExcercieseEntity, tags []string) ExcercieseView {
 	return ExcercieseView{

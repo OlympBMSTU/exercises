@@ -10,12 +10,6 @@ import (
 	"github.com/OlympBMSTU/excericieses/views/output"
 )
 
-// json: {
-// "status": Ok,
-// "message": error,
-// "data": data
-// }
-
 var mapHttpDbStatuses = map[int]ResultInfo{
 	db.NO_ERROR:         NewResultInfo("Ok", http.StatusOK, statusOK), //, "OK"),
 	db.CREATED:          NewResultInfo("Created", http.StatusCreated, statusOK),
@@ -51,10 +45,3 @@ func MatchDbResult(res result.Result) http_res.HttpResult {
 	outHttpRes.SetStatus(code)
 	return outHttpRes
 }
-
-// fmt.Print(outHttpRes)
-
-//http_res.ResultInernalSreverError()
-// if status.IsError() {
-
-// }

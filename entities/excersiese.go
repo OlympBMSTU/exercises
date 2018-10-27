@@ -11,14 +11,18 @@ type ExcercieseEntity struct {
 	Tags        []string
 	Level       uint
 	Subject     string
+	IsBroken    bool
 }
 
-func NewExcercieseEntity(answer string, tags []string, level uint, subject string) ExcercieseEntity {
+func NewExcercieseEntity(author uint, filename string, answer string, tags []string, level uint, subject string) ExcercieseEntity {
 	return ExcercieseEntity{
+		AuthorId:    author,
+		FileName:    filename,
 		Tags:        tags,
 		RightAnswer: answer,
 		Level:       level,
 		Subject:     subject,
+		IsBroken:    false,
 	}
 }
 
