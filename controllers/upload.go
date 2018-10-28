@@ -11,6 +11,7 @@ import (
 	"github.com/OlympBMSTU/exercises/entities"
 	"github.com/OlympBMSTU/exercises/fstorage"
 	"github.com/OlympBMSTU/exercises/result"
+	"github.com/OlympBMSTU/exercises/sender"
 	"github.com/jackc/pgx"
 )
 
@@ -84,15 +85,15 @@ func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 
 		}
 
-		// exId = dbRes.GetData().(int)
-		// senderRes := sender.SendAnswer(exId, exView.GetAnswer())
-		// if senderRes.IsError() {
-		// 	dbDelRes = db.DeleteExcerciese(exId, pool)
-		// 	fsDelRes = fstorage.DeleteFile(filename)
-		// 	WriteResponse(&writer, senderRes)
-		// 	return
-		// 	// if there is error what to do
-		// }
+		exId = dbRes.GetData().(int)
+		senderRes := sender.SendAnswer(exId, exView.GetAnswer())
+		if senderRes.IsError() {
+			dbDelRes = db.DeleteExcerciese(exId, pool)
+			fsDelRes = fstorage.DeleteFile(filename)
+			WriteResponse(&writer, senderRes)
+			return
+			// if there is error what to do
+		}
 
 		WriteResponse(&writer, dbRes)
 		// if err := nil {

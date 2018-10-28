@@ -73,7 +73,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION del_excerciese(id integer) 
 RETURNS INTEGER AS $$
 BEGIN 
-
+    DELETE FROM tag_excerciese 
 END;
 $$ LANGUAGE plpgsql;
 
