@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -21,6 +22,8 @@ type Config struct {
 	smtpPort       string
 	smtpUser       string
 	smtpPassword   string
+	acceptorMail   string
+	mailSubject    string
 }
 
 func (cfg Config) GetFileStorageName() string {
@@ -63,6 +66,14 @@ func (cfg Config) GetSMTPPassword() string {
 	return cfg.smtpPassword
 }
 
+func (cfg Config) GetAcceptorMail() string {
+	return cfg.acceptorMail
+}
+
+func (cfg Config) GetMailSubject() string {
+	return cfg.mailSubject
+}
+
 // it works but need to get path to dir
 // error handling, maybe return struct string, err
 // check
@@ -82,6 +93,12 @@ func Init() (*Config, error) {
 	fileData := string(fbytes)
 	configs := strings.Split(fileData, "\n")
 
+	countFields := reflect.ValueOf(Config{}).NumField()
+	if len(configs) < countFields {
+		fmt.Println("Not enough fields")
+		return nil, err
+	}
+
 	return &Config{
 		configs[0],
 		configs[1],
@@ -94,6 +111,8 @@ func Init() (*Config, error) {
 		configs[8],
 		configs[9],
 		configs[10],
+		configs[11],
+		configs[12],
 	}, nil
 }
 

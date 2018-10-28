@@ -4,35 +4,25 @@ package entities
 // написать Диме Кузнецову на какую почту что слать
 // слать заголовок задание и данные
 type ExerciseEntity struct {
-	Id          uint
-	AuthorId    uint
-	FileName    string
-	RightAnswer string
-	Tags        []string
-	Level       uint
-	Subject     string
-	IsBroken    bool
+	Id       uint
+	AuthorId uint
+	FileName string
+	Tags     []string
+	Level    uint
+	Subject  string
+	IsBroken bool
 }
 
-func NewExerciseEntity(author uint, filename string, answer string, tags []string, level uint, subject string) ExerciseEntity {
+func NewExerciseEntity(author uint, filename string, tags []string, level uint, subject string) ExerciseEntity {
 	return ExerciseEntity{
-		AuthorId:    author,
-		FileName:    filename,
-		Tags:        tags,
-		RightAnswer: answer,
-		Level:       level,
-		Subject:     subject,
-		IsBroken:    false,
+		AuthorId: author,
+		FileName: filename,
+		Tags:     tags,
+		Level:    level,
+		Subject:  subject,
+		IsBroken: false,
 	}
 }
-
-// func NewExcercieseEntity1(author_id uint, file_name string, right_answer string) ExcercieseEntity {
-// 	return ExcercieseEntity{
-// 		AuthorId:    author_id,
-// 		FileName:    file_name,
-// 		RightAnswer: right_answer,
-// 	}
-// }
 
 func (entity ExerciseEntity) GetId() uint {
 	return entity.Id
@@ -44,10 +34,6 @@ func (entity ExerciseEntity) GetAuthorId() uint {
 
 func (entity ExerciseEntity) GetFileName() string {
 	return entity.FileName
-}
-
-func (entity ExerciseEntity) GetRightAnswer() string {
-	return entity.RightAnswer
 }
 
 func (entity ExerciseEntity) GetLevel() uint {

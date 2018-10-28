@@ -1,19 +1,40 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/OlympBMSTU/exercises/auth"
 	"github.com/OlympBMSTU/exercises/db"
-	"github.com/OlympBMSTU/exercises/entities"
 	"github.com/OlympBMSTU/exercises/fstorage"
 	"github.com/OlympBMSTU/exercises/result"
-	"github.com/OlympBMSTU/exercises/sender"
+	"github.com/OlympBMSTU/exercises/views"
 	"github.com/jackc/pgx"
 )
+
+// answer := request.Form["answer"]
+// subject := request.Form["subject"]
+// level_str := request.Form["level"]
+// tags_arr := request.Form["tags"]
+
+// if len(answer) < 1 || len(subject) < 1 || len(level_str) < 1 || len(tags_arr) < 1 {
+// 	http.Error(writer, "Incorrect body", http.StatusBadRequest)
+// 	return
+// }
+
+// var tags []string
+// err = json.Unmarshal([]byte(tags_arr[0]), &tags)
+// if err != nil {
+// 	http.Error(writer, "Incorrect tags in body", http.StatusBadRequest)
+// 	return
+// }
+
+// var level int
+// if level, err = strconv.Atoi(level_str[0]); err != nil {
+// 	http.Error(writer, "Incorrect body", http.StatusBadRequest)
+// 	return
+// }
 
 func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
@@ -41,26 +62,9 @@ func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 			return
 		}
 
-		answer := request.Form["answer"]
-		subject := request.Form["subject"]
-		level_str := request.Form["level"]
-		tags_arr := request.Form["tags"]
-
-		if len(answer) < 1 || len(subject) < 1 || len(level_str) < 1 || len(tags_arr) < 1 {
-			http.Error(writer, "Incorrect body", http.StatusBadRequest)
-			return
-		}
-
-		var tags []string
-		err = json.Unmarshal([]byte(tags_arr[0]), &tags)
-		if err != nil {
-			http.Error(writer, "Incorrect tags in body", http.StatusBadRequest)
-			return
-		}
-
-		var level int
-		if level, err = strconv.Atoi(level_str[0]); err != nil {
-			http.Error(writer, "Incorrect body", http.StatusBadRequest)
+		parseRes := views.ExcercieseViewFromForm(request.Form)
+		if parseRes.IsError() {
+			WriteResponse(&writer, parseRes)
 			return
 		}
 
@@ -75,27 +79,27 @@ func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 			}
 		}
 
-		filename := fsRes.GetData().(string)
-		author_id := 0
-		dbExcerciese := entities.NewExerciseEntity(uint(author_id), filename, answer[0],
-			tags, uint(level), subject[0])
+		// filename := fsRes.GetData().(string)
+		// author_id := 0
+		// dbExcerciese := entities.NewExerciseEntity(uint(author_id), filename, answer[0],
+		// 	tags, uint(level), subject[0])
 
-		dbRes := db.SaveExercise(dbExcerciese, pool)
-		if dbRes.IsError() {
+		// dbRes := db.SaveExercise(dbExcerciese, pool)
+		// if dbRes.IsError() {
 
-		}
+		// }
 
-		exId = dbRes.GetData().(int)
-		senderRes := sender.SendAnswer(exId, exView.GetAnswer())
-		if senderRes.IsError() {
-			dbDelRes = db.DeleteExcerciese(exId, pool)
-			fsDelRes = fstorage.DeleteFile(filename)
-			WriteResponse(&writer, senderRes)
-			return
-			// if there is error what to do
-		}
+		// //exId = dbRes.GetData().(int)
+		// senderRes := sender.SendAnswer(exId, exView.GetAnswer())
+		// if senderRes.IsError() {
+		// 	//dbDelRes = db.DeleteExcerciese(exId, pool)
+		// 	//fsDelRes = fstorage.DeleteFile(filename)
+		// 	WriteResponse(&writer, senderRes)
+		// 	return
+		// 	// if there is error what to do
+		// }
 
-		WriteResponse(&writer, dbRes)
+		// WriteResponse(&writer, dbRes)
 		// if err := nil {
 		// 	// db.RemoveExcerciese(excercieseEntity.Id)
 		// 	// fs.RemoveFile(newName)

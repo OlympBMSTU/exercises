@@ -6,7 +6,6 @@ import (
 
 	"github.com/OlympBMSTU/exercises/db/result"
 	"github.com/OlympBMSTU/exercises/entities"
-	"github.com/OlympBMSTU/exercises/views"
 	"github.com/jackc/pgx"
 	"github.com/lib/pq"
 )
@@ -65,14 +64,14 @@ func GetExercise(id uint, pool *pgx.ConnPool) result.DbResult {
 		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
 
-	tags, err := getTags(GET_TAGS_FOR_EXERCISE, pool, id)
+	//tags, err := getTags(GET_TAGS_FOR_EXERCISE, pool, id)
 
 	// can tags be empyt ?
-	if err != nil {
-		return result.ErrorResult(err)
-	}
+	//	if err != nil {
+	//		return result.ErrorResult(err)
+	//	}
 
-	return result.OkResult(views.ExcercieseViewFrom(*excerciese, *tags))
+	return result.OkResult(excerciese) //views.ExcercieseViewFrom(*excerciese, *tags))
 }
 
 func GetExerciseList(tag string, subject string, level int,
