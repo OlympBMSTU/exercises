@@ -18,9 +18,9 @@ func Init() (*pgx.ConnPool, error) {
 
 	connPoolConfig := pgx.ConnPoolConfig{
 		ConnConfig: pgx.ConnConfig{
-			Host:     conf.GetHost(),
-			User:     conf.GetUser(),
-			Password: conf.GetPassword(),
+			Host:     conf.GetDBHost(),
+			User:     conf.GetDBUser(),
+			Password: conf.GetDBPassword(),
 			Database: conf.GetDatabase(),
 		},
 		MaxConnections: 5,

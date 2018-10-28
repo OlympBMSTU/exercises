@@ -3,7 +3,7 @@
 8) TODO trim answer, change , for .
 9) smtp send
 10) OutputExView
-11 upload ex normalize ->
+11 upload ex normalize -> 
  create view, by form trim all data, remove dot to , or vica versa
  ParseExView returns res
 

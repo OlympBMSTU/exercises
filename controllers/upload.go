@@ -79,15 +79,29 @@ func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 		dbExcerciese := entities.NewExerciseEntity(uint(author_id), filename, answer[0],
 			tags, uint(level), subject[0])
 
-		// err := sender.SendAnswer(0, "hi")
+		dbRes := db.SaveExercise(dbExcerciese, pool)
+		if dbRes.IsError() {
+
+		}
+
+		// exId = dbRes.GetData().(int)
+		// senderRes := sender.SendAnswer(exId, exView.GetAnswer())
+		// if senderRes.IsError() {
+		// 	dbDelRes = db.DeleteExcerciese(exId, pool)
+		// 	fsDelRes = fstorage.DeleteFile(filename)
+		// 	WriteResponse(&writer, senderRes)
+		// 	return
+		// 	// if there is error what to do
+		// }
+
+		WriteResponse(&writer, dbRes)
 		// if err := nil {
 		// 	// db.RemoveExcerciese(excercieseEntity.Id)
 		// 	// fs.RemoveFile(newName)
 		// 	return
 		// }
 
-		dbRes := db.SaveExercise(dbExcerciese, pool)
-		WriteResponse(&writer, dbRes)
+		// WriteResponse(&writer, dbRes)
 	})
 }
 

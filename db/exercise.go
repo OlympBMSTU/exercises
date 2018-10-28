@@ -16,6 +16,10 @@ const (
 	DEFAULT_OFFSET = 0
 )
 
+func DeleteExcerciese(exId int) result.DbResult {
+	return result.OkResult(exId)
+}
+
 func SaveExercise(exercise entities.ExerciseEntity, pool *pgx.ConnPool) result.DbResult {
 	row := pool.QueryRow(INSERT_EXERCISE,
 		exercise.GetAuthorId(),

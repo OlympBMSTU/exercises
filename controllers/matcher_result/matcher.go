@@ -6,6 +6,8 @@ import (
 	db_result "github.com/OlympBMSTU/exercises/db/result"
 	fs_result "github.com/OlympBMSTU/exercises/fstorage/result"
 	root_result "github.com/OlympBMSTU/exercises/result"
+	sender_result "github.com/OlympBMSTU/exercises/sender/result"
+	parser_result "github.com/OlympBMSTU/exercises/views/result"
 )
 
 func MatchResult(res root_result.Result) http.HttpResult {
@@ -16,6 +18,10 @@ func MatchResult(res root_result.Result) http.HttpResult {
 		return MatchFSResult(res)
 	case auth_result.AuthResult:
 		return MatchAuthResult(res)
+	case sender_result.SenderResult:
+		return MatchSenderResult(res)
+	case parser_result.ParserResult:
+		return MatchParserResult(res)
 	default:
 		// coorect this
 		return http.ResultInernalSreverError()
