@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/OlympBMSTU/exercises/auth/result"
+	"github.com/OlympBMSTU/exercises/config"
 )
 
 type JWTHeader struct {
@@ -30,7 +31,10 @@ type JWTPayload struct {
 const HASH_SECRET = "Любовь измеряется мерой прощения."
 
 func AuthByUserCookie(request *http.Request, cookieName string) result.AuthResult {
-	return result.OkResult(1)
+	conf, _ := config.GetConfigInstance()
+	if conf.GetTest() == "test" {
+		return result.OkResult(1)
+	}
 	cookie, err := request.Cookie(cookieName)
 	if err != nil {
 		return result.ErrorResult(result.NO_COOKIE, "No cookie")

@@ -88,12 +88,24 @@ func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 
 func GetExercise(pool *pgx.ConnPool) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		OptionsCredentials(&writer)
+		if request.Method == "OPTIONS" {
+			writer.Write([]byte("hi"))
+			return
+		}
 
 		if request.Method != "GET" {
 			http.Error(writer, "Unsopported method", 405)
 			return
 		}
+
 		writer.Header().Set("Content-Type", "application/json")
+
+		authRes := auth.AuthByUserCookie(request, "bmstuOlympAuth")
+		if authRes.IsError() {
+			WriteResponse(&writer, authRes)
+			return
+		}
 
 		// Get path variable from path
 		idStr := strings.TrimPrefix(request.URL.Path, "/api/exercises/get/")
@@ -111,12 +123,24 @@ func GetExercise(pool *pgx.ConnPool) http.HandlerFunc {
 
 func GetExercises(pool *pgx.ConnPool) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		OptionsCredentials(&writer)
+		if request.Method == "OPTIONS" {
+			writer.Write([]byte("hi"))
+			return
+		}
+
 		if request.Method != "GET" {
 			http.Error(writer, "Unsopported method", 405)
 			return
 		}
 
 		writer.Header().Set("Content-Type", "application/json")
+
+		authRes := auth.AuthByUserCookie(request, "bmstuOlympAuth")
+		if authRes.IsError() {
+			WriteResponse(&writer, authRes)
+			return
+		}
 
 		query := request.URL.Query()
 		pathVariablesStr := strings.TrimPrefix(request.URL.Path, "/api/exercises/list/")

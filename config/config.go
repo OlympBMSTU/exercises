@@ -24,6 +24,7 @@ type Config struct {
 	smtpPassword   string
 	acceptorMail   string
 	mailSubject    string
+	testVersion    string
 }
 
 func (cfg Config) GetFileStorageName() string {
@@ -74,6 +75,10 @@ func (cfg Config) GetMailSubject() string {
 	return cfg.mailSubject
 }
 
+func (cfg Config) GetTest() string {
+	return cfg.testVersion
+}
+
 // it works but need to get path to dir
 // error handling, maybe return struct string, err
 // check
@@ -113,6 +118,7 @@ func Init() (*Config, error) {
 		configs[10],
 		configs[11],
 		configs[12],
+		configs[13],
 	}, nil
 }
 
