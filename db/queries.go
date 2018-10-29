@@ -1,8 +1,9 @@
 package db
 
 const (
-	ADD_SUBJECT  = "INSERT INTO SUBJECT(name) VALUES($1)"
-	GET_SUBJECTS = "SELECT name FROM SUBJECT"
+	ADD_SUBJECT     = "INSERT INTO SUBJECT(name) VALUES($1)"
+	GET_SUBJECTS    = "SELECT name FROM SUBJECT"
+	DELETE_EXERCISE = "SELECT del_exercise($1)"
 
 	GET_EXERCISES_BY_SUBJECT = "select * from EXERCISE ex WHERE subject = $1 "
 	INSERT_EXERCISE          = "SELECT add_EXERCISE($1, $2, $3, $4, $5)"

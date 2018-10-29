@@ -20,6 +20,7 @@ func SendAnswer(exId uint, answer string) result.SenderResult {
 	pass := conf.GetSMTPPassword()
 	to := conf.GetAcceptorMail()
 	subject := conf.GetMailSubject()
+	path := conf.GetSMTPHost() + ":" + conf.GetSMTPPort()
 
 	answerStruct := AnswerS{exId, answer}
 	val, err := json.Marshal(answerStruct)
@@ -35,8 +36,8 @@ func SendAnswer(exId uint, answer string) result.SenderResult {
 	writer.WriteString(msg)
 	writer.Write(val)
 
-	err = smtp.SendMail("smtp.yandex.ru:25",
-		smtp.PlainAuth("", from, pass, "smtp.yandex.ru"),
+	err = smtp.SendMail(path,
+		smtp.PlainAuth("", from, pass, conf.GetSMTPHost()),
 		from, []string{to}, writer.Bytes())
 
 	if err != nil {

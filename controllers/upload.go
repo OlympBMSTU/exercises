@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -76,7 +77,8 @@ func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 		exId := uint(dbRes.GetData().(int))
 		senderRes := sender.SendAnswer(exId, exView.Answer)
 		if senderRes.IsError() {
-			//dbDelRes = db.DeleteExcerciese(exId, pool)
+			dbDelRes := db.DeleteExcerciese(exId, pool)
+			fmt.Print(dbDelRes)
 			//fsDelRes = fstorage.DeleteFile(filename)
 			WriteResponse(&writer, senderRes)
 			return

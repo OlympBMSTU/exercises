@@ -70,27 +70,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- CREATE OR REPLACE FUNCTION del_exercise(id integer) 
--- RETURNS INTEGER AS $$
--- BEGIN 
---     DELETE FROM tag_excerciese 
--- END;
--- $$ LANGUAGE plpgsql;
-
--- CREATE OR REPLACE FUNCTION del_excerciese(id integer) 
--- RETURNS INTEGER AS $$
--- DECLARE 
-
--- BEGIN
-
--- END
--- $$ LANGUAGE plpgsql;
--- todo deete funcntion that checks eist query for tag delete tag if no delete tag_ids
--- CREATE OR REPLACE FUNCTION del_excerciese(ex_id integer) 
--- RETURNS INTEGER AS $$
--- DECLARE tag_arr varchar(255)[];
--- BEGIN 
---     SELECT 
-
---     RETURN 0
--- END
+CREATE OR REPLACE FUNCTION del_exercise(ex_id integer) 
+RETURNS INTEGER AS $$
+DECLARE subj varchar(255);
+DECLARE tags_arr varchar(255)[];
+DECLARE count_ex integer;
+DECLARE tg_id integer;
+DECLARE count_deleted integer := 0;
+BEGIN
+    SELECT tags, subject FROM exercise WHERE id = ex_id into tags_arr, subj;
+    DELETE FROM tag_exercise WHERE exercise_id = ex_id;
+    FOR i IN 1..array_length(tags_arr, 1) LOOP 
+        -- RAISE NOTICE '%', i;
+        SELECT id FROM tag WHERE name = tags_arr[i] INTO tg_id;
+        SELECT COUNT(*) FROM tag_exercise WHERE tag_id = tg_id into count_ex;
+        IF count_ex = 0 THEN
+            DELETE FROM tag WHERE id = tg_id;
+            count_deleted := count_deleted + 1;
+        END IF;
+    END LOOP;
+    DELETE FROM exercise WHERE id = ex_id;
+    RETURN count_deleted;
+END;
+$$ LANGUAGE plpgsql;
