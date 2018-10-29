@@ -22,7 +22,6 @@ func DeleteExcerciese(exId int) result.DbResult {
 func SaveExercise(exercise entities.ExerciseEntity, pool *pgx.ConnPool) result.DbResult {
 	row := pool.QueryRow(INSERT_EXERCISE,
 		exercise.GetAuthorId(),
-		exercise.GetRightAnswer(),
 		exercise.GetLevel(),
 		exercise.GetFileName(),
 		exercise.GetSubject(),
@@ -64,14 +63,14 @@ func GetExercise(id uint, pool *pgx.ConnPool) result.DbResult {
 		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
 
-	//tags, err := getTags(GET_TAGS_FOR_EXERCISE, pool, id)
+	tags, err := getTags(GET_TAGS_FOR_EXERCISE, pool, id)
 
 	// can tags be empyt ?
-	//	if err != nil {
-	//		return result.ErrorResult(err)
-	//	}
+	if err != nil {
+		return result.ErrorResult(err)
+	}
 
-	return result.OkResult(excerciese) //views.ExcercieseViewFrom(*excerciese, *tags))
+	return result.OkResult(entities.NewExRepresentation(*excerciese, *tags))
 }
 
 func GetExerciseList(tag string, subject string, level int,

@@ -1,10 +1,19 @@
 package matcher_result
 
 import (
-	http_res "github.com/OlympBMSTU/exercises/controllers/http_result"
+	"net/http"
+
+	parser "github.com/OlympBMSTU/exercises/parser/result"
 	"github.com/OlympBMSTU/exercises/result"
 )
 
-func MatchParserResult(res result.Result) http_res.HttpResult {
-	return http_res.ResultInernalSreverError()
+var mapHttpParserStatuses = map[int]ResultInfo{
+	parser.NO_ERROR:        NewResultInfo("Ok", http.StatusOK, statusOK),
+	parser.INCORRECT_BODY:  NewResultInfo("Incorrect body", http.StatusBadRequest, statusError),
+	parser.INCORRECT_LEVEL: NewResultInfo("Incorrect level", http.StatusBadRequest, statusError),
+	parser.INCORRECT_TAGS:  NewResultInfo("Incorrect tags", http.StatusBadRequest, statusError),
+}
+
+func getAssociatedParserInfo(res result.Result) ResultInfo {
+	return mapHttpParserStatuses[res.GetStatus().GetCode()]
 }

@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/OlympBMSTU/exercises/parser"
+
 	"github.com/OlympBMSTU/exercises/auth"
 	"github.com/OlympBMSTU/exercises/db"
 	"github.com/OlympBMSTU/exercises/fstorage"
@@ -12,29 +14,6 @@ import (
 	"github.com/OlympBMSTU/exercises/views"
 	"github.com/jackc/pgx"
 )
-
-// answer := request.Form["answer"]
-// subject := request.Form["subject"]
-// level_str := request.Form["level"]
-// tags_arr := request.Form["tags"]
-
-// if len(answer) < 1 || len(subject) < 1 || len(level_str) < 1 || len(tags_arr) < 1 {
-// 	http.Error(writer, "Incorrect body", http.StatusBadRequest)
-// 	return
-// }
-
-// var tags []string
-// err = json.Unmarshal([]byte(tags_arr[0]), &tags)
-// if err != nil {
-// 	http.Error(writer, "Incorrect tags in body", http.StatusBadRequest)
-// 	return
-// }
-
-// var level int
-// if level, err = strconv.Atoi(level_str[0]); err != nil {
-// 	http.Error(writer, "Incorrect body", http.StatusBadRequest)
-// 	return
-// }
 
 func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
@@ -62,11 +41,13 @@ func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 			return
 		}
 
-		parseRes := views.ExcercieseViewFromForm(request.Form)
+		parseRes := parser.ParseExViewPostForm(request.Form)
 		if parseRes.IsError() {
 			WriteResponse(&writer, parseRes)
 			return
 		}
+
+		exView := parseRes.GetData().(views.ExerciseView)
 
 		var fsRes result.Result
 		for _, fheaders := range request.MultipartForm.File {
@@ -79,12 +60,14 @@ func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 			}
 		}
 
-		// filename := fsRes.GetData().(string)
-		// author_id := 0
-		// dbExcerciese := entities.NewExerciseEntity(uint(author_id), filename, answer[0],
-		// 	tags, uint(level), subject[0])
+		exView.SetFileName(fsRes.GetData().(string))
+		// exView.SetAuthor(authRes.GetData().(uint))
+		exView.SetAuthor(0)
+		dbEx := exView.ToExEntity()
 
-		// dbRes := db.SaveExercise(dbExcerciese, pool)
+		dbRes := db.SaveExercise(dbEx, pool)
+		WriteResponse(&writer, dbRes)
+
 		// if dbRes.IsError() {
 
 		// }

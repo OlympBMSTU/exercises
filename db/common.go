@@ -11,10 +11,10 @@ func scanExercise(rows *pgx.Rows) (*entities.ExerciseEntity, error) {
 	err := rows.Scan(
 		&exercise.Id,
 		&exercise.AuthorId,
-		&exercise.RightAnswer,
 		&exercise.Level,
 		&exercise.FileName,
 		&exercise.Subject,
+		&exercise.IsBroken,
 	)
 
 	if err != nil {

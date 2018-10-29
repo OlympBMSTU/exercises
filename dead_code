@@ -1,3 +1,148 @@
+
+
+// func MatchDbResult(res result.Result) http_res.HttpResult {
+// 	var jsonRes output.ResultView
+// 	info := mapHttpDbStatuses[res.GetStatus().GetCode()]
+// 	if res.IsError() {
+// 		jsonRes.SetData(nil)
+// 	} else {
+// 		jsonRes.SetData(res.GetData())
+// 	}
+// 	jsonRes.SetStatus(info.Status)
+// 	jsonRes.SetMessage(info.Message)
+
+// 	val, err := json.Marshal(jsonRes)
+// 	code := info.HttpCode
+// 	var outHttpRes http_res.HttpResult
+
+// 	if err != nil {
+// 		code = http.StatusInternalServerError
+// 	} else {
+// 		outHttpRes.SetBody(val)
+// 	}
+
+// 	outHttpRes.SetStatus(code)
+// 	return outHttpRes
+// }
+
+// func MatchFSResult(res result.Result) http_res.HttpResult {
+// 	var jsonRes output.ResultView
+// 	info := mapHttpDbStatuses[res.GetStatus().GetCode()]
+
+// 	jsonRes.SetStatus(info.Status)
+// 	jsonRes.SetMessage(info.Message)
+
+// 	val, err := json.Marshal(jsonRes)
+// 	code := info.HttpCode
+// 	var outHttpRes http_res.HttpResult
+
+// 	if err != nil {
+// 		code = http.StatusInternalServerError
+// 	} else {
+// 		outHttpRes.SetBody(val)
+// 	}
+
+// 	outHttpRes.SetStatus(code)
+// 	return outHttpRes
+// }
+
+// func MatchAuthResult(res result.Result) http_res.HttpResult {
+// 	var jsonRes output.ResultView
+// 	info := mapHttpAuthStatuses[res.GetStatus().GetCode()]
+// 	jsonRes.SetStatus(info.Status)
+// 	jsonRes.SetMessage(info.Message)
+// 	code := info.HttpCode
+
+// 	var outHttpRes http_res.HttpResult
+// 	val, err := json.Marshal(jsonRes)
+// 	if err != nil {
+// 		code = http.StatusInternalServerError
+// 	} else {
+// 		outHttpRes.SetBody(val)
+// 	}
+// 	outHttpRes.SetStatus(code)
+
+// 	return outHttpRes
+// }
+
+// func MatchFSResult(res result.Result) http_res.HttpResult {
+// 	var jsonRes output.ResultView
+// 	info := mapHttpDbStatuses[res.GetStatus().GetCode()]
+
+// 	jsonRes.SetStatus(info.Status)
+// 	jsonRes.SetMessage(info.Message)
+
+// 	val, err := json.Marshal(jsonRes)
+// 	code := info.HttpCode
+// 	var outHttpRes http_res.HttpResult
+
+// 	if err != nil {
+// 		code = http.StatusInternalServerError
+// 	} else {
+// 		outHttpRes.SetBody(val)
+// 	}
+
+// 	outHttpRes.SetStatus(code)
+// 	return outHttpRes
+// }
+
+
+// func send(body string) {
+// 	conf, _ := Config.GetInstance()
+// 	from := conf.GetSenderMail()
+// 	pass := conf.GetSenderPass()
+// 	to := conf.GetAcceptorMail()
+
+// 	val, err := json.Marshal(data)
+// 	if err != nil {
+// 		return
+// 	}
+// 	msg := "From: " + from + "\n" +
+// 		"To: " + to + "\n" +
+// 		"Subject: Hello there\n\n"
+// 	var writer bytes.Buffer
+// 	writer.WriteString(msg)
+// 	writer.Write(val)
+// 	err = smtp.SendMail("smtp.yandex.ru:25",
+// 		smtp.PlainAuth("", from, pass, "smtp.yandex.ru"),
+// 		from, []string{to}, writer.Bytes())
+
+// 	if err != nil {
+// 		log.Printf("smtp error: %s", err)
+// 		return
+// 	}
+
+// 	// log.Print("sent, visit http://foobarbazz.mailinator.com")
+// }
+
+
+// answer := request.Form["answer"]
+// subject := request.Form["subject"]
+// level_str := request.Form["level"]
+// tags_arr := request.Form["tags"]
+
+// if len(answer) < 1 || len(subject) < 1 || len(level_str) < 1 || len(tags_arr) < 1 {
+// 	http.Error(writer, "Incorrect body", http.StatusBadRequest)
+// 	return
+// }
+
+// var tags []string
+// err = json.Unmarshal([]byte(tags_arr[0]), &tags)
+// if err != nil {
+// 	http.Error(writer, "Incorrect tags in body", http.StatusBadRequest)
+// 	return
+// }
+
+// var level int
+// if level, err = strconv.Atoi(level_str[0]); err != nil {
+// 	http.Error(writer, "Incorrect body", http.StatusBadRequest)
+// 	return
+// }
+
+// author_id := 0
+// dbExcerciese := entities.NewExerciseEntity(uint(author_id), filename, answer[0],
+// 	tags, uint(level), subject[0])
+
 // func NewExcercieseEntity1(author_id uint, file_name string, right_answer string) ExcercieseEntity {
 // 	return ExcercieseEntity{
 // 		AuthorId:    author_id,

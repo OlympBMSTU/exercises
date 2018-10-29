@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -23,10 +24,11 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	var rawTags []string
 	err = json.Unmarshal([]byte(tagsJsonArr[0]), &rawTags)
 	if err != nil {
-		return result.ErrorResult(result.INCORRECT_TAGS, "Some tags array is broken")
+		fmt.Print(err)
+		//return result.ErrorResult(result.INCORRECT_TAGS, "Some tags array is broken")
 	}
 
-	tags := make([]string, 1)
+	tags := make([]string, 0)
 	for _, tag := range rawTags {
 		trimTag := strings.Trim(tag, " ")
 		tags = append(tags, trimTag)

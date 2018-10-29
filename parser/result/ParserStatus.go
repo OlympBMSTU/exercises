@@ -21,5 +21,9 @@ func (status ParserStatus) GetDescription() string {
 }
 
 func (status ParserStatus) IsError() bool {
-	return false
+	return !(status.code == NO_ERROR)
+}
+
+// TODO
+func parseError(err error) {
 }

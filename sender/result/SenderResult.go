@@ -22,9 +22,21 @@ func (res SenderResult) IsError() bool {
 }
 
 func OkResult(params ...interface{}) SenderResult {
-	return SenderResult{}
+	return SenderResult{
+		SenderData{nil},
+		SenderStatus{NO_ERROR, ""},
+	}
 }
 
 func ErrorResult(params ...interface{}) SenderResult {
-	return SenderResult{}
+	if len(params) < 2 {
+		return SenderResult{
+			SenderData{nil},
+			SenderStatus{ERROR_SEND, ""},
+		}
+	}
+	return SenderResult{
+		SenderData{nil},
+		SenderStatus{params[0].(int), params[1].(string)},
+	}
 }

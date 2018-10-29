@@ -20,5 +20,5 @@ func (status SenderStatus) GetDescription() string {
 }
 
 func (status SenderStatus) IsError() bool {
-	return false
+	return !(status.code == NO_ERROR)
 }

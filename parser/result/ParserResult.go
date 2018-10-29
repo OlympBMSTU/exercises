@@ -19,10 +19,23 @@ func (res ParserResult) GetStatus() result.Status {
 	return res.status
 }
 
+// implement TODO call parse error
 func ErrorResult(params ...interface{}) ParserResult {
-	return ParserResult{}
+	if len(params) < 2 {
+		return ParserResult{
+			ParserData{nil},
+			ParserStatus{INCORRECT_BODY, "Incorrect body"},
+		}
+	}
+	return ParserResult{
+		ParserData{nil},
+		ParserStatus{params[0].(int), params[1].(string)},
+	}
 }
 
 func OkResult(data interface{}) ParserResult {
-	return ParserResult{}
+	return ParserResult{
+		ParserData{data},
+		ParserStatus{NO_ERROR, ""},
+	}
 }

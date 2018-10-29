@@ -9,12 +9,12 @@ type ExerciseRepresentation struct {
 	Author   uint     `json:"author"`
 }
 
-func NewExRepresentation(ex ExerciseEntity) ExerciseRepresentation {
+func NewExRepresentation(ex ExerciseEntity, tags []string) ExerciseRepresentation {
 	return ExerciseRepresentation{
 		Id:       ex.Id,
 		FileName: ex.FileName,
 		Subject:  ex.Subject,
-		Tags:     ex.Tags,
+		Tags:     tags,
 		Level:    ex.Level,
 		Author:   ex.AuthorId,
 	}
