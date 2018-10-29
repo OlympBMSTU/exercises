@@ -1,23 +1,26 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/OlympBMSTU/exercises/entities"
 	"github.com/jackc/pgx"
 )
 
 func scanExercise(rows *pgx.Rows) (*entities.ExerciseEntity, error) {
 	var exercise entities.ExerciseEntity
-
 	err := rows.Scan(
 		&exercise.Id,
 		&exercise.AuthorId,
 		&exercise.Level,
 		&exercise.FileName,
 		&exercise.Subject,
+		&exercise.Tags,
 		&exercise.IsBroken,
 	)
 
 	if err != nil {
+		fmt.Print(err.Error())
 		return nil, err
 	}
 

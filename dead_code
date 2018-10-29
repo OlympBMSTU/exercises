@@ -1,4 +1,10 @@
 
+	// tags, err := getTags(GET_TAGS_FOR_EXERCISE, pool, id)
+
+	// can tags be empyt ?
+	// if err != nil {
+	// return result.ErrorResult(err)
+	// }
 
 // func MatchDbResult(res result.Result) http_res.HttpResult {
 // 	var jsonRes output.ResultView

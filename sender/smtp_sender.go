@@ -14,14 +14,14 @@ type AnswerS struct {
 	Answer string
 }
 
-func SendAnswer(ex_id uint, answer string) result.SenderResult {
+func SendAnswer(exId uint, answer string) result.SenderResult {
 	conf, _ := config.GetConfigInstance()
 	from := conf.GetSMTPUser()
 	pass := conf.GetSMTPPassword()
 	to := conf.GetAcceptorMail()
 	subject := conf.GetMailSubject()
 
-	answerStruct := AnswerS{ex_id, answer}
+	answerStruct := AnswerS{exId, answer}
 	val, err := json.Marshal(answerStruct)
 	if err != nil {
 		return result.ErrorResult(err)

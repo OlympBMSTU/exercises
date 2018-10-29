@@ -10,6 +10,7 @@ create table if not exists exercise (
     level integer,
     file_name varchar(255),
     subject varchar(255),
+    tags varchar(255)[],
     is_wrong boolean default false
 );
 
@@ -52,7 +53,7 @@ BEGIN
         RETURN -1;
     END IF;
 
-    INSERT INTO EXERCISE(author_id, file_name, level, subject) VALUES(auth_id, f_name, lev, subj) RETURNING id INTO ex_id;
+    INSERT INTO EXERCISE(author_id, file_name, level, subject, tags) VALUES(auth_id, f_name, lev, subj, tags) RETURNING id INTO ex_id;
     FOR i IN 1..array_length(tags, 1) LOOP
         SELECT id from tag where subject = subj and name = tags[i] into t_id;
         if t_id IS null then 

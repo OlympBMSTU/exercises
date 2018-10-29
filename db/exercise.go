@@ -28,18 +28,18 @@ func SaveExercise(exercise entities.ExerciseEntity, pool *pgx.ConnPool) result.D
 		pq.Array(exercise.GetTags()),
 	)
 
-	var returnCode int
-	err := row.Scan(&returnCode)
+	var returnedId int
+	err := row.Scan(&returnedId)
 
 	if err != nil {
 		return result.ErrorResult(err)
 	}
 
-	if returnCode == -1 {
+	if returnedId == -1 {
 		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
 	}
 
-	return result.OkResult(nil, result.CREATED)
+	return result.OkResult(returnedId, result.CREATED)
 }
 
 func GetExercise(id uint, pool *pgx.ConnPool) result.DbResult {
@@ -63,14 +63,7 @@ func GetExercise(id uint, pool *pgx.ConnPool) result.DbResult {
 		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
 
-	tags, err := getTags(GET_TAGS_FOR_EXERCISE, pool, id)
-
-	// can tags be empyt ?
-	if err != nil {
-		return result.ErrorResult(err)
-	}
-
-	return result.OkResult(entities.NewExRepresentation(*excerciese, *tags))
+	return result.OkResult(entities.NewExRepresentation(*excerciese))
 }
 
 func GetExerciseList(tag string, subject string, level int,

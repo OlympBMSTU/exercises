@@ -1,12 +1,17 @@
 2) Maybe scan simple data as one function, simply send query (no need now) refl
 5) Routing needs refactor!!!
-8) TODO trim answer, change , for .
-9) smtp send
+6) Check sender 
+7) return auth and check it in all controllers
+8) delete exerciese if answer not sended
+9) TODO parseError in other packages
+10) Check it all
+11) Add logging
+
+
+Finished
+8) TODO trim answer, change , for . + 
+9) smtp send // maybe works
 10) OutputExView
 11 upload ex normalize -> 
  create view, by form trim all data, remove dot to , or vica versa
  ParseExView returns res
-
-
-		// form := request.Form //.(map[string][]string)
-		// m(form)

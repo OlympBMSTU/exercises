@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/OlympBMSTU/exercises/parser"
+	"github.com/OlympBMSTU/exercises/sender"
 
 	"github.com/OlympBMSTU/exercises/auth"
 	"github.com/OlympBMSTU/exercises/db"
@@ -63,33 +64,25 @@ func UploadExerciseHandler(pool *pgx.ConnPool) http.HandlerFunc {
 		exView.SetFileName(fsRes.GetData().(string))
 		// exView.SetAuthor(authRes.GetData().(uint))
 		exView.SetAuthor(0)
+
 		dbEx := exView.ToExEntity()
-
 		dbRes := db.SaveExercise(dbEx, pool)
+		if dbRes.IsError() {
+			WriteResponse(&writer, dbRes)
+			// TODO delete file
+			return
+		}
+
+		exId := uint(dbRes.GetData().(int))
+		senderRes := sender.SendAnswer(exId, exView.Answer)
+		if senderRes.IsError() {
+			//dbDelRes = db.DeleteExcerciese(exId, pool)
+			//fsDelRes = fstorage.DeleteFile(filename)
+			WriteResponse(&writer, senderRes)
+			return
+		}
+
 		WriteResponse(&writer, dbRes)
-
-		// if dbRes.IsError() {
-
-		// }
-
-		// //exId = dbRes.GetData().(int)
-		// senderRes := sender.SendAnswer(exId, exView.GetAnswer())
-		// if senderRes.IsError() {
-		// 	//dbDelRes = db.DeleteExcerciese(exId, pool)
-		// 	//fsDelRes = fstorage.DeleteFile(filename)
-		// 	WriteResponse(&writer, senderRes)
-		// 	return
-		// 	// if there is error what to do
-		// }
-
-		// WriteResponse(&writer, dbRes)
-		// if err := nil {
-		// 	// db.RemoveExcerciese(excercieseEntity.Id)
-		// 	// fs.RemoveFile(newName)
-		// 	return
-		// }
-
-		// WriteResponse(&writer, dbRes)
 	})
 }
 
@@ -132,7 +125,7 @@ func GetExercises(pool *pgx.ConnPool) http.HandlerFunc {
 		tag := ""
 		level := -1
 
-		if len(vars) == 0 {
+		if len(vars) == 0 || (len(vars) == 1 && vars[0] == "") {
 			http.Error(writer, "Not enough parameter", 404)
 			return
 		}

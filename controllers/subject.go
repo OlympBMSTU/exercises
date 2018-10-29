@@ -29,7 +29,7 @@ func GetTags(pool *pgx.ConnPool) http.HandlerFunc {
 		}
 		writer.Header().Set("Content-Type", "application/json")
 
-		subject := strings.TrimPrefix(request.URL.Path, "/api/excercises/tags/")
+		subject := strings.TrimPrefix(request.URL.Path, "/api/exercises/tags/")
 		dbRes := db.GetTgasBySubect(subject, pool)
 
 		WriteResponse(&writer, dbRes)
