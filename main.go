@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/controllers"
@@ -26,10 +27,16 @@ func Init() (*pgx.ConnPool, error) {
 		return nil, err
 	}
 
+	port, err := strconv.Atoi(conf.GetDBPort())
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
 	connPoolConfig := pgx.ConnPoolConfig{
 		ConnConfig: pgx.ConnConfig{
 			Host:     conf.GetDBHost(),
 			User:     conf.GetDBUser(),
+			Port:     uint16(port),
 			Password: conf.GetDBPassword(),
 			Database: conf.GetDatabase(),
 		},
