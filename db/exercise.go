@@ -2,11 +2,12 @@ package db
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"log"
 
 	"github.com/OlympBMSTU/exercises/db/result"
 	"github.com/OlympBMSTU/exercises/entities"
-	"github.com/jackc/pgx"
 	"github.com/lib/pq"
 )
 
@@ -15,13 +16,25 @@ const (
 	DEFAULT_OFFSET = 0
 )
 
-func DeleteExcerciese(exId uint, pool *pgx.ConnPool) result.DbResult {
-	_, err := pool.Exec(DELETE_EXERCISE, exId)
+func DeleteExcerciese(exId uint, ctx context.Context) result.DbResult {
+	db := getDb(ctx)
+	if db == nil {
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
+	_, err := db.Exec(DELETE_EXERCISE, exId)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return result.CreateResult(nil, err)
 }
 
-func SaveExercise(exercise entities.ExerciseEntity, pool *pgx.ConnPool) result.DbResult {
-	row := pool.QueryRow(INSERT_EXERCISE,
+func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
+	db := getDb(ctx)
+	if db == nil {
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
+
+	row := db.QueryRow(INSERT_EXERCISE,
 		exercise.GetAuthorId(),
 		exercise.GetLevel(),
 		exercise.GetFileName(),
@@ -33,18 +46,25 @@ func SaveExercise(exercise entities.ExerciseEntity, pool *pgx.ConnPool) result.D
 	err := row.Scan(&returnedId)
 
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 
 	if returnedId == -1 {
+		log.Println("No subject in db")
 		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
 	}
 
 	return result.OkResult(returnedId, result.CREATED)
 }
 
-func GetExercise(id uint, pool *pgx.ConnPool) result.DbResult {
-	rows, err := pool.Query(GET_EXERCISE_BY_ID, id)
+func GetExercise(id uint, ctx context.Context) result.DbResult {
+	db := getDb(ctx)
+	if db == nil {
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
+
+	rows, err := db.Query(GET_EXERCISE_BY_ID, id)
 	defer rows.Close()
 
 	if err != nil {
@@ -61,6 +81,7 @@ func GetExercise(id uint, pool *pgx.ConnPool) result.DbResult {
 	}
 
 	if excerciese == nil {
+		log.Println("Result set is empty")
 		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
 
@@ -68,7 +89,12 @@ func GetExercise(id uint, pool *pgx.ConnPool) result.DbResult {
 }
 
 func GetExerciseList(tag string, subject string, level int,
-	limit int, offset int, order_level bool, poll *pgx.ConnPool) result.DbResult {
+	limit int, offset int, order_level bool, ctx context.Context) result.DbResult {
+
+	db := getDb(ctx)
+	if db == nil {
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
 
 	var query bytes.Buffer
 
@@ -105,10 +131,11 @@ func GetExerciseList(tag string, subject string, level int,
 	args = append(args, offset)
 	query.WriteString(fmt.Sprintf("OFFSET $%d ", len(args)))
 
-	rows, err := poll.Query(query.String(), args...)
+	rows, err := db.Query(query.String(), args...)
 	defer rows.Close()
 
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 
@@ -119,6 +146,7 @@ func GetExerciseList(tag string, subject string, level int,
 		exercise, err := scanExercise(rows)
 
 		if err != nil {
+			log.Println(err.Error())
 			return result.ErrorResult(err)
 		}
 		entities = append(entities, *exercise)

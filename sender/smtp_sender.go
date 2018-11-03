@@ -3,9 +3,11 @@ package sender
 import (
 	"bytes"
 	"encoding/json"
+	"log"
 	"net/smtp"
 
 	"github.com/OlympBMSTU/exercises/config"
+	"github.com/OlympBMSTU/exercises/logger"
 	"github.com/OlympBMSTU/exercises/sender/result"
 )
 
@@ -25,6 +27,7 @@ func SendAnswer(exId uint, answer string) result.SenderResult {
 	answerStruct := AnswerS{exId, answer}
 	val, err := json.Marshal(answerStruct)
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 
@@ -41,6 +44,7 @@ func SendAnswer(exId uint, answer string) result.SenderResult {
 		from, []string{to}, writer.Bytes())
 
 	if err != nil {
+		logger.LogE.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 

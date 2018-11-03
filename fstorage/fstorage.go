@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 	"mime/multipart"
 	"os"
@@ -62,11 +63,13 @@ func WriteFile(fileHdr *multipart.FileHeader) result.FSResult {
 	defer inFile.Close()
 
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 
 	err = os.MkdirAll(newDirsPath, 0777)
 	if err != nil {
+		log.Println(err.Error())
 		// clear dirs
 		return result.ErrorResult(err)
 	}
@@ -74,10 +77,12 @@ func WriteFile(fileHdr *multipart.FileHeader) result.FSResult {
 	f, err := os.Create(filePathWithExt)
 	defer f.Close() // ? is it
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 	_, err = io.Copy(f, inFile)
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 	return result.OkResult(newNamePart + ext)

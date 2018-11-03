@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"log"
 	"net/http"
 
 	"github.com/OlympBMSTU/exercises/config"
@@ -9,10 +10,19 @@ import (
 	"github.com/jackc/pgx"
 )
 
+type ContextInjector struct {
+	ctx context.Context
+	h   http.Handler
+}
+
+func (ci *ContextInjector) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	ci.h.ServeHTTP(writer, request.WithContext(ci.ctx))
+}
+
 func Init() (*pgx.ConnPool, error) {
 	conf, err := config.GetConfigInstance()
 	if err != nil {
-		fmt.Println("Error in config file")
+		log.Println(err)
 		return nil, err
 	}
 
@@ -28,28 +38,30 @@ func Init() (*pgx.ConnPool, error) {
 
 	pool, err := pgx.NewConnPool(connPoolConfig)
 	if err != nil {
-		fmt.Println("Error create pool")
+		log.Println(err)
 		return nil, err
 	}
 	return pool, nil
 }
 
-func InitRouter(pool *pgx.ConnPool) {
-	http.HandleFunc("/api/exercises/upload_exercise", controllers.UploadExerciseHandler(pool))
-	http.HandleFunc("/api/exercises/get/", controllers.GetExercise(pool))
-	http.HandleFunc("/api/exercises/list/", controllers.GetExercises(pool))
-	http.HandleFunc("/api/exercises/subjects/", controllers.GetSubjects(pool))
-	http.HandleFunc("/api/exercises/tags/", controllers.GetTags(pool))
+func InitRouter(ctx context.Context) {
+	http.Handle("/api/exercises/upload_exercise", &ContextInjector{ctx, http.HandlerFunc(controllers.UploadExerciseHandler)})
+	http.Handle("/api/exercises/get/", &ContextInjector{ctx, http.HandlerFunc(controllers.GetExercise)})
+	http.Handle("/api/exercises/list/", &ContextInjector{ctx, http.HandlerFunc(controllers.GetExercises)})
+	http.Handle("/api/exercises/subjects/", &ContextInjector{ctx, http.HandlerFunc(controllers.GetSubjects)})
+	http.Handle("/api/exercises/tags/", &ContextInjector{ctx, http.HandlerFunc(controllers.GetTags)})
 }
 
 func main() {
 	pool, err := Init()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err.Error())
 		panic("Error start server")
 	}
 
-	InitRouter(pool)
+	ctx := context.WithValue(context.Background(), "db", pool)
+
+	InitRouter(ctx)
 
 	http.ListenAndServe("localhost:5469", nil)
 }

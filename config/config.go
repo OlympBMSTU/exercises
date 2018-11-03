@@ -1,8 +1,8 @@
 package config
 
 import (
-	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"reflect"
 	"strings"
@@ -90,8 +90,8 @@ func Init() (*Config, error) {
 
 	fbytes, err := ioutil.ReadAll(file)
 	if err != nil {
-		fmt.Println("Cant start server without initial file\n" +
-			"Please creaate init file and put it to /etc/serv/")
+		log.Println("Cant start server without initial file\n"+
+			"Please creaate init file and put it to /etc/serv/", err)
 		return nil, err
 	}
 
@@ -100,7 +100,7 @@ func Init() (*Config, error) {
 
 	countFields := reflect.ValueOf(Config{}).NumField()
 	if len(configs) < countFields {
-		fmt.Println("Not enough fields")
+		log.Println("Not enough fields")
 		return nil, err
 	}
 
@@ -134,6 +134,6 @@ func GetConfigInstance() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Print(configInstance.GetFileStorageName())
+	// fmt.Print(configInstance.GetFileStorageName())
 	return configInstance, nil
 }

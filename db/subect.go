@@ -1,18 +1,33 @@
 package db
 
 import (
+	"context"
+	"log"
+
 	"github.com/OlympBMSTU/exercises/db/result"
-	"github.com/jackc/pgx"
 )
 
-func AddSubject(subject string, pool *pgx.ConnPool) result.DbResult {
-	_, err := pool.Exec(ADD_SUBJECT, subject)
+func AddSubject(subject string, ctx context.Context) result.DbResult {
+	db := getDb(ctx)
+	if db == nil {
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
+	_, err := db.Exec(ADD_SUBJECT, subject)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return result.CreateResult(nil, err, result.CREATED)
 }
 
-func GetSubjects(pool *pgx.ConnPool) result.DbResult {
-	rows, err := pool.Query(GET_SUBJECTS)
+func GetSubjects(ctx context.Context) result.DbResult {
+	db := getDb(ctx)
+	if db == nil {
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
+
+	rows, err := db.Query(GET_SUBJECTS)
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 
@@ -22,6 +37,7 @@ func GetSubjects(pool *pgx.ConnPool) result.DbResult {
 
 		err = rows.Scan(&subject)
 		if err != nil {
+			log.Println(err.Error())
 			break
 		}
 
@@ -29,23 +45,32 @@ func GetSubjects(pool *pgx.ConnPool) result.DbResult {
 	}
 
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 
 	if len(subjects) == 0 {
+		log.Println("Empty result")
 		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
 
 	return result.OkResult(subjects)
 }
 
-func GetTgasBySubect(subject string, pool *pgx.ConnPool) result.DbResult {
-	data, err := getTags(GET_TAGS_BY_SUBJECT, pool, subject)
+func GetTgasBySubect(subject string, ctx context.Context) result.DbResult {
+	db := getDb(ctx)
+	if db == nil {
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
+
+	data, err := getTags(GET_TAGS_BY_SUBJECT, db, subject)
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
 
 	if len(*data) == 0 {
+		log.Println("Empty result")
 		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
 

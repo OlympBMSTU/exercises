@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"log"
 	"strconv"
 	"strings"
 
@@ -23,6 +24,7 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	var rawTags []string
 	err = json.Unmarshal([]byte(tagsJsonArr[0]), &rawTags)
 	if err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(result.INCORRECT_TAGS, "Some tags array is broken")
 	}
 
@@ -37,6 +39,7 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 
 	var level int
 	if level, err = strconv.Atoi(levelStringArr[0]); err != nil {
+		log.Println(err.Error())
 		return result.ErrorResult(result.INCORRECT_LEVEL, "Level is broken")
 	}
 
