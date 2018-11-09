@@ -20,26 +20,22 @@ type AnswerS struct {
 type noAuth struct {
 }
 
-func (a *noAuth) Start(server *ServerInfo) (string, []byte, error) {
+func (a *noAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 	return "", nil, nil
 }
 
 func (a *noAuth) Next(fromServer []byte, more bool) ([]byte, error) {
-	if more {
-		// We've already sent everything.
-		return nil, errors.New("unexpected server challenge")
-	}
 	return nil, nil
 }
 
-func NoAuth() Auth {
+func NoAuth() smtp.Auth {
 	return &noAuth{}
 }
 
 func SendAnswer(exId uint, answer string) result.SenderResult {
 	conf, _ := config.GetConfigInstance()
 	from := conf.GetSMTPUser()
-	pass := conf.GetSMTPPassword()
+	//pass := conf.GetSMTPPassword()
 	to := conf.GetAcceptorMail()
 	subject := conf.GetMailSubject()
 	path := conf.GetSMTPHost() + ":" + conf.GetSMTPPort()
