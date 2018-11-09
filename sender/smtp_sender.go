@@ -20,11 +20,11 @@ type AnswerS struct {
 type noAuth struct {
 }
 
-func (a *plainAuth) Start(server *ServerInfo) (string, []byte, error) {
+func (a *noAuth) Start(server *ServerInfo) (string, []byte, error) {
 	return "", nil, nil
 }
 
-func (a *plainAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+func (a *noAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	if more {
 		// We've already sent everything.
 		return nil, errors.New("unexpected server challenge")
