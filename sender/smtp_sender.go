@@ -16,6 +16,26 @@ type AnswerS struct {
 	Answer string
 }
 
+// noAuth
+type noAuth struct {
+}
+
+func (a *plainAuth) Start(server *ServerInfo) (string, []byte, error) {
+	return "", nil, nil
+}
+
+func (a *plainAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+	if more {
+		// We've already sent everything.
+		return nil, errors.New("unexpected server challenge")
+	}
+	return nil, nil
+}
+
+func NoAuth() Auth {
+	return &noAuth{}
+}
+
 func SendAnswer(exId uint, answer string) result.SenderResult {
 	conf, _ := config.GetConfigInstance()
 	from := conf.GetSMTPUser()
@@ -31,7 +51,9 @@ func SendAnswer(exId uint, answer string) result.SenderResult {
 		return result.ErrorResult(err)
 	}
 
-	msg := "From: " + from + "\n" +
+	msg := "From: " +
+		"Центр довузовской подготовки МГТУ им. Н.Э. Баумана" +
+		" <cdp@bmstu.ru>\n" +
 		"To: " + to + "\n" +
 		"Subject: " + subject + "\n\n"
 
@@ -40,7 +62,7 @@ func SendAnswer(exId uint, answer string) result.SenderResult {
 	writer.Write(val)
 
 	err = smtp.SendMail(path,
-		smtp.PlainAuth("", from, pass, conf.GetSMTPHost()),
+		NoAuth(),
 		from, []string{to}, writer.Bytes())
 
 	if err != nil {
