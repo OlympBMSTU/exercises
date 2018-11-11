@@ -46,7 +46,7 @@ func AuthByUserCookie(request *http.Request, cookieName string) result.AuthResul
 }
 
 func authUser(jwt string, hashSecret string) result.AuthResult {
-	jwt_norm, err := QueryUnescape(jwt)
+	jwt_norm, err := url.QueryUnescape(jwt)
 	if err != nil {
 		logger.LogE.Println(err)
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
@@ -59,7 +59,7 @@ func authUser(jwt string, hashSecret string) result.AuthResult {
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
 	}
 
-	header, err := base64.StdEncoding.DecodeString(jwt_header)
+	header, err := base64.StdEncoding.DecodeString(jwt_data[0])
 	if err != nil {
 		logger.LogE.Println(err)
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
