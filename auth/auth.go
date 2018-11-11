@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -45,23 +46,31 @@ func AuthByUserCookie(request *http.Request, cookieName string) result.AuthResul
 }
 
 func authUser(jwt string, hashSecret string) result.AuthResult {
-	jwt_data := strings.Split(jwt, ".")
+	jwt_norm, err := QueryUnescape(jwt)
+	if err != nil {
+		logger.LogE.Println(err)
+		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
+	}
+
+	jwt_data := strings.Split(jwt_norm, ".")
 
 	if len(jwt_data) != 3 {
 		logger.LogE.Println(errors.New("JWT len is not equal 3"))
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
 	}
 
-	header, err := base64.StdEncoding.DecodeString(jwt_data[0])
+	header, err := base64.StdEncoding.DecodeString(jwt_header)
 	if err != nil {
 		logger.LogE.Println(err)
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
 	}
+
 	payload, err := base64.StdEncoding.DecodeString(jwt_data[1])
 	if err != nil {
 		logger.LogE.Println(err)
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
 	}
+
 	hash, err := base64.StdEncoding.DecodeString(jwt_data[2])
 	if err != nil {
 		logger.LogE.Println(err)
