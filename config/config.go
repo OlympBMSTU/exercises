@@ -105,7 +105,7 @@ func (cfg Config) GetListenerPort() string {
 // check
 
 func Init() (*Config, error) {
-	iniPath := "/etc/serv"
+	iniPath := "/etc/exercises.cfg"
 
 	file, err := os.Open(iniPath)
 
