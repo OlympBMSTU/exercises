@@ -12,6 +12,7 @@ import (
 
 type Config struct {
 	fileStorageDir string
+	listenerHost   string
 	listenerPort   string
 	dbHost         string
 	dbPort         string
@@ -25,6 +26,8 @@ type Config struct {
 	acceptorMail   string
 	mailSubject    string
 	testVersion    string
+	authCookieName string
+	authSecret     string
 }
 
 func (cfg Config) GetFileStorageName() string {
@@ -75,9 +78,27 @@ func (cfg Config) GetMailSubject() string {
 	return cfg.mailSubject
 }
 
-func (cfg Config) GetTest() string {
-	return cfg.testVersion
+func (cfg Config) IsTest() bool {
+	return cfg.testVersion == "test"
 }
+
+func (cfg Config) GetAuthCookieName() string {
+	return cfg.authCookieName
+}
+
+func (cfg Config) GetAuthSecret() string {
+	return cfg.authSecret
+}
+
+func (cfg Config) GetListenerHost() string {
+	return cfg.listenerHost
+}
+
+func (cfg Config) GetListenerPort() string {
+	return cfg.listenerPort
+}
+
+// const HASH_SECRET = "Любовь измеряется мерой прощения."
 
 // it works but need to get path to dir
 // error handling, maybe return struct string, err
@@ -119,6 +140,9 @@ func Init() (*Config, error) {
 		configs[11],
 		configs[12],
 		configs[13],
+		configs[14],
+		configs[15],
+		configs[16],
 	}, nil
 }
 

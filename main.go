@@ -70,5 +70,9 @@ func main() {
 
 	InitRouter(ctx)
 
-	http.ListenAndServe("localhost:5469", nil)
+	conf, _ := config.GetConfigInstance()
+
+	listener := conf.GetListenerHost() + ":" + conf.GetListenerPort()
+
+	http.ListenAndServe(listener, nil)
 }

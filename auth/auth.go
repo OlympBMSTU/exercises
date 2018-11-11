@@ -7,12 +7,14 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/OlympBMSTU/exercises/auth/result"
 	"github.com/OlympBMSTU/exercises/config"
+	"github.com/OlympBMSTU/exercises/logger"
 )
 
 type JWTHeader struct {
@@ -28,44 +30,55 @@ type JWTPayload struct {
 	Exp  uint   `json:"exp"`
 }
 
-const HASH_SECRET = "Любовь измеряется мерой прощения."
-
 func AuthByUserCookie(request *http.Request, cookieName string) result.AuthResult {
 	conf, _ := config.GetConfigInstance()
-	if conf.GetTest() == "test" {
+	if conf.IsTest() {
 		return result.OkResult(1)
 	}
 	cookie, err := request.Cookie(cookieName)
 	if err != nil {
+		logger.LogE.Println(errors.New("Cookie missing"))
 		return result.ErrorResult(result.NO_COOKIE, "No cookie")
 	}
 
-	return authUser(cookie.Value)
+	return authUser(cookie.Value, conf.GetAuthSecret())
 }
 
-func authUser(jwt string) result.AuthResult {
+func authUser(jwt string, hashSecret string) result.AuthResult {
 	jwt_data := strings.Split(jwt, ".")
 
 	if len(jwt_data) != 3 {
+		logger.LogE.Println(errors.New("JWT len is not equal 3"))
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
 	}
 
 	header, err := base64.StdEncoding.DecodeString(jwt_data[0])
+	if err != nil {
+		logger.LogE.Println(err)
+		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
+	}
 	payload, err := base64.StdEncoding.DecodeString(jwt_data[1])
+	if err != nil {
+		logger.LogE.Println(err)
+		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
+	}
 	hash, err := base64.StdEncoding.DecodeString(jwt_data[2])
 	if err != nil {
+		logger.LogE.Println(err)
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
 	}
 
 	var jwt_header JWTHeader
 	err = json.Unmarshal(header, &jwt_header)
 	if err != nil {
+		logger.LogE.Println(err)
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
 	}
 
 	var jwt_payload JWTPayload
 	err = json.Unmarshal(payload, &jwt_payload)
 	if err != nil {
+		logger.LogE.Println(err)
 		return result.ErrorResult(result.ERROR_PARSE_JWT, "")
 	}
 
@@ -74,10 +87,11 @@ func authUser(jwt string) result.AuthResult {
 	buffer.WriteString(".")
 	buffer.WriteString(jwt_data[1])
 
-	mac := hmac.New(sha256.New, []byte(HASH_SECRET))
+	mac := hmac.New(sha256.New, []byte(hashSecret))
 	mac.Write(buffer.Bytes())
 	expected := []byte(hex.EncodeToString(mac.Sum(nil)))
 	if !hmac.Equal(hash, expected) {
+		logger.LogE.Println(errors.New("Not equal cookie"))
 		return result.ErrorResult(result.NO_AUTHROIZED, "")
 	}
 
@@ -85,6 +99,7 @@ func authUser(jwt string) result.AuthResult {
 
 	// maybe wrong
 	if jwt_payload.Exp < uint(v) {
+		logger.LogE.Println(errors.New("Cookie is expired"))
 		return result.ErrorResult(result.NO_AUTHROIZED, "")
 	}
 	return result.OkResult(jwt_payload.Id)

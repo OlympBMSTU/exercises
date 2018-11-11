@@ -6,14 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OlympBMSTU/exercises/config"
-	"github.com/OlympBMSTU/exercises/parser"
-	"github.com/OlympBMSTU/exercises/sender"
-
 	"github.com/OlympBMSTU/exercises/auth"
+	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/db"
 	"github.com/OlympBMSTU/exercises/fstorage"
+	"github.com/OlympBMSTU/exercises/parser"
 	"github.com/OlympBMSTU/exercises/result"
+	"github.com/OlympBMSTU/exercises/sender"
 	"github.com/OlympBMSTU/exercises/views"
 )
 
@@ -29,7 +28,8 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	authRes := auth.AuthByUserCookie(request, "bmstuOlympAuth")
+	conf, _ := config.GetConfigInstance()
+	authRes := auth.AuthByUserCookie(request, conf.GetAuthCookieName())
 	if authRes.IsError() {
 		WriteResponse(&writer, authRes)
 		return
@@ -63,12 +63,12 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 
 	exView.SetFileName(fsRes.GetData().(string))
 
-	conf, _ := config.GetConfigInstance()
-	if conf.GetTest() != "test" {
-		exView.SetAuthor(authRes.GetData().(uint))
-	} else {
-		exView.SetAuthor(0)
-	}
+	// conf, _ := config.GetConfigInstance()
+	// if conf.GetTest() != "test" {
+	// 	exView.SetAuthor(authRes.GetData().(uint))
+	// } else {
+	// 	exView.SetAuthor(0)
+	// }
 
 	dbEx := exView.ToExEntity()
 	dbRes := db.SaveExercise(dbEx, request.Context())
@@ -105,7 +105,8 @@ func GetExercise(writer http.ResponseWriter, request *http.Request) {
 
 	writer.Header().Set("Content-Type", "application/json")
 
-	authRes := auth.AuthByUserCookie(request, "bmstuOlympAuth")
+	conf, _ := config.GetConfigInstance()
+	authRes := auth.AuthByUserCookie(request, conf.GetAuthCookieName())
 	if authRes.IsError() {
 		WriteResponse(&writer, authRes)
 		return
