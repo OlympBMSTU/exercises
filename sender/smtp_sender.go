@@ -48,7 +48,7 @@ func SendAnswer(ExId uint, Answer string) result.SenderResult {
 	// Set the sender and recipient.
 	log.Println("2")
 	c.Mail("cdp@bmstu.ru")
-	c.Rcpt("himjune@mail.ru")
+	c.Rcpt(to)
 	// Send the email body.
 	log.Println("3")
 	wc, err := c.Data()
@@ -58,12 +58,14 @@ func SendAnswer(ExId uint, Answer string) result.SenderResult {
 	}
 	defer wc.Close()
 
-	log.Println("4")
 	buf := bytes.NewBufferString(msg)
 	if _, err = buf.WriteTo(wc); err != nil {
 		log.Println(err)
 	}
 
+	log.Println("Sended ")
+	log.Println(ExId)
+	log.Println("\n")
 	return result.OkResult(nil)
 }
 

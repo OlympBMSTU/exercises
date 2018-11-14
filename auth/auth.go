@@ -36,6 +36,9 @@ func AuthByUserCookie(request *http.Request, cookieName string) result.AuthResul
 	if conf.IsTest() {
 		return result.OkResult(1)
 	}
+
+	cookieName = conf.GetAuthCookieName()
+
 	cookie, err := request.Cookie(cookieName)
 	if err != nil {
 		logger.LogE.Println(errors.New("Cookie missing"))
