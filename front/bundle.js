@@ -61,7 +61,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "7ef1e66de58b59d34af0"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "f8916d7944fcb86954bc"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -12500,10 +12500,11 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n._1TTq_AwmgXQWh0iTYodVKa_0[data-v-67781728] {\n  text-align: center;\n  padding: 8px;\n}\n._2ArvCG2yxEcKN0T3OpMNYI_0[data-v-67781728] {\n  opacity: 0.5;\n  pointer-events: none;\n}\n.D64DRjmsu06WHPPpjA1au_0[data-v-67781728] {\n  display: block;\n  width: 100%;\n  border-radius: 2px;\n  padding: 5px;\n  margin-bottom: 5px;\n  border: 1px solid #333;\n  outline: none;\n  box-sizing: border-box;\n  font-size: 18px;\n}\n._3splPgL7ApRe9h5F6xvLUR_0[data-v-67781728] {\n  display: block;\n  background: #6993bb;\n  padding: 10px;\n  font-size: 18px;\n  color: #fff;\n  margin-top: 10px;\n  cursor: pointer;\n}\n._2o1pabbYksM4YKqhCUlidI_0[data-v-67781728] {\n  border-color: #f51000;\n  color: #f51000;\n}\n", ""]);
+exports.push([module.i, "\n._2ZFpmNuOhTGKVIbyiuk5Fn_0[data-v-67781728] {\n  padding: 20px;\n}\n._1TTq_AwmgXQWh0iTYodVKa_0[data-v-67781728] {\n  text-align: center;\n  padding: 8px;\n}\n._2ArvCG2yxEcKN0T3OpMNYI_0[data-v-67781728] {\n  opacity: 0.5;\n  pointer-events: none;\n}\n.D64DRjmsu06WHPPpjA1au_0[data-v-67781728] {\n  display: block;\n  width: 100%;\n  border-radius: 2px;\n  padding: 5px;\n  margin-bottom: 5px;\n  border: 1px solid #333;\n  outline: none;\n  box-sizing: border-box;\n  font-size: 18px;\n}\n._3splPgL7ApRe9h5F6xvLUR_0[data-v-67781728] {\n  display: block;\n  background: #6993bb;\n  padding: 10px;\n  font-size: 18px;\n  color: #fff;\n  margin-top: 10px;\n  cursor: pointer;\n}\n._2o1pabbYksM4YKqhCUlidI_0[data-v-67781728] {\n  border-color: #f51000;\n  color: #f51000;\n}\n", ""]);
 
 // exports
 exports.locals = {
+	"wrapper": "_2ZFpmNuOhTGKVIbyiuk5Fn_0",
 	"header": "_1TTq_AwmgXQWh0iTYodVKa_0",
 	"disabled": "_2ArvCG2yxEcKN0T3OpMNYI_0",
 	"textinput": "D64DRjmsu06WHPPpjA1au_0",
@@ -13682,6 +13683,7 @@ var index_esm = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_fileapi__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_fileapi___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_fileapi__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Upload__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_whatwg_fetch__ = __webpack_require__(36);
 //
 //
 //
@@ -13727,6 +13729,11 @@ var index_esm = {
 //
 //
 //
+//
+//
+//
+//
+
 
 
 
@@ -13736,10 +13743,12 @@ var index_esm = {
   inject: ['$validator'],
   data() {
     return {
+      dataReady: false,
+      subjects: [],
       loader: null,
       answer: '',
       tags: '',
-      subject: '',
+      subject: '-1',
       lvl: '',
       loadingError: '',
       loadingSuccess: null,
@@ -13751,7 +13760,7 @@ var index_esm = {
   },
   computed: {
     ready() {
-      return this.loader && this.answer.length && this.tags.length && this.lvl.length && this.subject.length;
+      return this.loader && this.answer.length && this.tags.length && this.lvl.length && this.subject !== '-1';
     }
   },
   methods: {
@@ -13777,7 +13786,7 @@ var index_esm = {
     load(files) {
       this.err = '';
       FileAPI.upload({
-        url: 'http://olymp.bmstu.ru/exercises/api/upload_exercise',
+        url: 'http://localhost:5469/api/exercises/upload_exercise',
         headers: {
           'Access-Controll-Request-Method': 'POST'
         },
@@ -13803,6 +13812,19 @@ var index_esm = {
         }
       });
     }
+  },
+  mounted() {
+    fetch('/exercises/subjects', {
+      method: 'GET',
+      credentials: 'include'
+    }).then(res => {
+      return res.json();
+    }).then(res => {
+      if (res.Data && res.Data.length) {
+        this.subjects = res.Data;
+        this.dataReady = true;
+      }
+    });
   }
 });
 
@@ -21741,159 +21763,190 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    [
-      _c("div", { class: [_vm.$style.header] }, [
-        _vm._v("\n    Система проведения олимпиад. Загрузка заданий.\n  ")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.answer,
-            expression: "answer"
-          }
-        ],
-        class: [_vm.$style.textinput],
-        attrs: { placeholder: "Введите ответ на задание" },
-        domProps: { value: _vm.answer },
-        on: {
-          input: function($event) {
-            if ($event.target.composing) {
-              return
+  return _vm.dataReady
+    ? _c(
+        "div",
+        { class: [_vm.$style.wrapper] },
+        [
+          _c("div", { class: [_vm.$style.header] }, [
+            _vm._v("\n    Система проведения олимпиад. Загрузка заданий.\n  ")
+          ]),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.answer,
+                expression: "answer"
+              }
+            ],
+            class: [_vm.$style.textinput],
+            attrs: { placeholder: "Введите ответ на задание" },
+            domProps: { value: _vm.answer },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.answer = $event.target.value
+              }
             }
-            _vm.answer = $event.target.value
-          }
-        }
-      }),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.tags,
-            expression: "tags"
-          }
-        ],
-        class: [_vm.$style.textinput],
-        attrs: { placeholder: "Введите тэги через запятую" },
-        domProps: { value: _vm.tags },
-        on: {
-          input: function($event) {
-            if ($event.target.composing) {
-              return
+          }),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.tags,
+                expression: "tags"
+              }
+            ],
+            class: [_vm.$style.textinput],
+            attrs: { placeholder: "Введите тэги через запятую" },
+            domProps: { value: _vm.tags },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.tags = $event.target.value
+              }
             }
-            _vm.tags = $event.target.value
-          }
-        }
-      }),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.subject,
-            expression: "subject"
-          }
-        ],
-        class: [_vm.$style.textinput],
-        attrs: { placeholder: "Введите предмет" },
-        domProps: { value: _vm.subject },
-        on: {
-          input: function($event) {
-            if ($event.target.composing) {
-              return
+          }),
+          _vm._v(" "),
+          _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.subject,
+                  expression: "subject"
+                }
+              ],
+              class: [_vm.$style.textinput],
+              on: {
+                change: function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.subject = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                }
+              }
+            },
+            [
+              _c(
+                "option",
+                { attrs: { disabled: "", selected: "", value: "-1" } },
+                [_vm._v("Выберите предмет")]
+              ),
+              _vm._v(" "),
+              _vm._l(_vm.subjects, function(item, index) {
+                return _c(
+                  "option",
+                  { key: index, domProps: { value: "" + item } },
+                  [_vm._v(_vm._s(item))]
+                )
+              })
+            ],
+            2
+          ),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.lvl,
+                expression: "lvl"
+              },
+              {
+                name: "validate",
+                rawName: "v-validate",
+                value: "numeric",
+                expression: "'numeric'"
+              }
+            ],
+            class: [
+              _vm.$style.textinput,
+              ((_obj = {}),
+              (_obj[_vm.$style.err] = _vm.errors.first("lvl")),
+              _obj)
+            ],
+            attrs: { placeholder: "Введите слоджность задания", name: "lvl" },
+            domProps: { value: _vm.lvl },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.lvl = $event.target.value
+              }
             }
-            _vm.subject = $event.target.value
-          }
-        }
-      }),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.lvl,
-            expression: "lvl"
-          },
-          {
-            name: "validate",
-            rawName: "v-validate",
-            value: "numeric",
-            expression: "'numeric'"
-          }
-        ],
-        class: [
-          _vm.$style.textinput,
-          ((_obj = {}), (_obj[_vm.$style.err] = _vm.errors.first("lvl")), _obj)
-        ],
-        attrs: { placeholder: "Введите слоджность задания", name: "lvl" },
-        domProps: { value: _vm.lvl },
-        on: {
-          input: function($event) {
-            if ($event.target.composing) {
-              return
+          }),
+          _vm._v(" "),
+          _vm.errors.first("lvl")
+            ? [
+                _c("small", { staticStyle: { color: "#f51000" } }, [
+                  _vm._v(_vm._s(_vm.errors.first("lvl")))
+                ])
+              ]
+            : _vm._e(),
+          _vm._v(" "),
+          _c("UploadForm", {
+            directives: [
+              {
+                name: "validate",
+                rawName: "v-validate",
+                value: "ext:pdf",
+                expression: "'ext:pdf'"
+              }
+            ],
+            attrs: {
+              height: "200px",
+              loadingError: _vm.loadingError,
+              loadingSuccess: _vm.loadingSuccess,
+              uploading: _vm.uploading,
+              name: "task_loader",
+              error: _vm.errors.first("task_loader")
+            },
+            on: { upload: _vm.updateFiles },
+            model: {
+              value: _vm.loader,
+              callback: function($$v) {
+                _vm.loader = $$v
+              },
+              expression: "loader"
             }
-            _vm.lvl = $event.target.value
-          }
-        }
-      }),
-      _vm._v(" "),
-      _vm.errors.first("lvl")
-        ? [
-            _c("small", { staticStyle: { color: "#f51000" } }, [
-              _vm._v(_vm._s(_vm.errors.first("lvl")))
-            ])
-          ]
-        : _vm._e(),
-      _vm._v(" "),
-      _c("UploadForm", {
-        directives: [
-          {
-            name: "validate",
-            rawName: "v-validate",
-            value: "ext:pdf",
-            expression: "'ext:pdf'"
-          }
+          }),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              class: [
+                ((_obj$1 = {}),
+                (_obj$1[_vm.$style.disabled] = !_vm.ready),
+                _obj$1),
+                _vm.$style.btn
+              ],
+              on: { click: _vm.onFilesLoading }
+            },
+            [_vm._v("Загрузить")]
+          )
         ],
-        attrs: {
-          height: "200px",
-          loadingError: _vm.loadingError,
-          loadingSuccess: _vm.loadingSuccess,
-          uploading: _vm.uploading,
-          name: "task_loader",
-          error: _vm.errors.first("task_loader")
-        },
-        on: { upload: _vm.updateFiles },
-        model: {
-          value: _vm.loader,
-          callback: function($$v) {
-            _vm.loader = $$v
-          },
-          expression: "loader"
-        }
-      }),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          class: [
-            ((_obj$1 = {}), (_obj$1[_vm.$style.disabled] = !_vm.ready), _obj$1),
-            _vm.$style.btn
-          ],
-          on: { click: _vm.onFilesLoading }
-        },
-        [_vm._v("Загрузить")]
+        2
       )
-    ],
-    2
-  )
+    : _vm._e()
   var _obj
   var _obj$1
 }
@@ -30008,6 +30061,534 @@ exports.default = dictionary;
 /***/ (function(module, exports, __webpack_require__) {
 
 !function(n,e){ true?module.exports=e():"function"==typeof define&&define.amd?define(e):(n.__vee_validate_locale__ru=n.__vee_validate_locale__ru||{},n.__vee_validate_locale__ru.js=e())}(this,function(){"use strict";var n,e={name:"ru",messages:{_default:function(n){return"Значение поля "+n+" недопустимо."},after:function(n,e){var t=e[0];return"В поле "+n+" должна быть дата после "+(e[1]?"или равная ":"")+t+"."},alpha_dash:function(n){return"Поле "+n+" может содержать только буквы, цифры и дефис."},alpha_num:function(n){return"Поле "+n+" может содержать только буквы и цифры."},alpha_spaces:function(n){return"Поле "+n+" может содержать только буквы и пробелы."},alpha:function(n){return"Поле "+n+" может содержать только буквы."},before:function(n,e){var t=e[0];return"В поле "+n+" должна быть дата до "+(e[1]?"или равная ":"")+t+"."},between:function(n,e){return"Поле "+n+" должно быть между "+e[0]+" и "+e[1]+"."},confirmed:function(n,e){return"Поле "+n+" не совпадает с "+e[0]+"."},credit_card:function(n){return"Поле "+n+" должно быть действительным номером карты"},date_between:function(n,e){return"Поле "+n+" должно быть между "+e[0]+" и "+e[1]+"."},date_format:function(n,e){return"Поле "+n+" должно быть в формате "+e[0]+"."},decimal:function(n,e){void 0===e&&(e=[]);var t=e[0];return void 0===t&&(t="*"),"Поле "+n+" должно быть числовым и может содержать "+("*"===t?"":t)+" десятичных числа."},digits:function(n,e){return"Поле "+n+" должно быть числовым и точно содержать "+e[0]+" цифры."},dimensions:function(n,e){return"Поле "+n+" должно быть "+e[0]+" пикселей на "+e[1]+" пикселей."},email:function(n){return"Поле "+n+" должно быть действительным электронным адресом."},ext:function(n,e){return"Поле "+n+" должно быть действительным файлом. ("+e.slice(0)+")"},image:function(n){return"Поле "+n+" должно быть изображением."},included:function(n){return"Поле "+n+" должно быть допустимым значением."},integer:function(n){return"Поле "+n+" должно быть целым числом."},ip:function(n){return"Поле "+n+" должно быть действительным IP-адресом."},length:function(n,e){var t=e[0],r=e[1];return r?"Длина поля "+n+" должна быть между "+t+" и "+r+".":"Длина поля "+n+" должна быть "+t+"."},max:function(n,e){return"Поле "+n+" не может быть более "+e[0]+" символов."},max_value:function(n,e){return"Поле "+n+" должно быть "+e[0]+" или менее."},mimes:function(n,e){return"Поле "+n+" должно иметь допустимый тип файла. ("+e.slice(0)+")"},min:function(n,e){return"Поле "+n+" должно быть не менее "+e[0]+" символов."},min_value:function(n,e){return"Поле "+n+" должно быть "+e[0]+" или больше."},excluded:function(n){return"Поле "+n+" должно быть допустимым значением."},numeric:function(n){return"Поле "+n+" должно быть числом."},regex:function(n){return"Поле "+n+" имеет ошибочный формат."},required:function(n){return"Поле "+n+" обязательно для заполнения."},size:function(n,e){var t,r,u,i=e[0];return"Поле "+n+" должно быть меньше, чем "+(t=i,r=1024,u=0==(t=Number(t)*r)?0:Math.floor(Math.log(t)/Math.log(r)),1*(t/Math.pow(r,u)).toFixed(2)+" "+["Byte","KB","MB","GB","TB","PB","EB","ZB","YB"][u])+"."},url:function(n){return"Поле "+n+" имеет ошибочный формат URL."}},attributes:{}};return"undefined"!=typeof VeeValidate&&VeeValidate.Validator.localize(((n={})[e.name]=e,n)),e});
+
+/***/ }),
+/* 36 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export Headers */
+/* unused harmony export Request */
+/* unused harmony export Response */
+/* unused harmony export DOMException */
+/* unused harmony export fetch */
+var support = {
+  searchParams: 'URLSearchParams' in self,
+  iterable: 'Symbol' in self && 'iterator' in Symbol,
+  blob:
+    'FileReader' in self &&
+    'Blob' in self &&
+    (function() {
+      try {
+        new Blob()
+        return true
+      } catch (e) {
+        return false
+      }
+    })(),
+  formData: 'FormData' in self,
+  arrayBuffer: 'ArrayBuffer' in self
+}
+
+function isDataView(obj) {
+  return obj && DataView.prototype.isPrototypeOf(obj)
+}
+
+if (support.arrayBuffer) {
+  var viewClasses = [
+    '[object Int8Array]',
+    '[object Uint8Array]',
+    '[object Uint8ClampedArray]',
+    '[object Int16Array]',
+    '[object Uint16Array]',
+    '[object Int32Array]',
+    '[object Uint32Array]',
+    '[object Float32Array]',
+    '[object Float64Array]'
+  ]
+
+  var isArrayBufferView =
+    ArrayBuffer.isView ||
+    function(obj) {
+      return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+    }
+}
+
+function normalizeName(name) {
+  if (typeof name !== 'string') {
+    name = String(name)
+  }
+  if (/[^a-z0-9\-#$%&'*+.^_`|~]/i.test(name)) {
+    throw new TypeError('Invalid character in header field name')
+  }
+  return name.toLowerCase()
+}
+
+function normalizeValue(value) {
+  if (typeof value !== 'string') {
+    value = String(value)
+  }
+  return value
+}
+
+// Build a destructive iterator for the value list
+function iteratorFor(items) {
+  var iterator = {
+    next: function() {
+      var value = items.shift()
+      return {done: value === undefined, value: value}
+    }
+  }
+
+  if (support.iterable) {
+    iterator[Symbol.iterator] = function() {
+      return iterator
+    }
+  }
+
+  return iterator
+}
+
+function Headers(headers) {
+  this.map = {}
+
+  if (headers instanceof Headers) {
+    headers.forEach(function(value, name) {
+      this.append(name, value)
+    }, this)
+  } else if (Array.isArray(headers)) {
+    headers.forEach(function(header) {
+      this.append(header[0], header[1])
+    }, this)
+  } else if (headers) {
+    Object.getOwnPropertyNames(headers).forEach(function(name) {
+      this.append(name, headers[name])
+    }, this)
+  }
+}
+
+Headers.prototype.append = function(name, value) {
+  name = normalizeName(name)
+  value = normalizeValue(value)
+  var oldValue = this.map[name]
+  this.map[name] = oldValue ? oldValue + ', ' + value : value
+}
+
+Headers.prototype['delete'] = function(name) {
+  delete this.map[normalizeName(name)]
+}
+
+Headers.prototype.get = function(name) {
+  name = normalizeName(name)
+  return this.has(name) ? this.map[name] : null
+}
+
+Headers.prototype.has = function(name) {
+  return this.map.hasOwnProperty(normalizeName(name))
+}
+
+Headers.prototype.set = function(name, value) {
+  this.map[normalizeName(name)] = normalizeValue(value)
+}
+
+Headers.prototype.forEach = function(callback, thisArg) {
+  for (var name in this.map) {
+    if (this.map.hasOwnProperty(name)) {
+      callback.call(thisArg, this.map[name], name, this)
+    }
+  }
+}
+
+Headers.prototype.keys = function() {
+  var items = []
+  this.forEach(function(value, name) {
+    items.push(name)
+  })
+  return iteratorFor(items)
+}
+
+Headers.prototype.values = function() {
+  var items = []
+  this.forEach(function(value) {
+    items.push(value)
+  })
+  return iteratorFor(items)
+}
+
+Headers.prototype.entries = function() {
+  var items = []
+  this.forEach(function(value, name) {
+    items.push([name, value])
+  })
+  return iteratorFor(items)
+}
+
+if (support.iterable) {
+  Headers.prototype[Symbol.iterator] = Headers.prototype.entries
+}
+
+function consumed(body) {
+  if (body.bodyUsed) {
+    return Promise.reject(new TypeError('Already read'))
+  }
+  body.bodyUsed = true
+}
+
+function fileReaderReady(reader) {
+  return new Promise(function(resolve, reject) {
+    reader.onload = function() {
+      resolve(reader.result)
+    }
+    reader.onerror = function() {
+      reject(reader.error)
+    }
+  })
+}
+
+function readBlobAsArrayBuffer(blob) {
+  var reader = new FileReader()
+  var promise = fileReaderReady(reader)
+  reader.readAsArrayBuffer(blob)
+  return promise
+}
+
+function readBlobAsText(blob) {
+  var reader = new FileReader()
+  var promise = fileReaderReady(reader)
+  reader.readAsText(blob)
+  return promise
+}
+
+function readArrayBufferAsText(buf) {
+  var view = new Uint8Array(buf)
+  var chars = new Array(view.length)
+
+  for (var i = 0; i < view.length; i++) {
+    chars[i] = String.fromCharCode(view[i])
+  }
+  return chars.join('')
+}
+
+function bufferClone(buf) {
+  if (buf.slice) {
+    return buf.slice(0)
+  } else {
+    var view = new Uint8Array(buf.byteLength)
+    view.set(new Uint8Array(buf))
+    return view.buffer
+  }
+}
+
+function Body() {
+  this.bodyUsed = false
+
+  this._initBody = function(body) {
+    this._bodyInit = body
+    if (!body) {
+      this._bodyText = ''
+    } else if (typeof body === 'string') {
+      this._bodyText = body
+    } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+      this._bodyBlob = body
+    } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+      this._bodyFormData = body
+    } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+      this._bodyText = body.toString()
+    } else if (support.arrayBuffer && support.blob && isDataView(body)) {
+      this._bodyArrayBuffer = bufferClone(body.buffer)
+      // IE 10-11 can't handle a DataView body.
+      this._bodyInit = new Blob([this._bodyArrayBuffer])
+    } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
+      this._bodyArrayBuffer = bufferClone(body)
+    } else {
+      this._bodyText = body = Object.prototype.toString.call(body)
+    }
+
+    if (!this.headers.get('content-type')) {
+      if (typeof body === 'string') {
+        this.headers.set('content-type', 'text/plain;charset=UTF-8')
+      } else if (this._bodyBlob && this._bodyBlob.type) {
+        this.headers.set('content-type', this._bodyBlob.type)
+      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+        this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
+      }
+    }
+  }
+
+  if (support.blob) {
+    this.blob = function() {
+      var rejected = consumed(this)
+      if (rejected) {
+        return rejected
+      }
+
+      if (this._bodyBlob) {
+        return Promise.resolve(this._bodyBlob)
+      } else if (this._bodyArrayBuffer) {
+        return Promise.resolve(new Blob([this._bodyArrayBuffer]))
+      } else if (this._bodyFormData) {
+        throw new Error('could not read FormData body as blob')
+      } else {
+        return Promise.resolve(new Blob([this._bodyText]))
+      }
+    }
+
+    this.arrayBuffer = function() {
+      if (this._bodyArrayBuffer) {
+        return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
+      } else {
+        return this.blob().then(readBlobAsArrayBuffer)
+      }
+    }
+  }
+
+  this.text = function() {
+    var rejected = consumed(this)
+    if (rejected) {
+      return rejected
+    }
+
+    if (this._bodyBlob) {
+      return readBlobAsText(this._bodyBlob)
+    } else if (this._bodyArrayBuffer) {
+      return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+    } else if (this._bodyFormData) {
+      throw new Error('could not read FormData body as text')
+    } else {
+      return Promise.resolve(this._bodyText)
+    }
+  }
+
+  if (support.formData) {
+    this.formData = function() {
+      return this.text().then(decode)
+    }
+  }
+
+  this.json = function() {
+    return this.text().then(JSON.parse)
+  }
+
+  return this
+}
+
+// HTTP methods whose capitalization should be normalized
+var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+function normalizeMethod(method) {
+  var upcased = method.toUpperCase()
+  return methods.indexOf(upcased) > -1 ? upcased : method
+}
+
+function Request(input, options) {
+  options = options || {}
+  var body = options.body
+
+  if (input instanceof Request) {
+    if (input.bodyUsed) {
+      throw new TypeError('Already read')
+    }
+    this.url = input.url
+    this.credentials = input.credentials
+    if (!options.headers) {
+      this.headers = new Headers(input.headers)
+    }
+    this.method = input.method
+    this.mode = input.mode
+    this.signal = input.signal
+    if (!body && input._bodyInit != null) {
+      body = input._bodyInit
+      input.bodyUsed = true
+    }
+  } else {
+    this.url = String(input)
+  }
+
+  this.credentials = options.credentials || this.credentials || 'same-origin'
+  if (options.headers || !this.headers) {
+    this.headers = new Headers(options.headers)
+  }
+  this.method = normalizeMethod(options.method || this.method || 'GET')
+  this.mode = options.mode || this.mode || null
+  this.signal = options.signal || this.signal
+  this.referrer = null
+
+  if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+    throw new TypeError('Body not allowed for GET or HEAD requests')
+  }
+  this._initBody(body)
+}
+
+Request.prototype.clone = function() {
+  return new Request(this, {body: this._bodyInit})
+}
+
+function decode(body) {
+  var form = new FormData()
+  body
+    .trim()
+    .split('&')
+    .forEach(function(bytes) {
+      if (bytes) {
+        var split = bytes.split('=')
+        var name = split.shift().replace(/\+/g, ' ')
+        var value = split.join('=').replace(/\+/g, ' ')
+        form.append(decodeURIComponent(name), decodeURIComponent(value))
+      }
+    })
+  return form
+}
+
+function parseHeaders(rawHeaders) {
+  var headers = new Headers()
+  // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
+  // https://tools.ietf.org/html/rfc7230#section-3.2
+  var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, ' ')
+  preProcessedHeaders.split(/\r?\n/).forEach(function(line) {
+    var parts = line.split(':')
+    var key = parts.shift().trim()
+    if (key) {
+      var value = parts.join(':').trim()
+      headers.append(key, value)
+    }
+  })
+  return headers
+}
+
+Body.call(Request.prototype)
+
+function Response(bodyInit, options) {
+  if (!options) {
+    options = {}
+  }
+
+  this.type = 'default'
+  this.status = options.status === undefined ? 200 : options.status
+  this.ok = this.status >= 200 && this.status < 300
+  this.statusText = 'statusText' in options ? options.statusText : 'OK'
+  this.headers = new Headers(options.headers)
+  this.url = options.url || ''
+  this._initBody(bodyInit)
+}
+
+Body.call(Response.prototype)
+
+Response.prototype.clone = function() {
+  return new Response(this._bodyInit, {
+    status: this.status,
+    statusText: this.statusText,
+    headers: new Headers(this.headers),
+    url: this.url
+  })
+}
+
+Response.error = function() {
+  var response = new Response(null, {status: 0, statusText: ''})
+  response.type = 'error'
+  return response
+}
+
+var redirectStatuses = [301, 302, 303, 307, 308]
+
+Response.redirect = function(url, status) {
+  if (redirectStatuses.indexOf(status) === -1) {
+    throw new RangeError('Invalid status code')
+  }
+
+  return new Response(null, {status: status, headers: {location: url}})
+}
+
+var DOMException = self.DOMException
+try {
+  new DOMException()
+} catch (err) {
+  DOMException = function(message, name) {
+    this.message = message
+    this.name = name
+    var error = Error(message)
+    this.stack = error.stack
+  }
+  DOMException.prototype = Object.create(Error.prototype)
+  DOMException.prototype.constructor = DOMException
+}
+
+function fetch(input, init) {
+  return new Promise(function(resolve, reject) {
+    var request = new Request(input, init)
+
+    if (request.signal && request.signal.aborted) {
+      return reject(new DOMException('Aborted', 'AbortError'))
+    }
+
+    var xhr = new XMLHttpRequest()
+
+    function abortXhr() {
+      xhr.abort()
+    }
+
+    xhr.onload = function() {
+      var options = {
+        status: xhr.status,
+        statusText: xhr.statusText,
+        headers: parseHeaders(xhr.getAllResponseHeaders() || '')
+      }
+      options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
+      var body = 'response' in xhr ? xhr.response : xhr.responseText
+      resolve(new Response(body, options))
+    }
+
+    xhr.onerror = function() {
+      reject(new TypeError('Network request failed'))
+    }
+
+    xhr.ontimeout = function() {
+      reject(new TypeError('Network request failed'))
+    }
+
+    xhr.onabort = function() {
+      reject(new DOMException('Aborted', 'AbortError'))
+    }
+
+    xhr.open(request.method, request.url, true)
+
+    if (request.credentials === 'include') {
+      xhr.withCredentials = true
+    } else if (request.credentials === 'omit') {
+      xhr.withCredentials = false
+    }
+
+    if ('responseType' in xhr && support.blob) {
+      xhr.responseType = 'blob'
+    }
+
+    request.headers.forEach(function(value, name) {
+      xhr.setRequestHeader(name, value)
+    })
+
+    if (request.signal) {
+      request.signal.addEventListener('abort', abortXhr)
+
+      xhr.onreadystatechange = function() {
+        // DONE (success or failure)
+        if (xhr.readyState === 4) {
+          request.signal.removeEventListener('abort', abortXhr)
+        }
+      }
+    }
+
+    xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+  })
+}
+
+fetch.polyfill = true
+
+if (!self.fetch) {
+  self.fetch = fetch
+  self.Headers = Headers
+  self.Request = Request
+  self.Response = Response
+}
+
 
 /***/ })
 /******/ ]);
