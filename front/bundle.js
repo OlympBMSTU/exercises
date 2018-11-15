@@ -21883,7 +21883,7 @@ var render = function() {
               (_obj[_vm.$style.err] = _vm.errors.first("lvl")),
               _obj)
             ],
-            attrs: { placeholder: "Введите слоджность задания", name: "lvl" },
+            attrs: { placeholder: "Введите сложность задания", name: "lvl" },
             domProps: { value: _vm.lvl },
             on: {
               input: function($event) {
