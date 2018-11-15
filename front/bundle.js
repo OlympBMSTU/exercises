@@ -13786,7 +13786,7 @@ var index_esm = {
     load(files) {
       this.err = '';
       FileAPI.upload({
-        url: 'http://localhost:5469/api/exercises/upload_exercise',
+        url: '/api/exercises/upload_exercise',
         headers: {
           'Access-Controll-Request-Method': 'POST'
         },
@@ -13814,7 +13814,7 @@ var index_esm = {
     }
   },
   mounted() {
-    fetch('/exercises/subjects', {
+    fetch('/api/exercises/subjects', {
       method: 'GET',
       credentials: 'include'
     }).then(res => {
@@ -18780,7 +18780,7 @@ _vue2.default.use(_vueRouter2.default);
 exports.default = new _vueRouter2.default({
   mode: 'history',
   routes: [{
-    path: '/tasks/upload',
+    path: '/exercises/upload',
     component: _UploadManager2.default
   }]
 });
