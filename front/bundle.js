@@ -21779,6 +21779,12 @@ var render = function() {
                 rawName: "v-model",
                 value: _vm.answer,
                 expression: "answer"
+              },
+              {
+                name: "validate",
+                rawName: "v-validate",
+                value: "decimal",
+                expression: "'decimal'"
               }
             ],
             class: [_vm.$style.textinput],
