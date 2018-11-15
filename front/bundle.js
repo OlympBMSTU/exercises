@@ -21783,8 +21783,8 @@ var render = function() {
               {
                 name: "validate",
                 rawName: "v-validate",
-                value: "numeric",
-                expression: "'numeric'"
+                value: "decimal",
+                expression: "'decimal'"
               }
             ],
             class: [
