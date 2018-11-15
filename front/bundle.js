@@ -21783,12 +21783,17 @@ var render = function() {
               {
                 name: "validate",
                 rawName: "v-validate",
-                value: "decimal",
-                expression: "'decimal'"
+                value: "numeric",
+                expression: "'numeric'"
               }
             ],
-            class: [_vm.$style.textinput],
-            attrs: { placeholder: "Введите ответ на задание" },
+            class: [
+              _vm.$style.textinput,
+              ((_obj = {}),
+              (_obj[_vm.$style.err] = _vm.errors.first("answer")),
+              _obj)
+            ],
+            attrs: { placeholder: "Введите ответ на задание", name: "answer" },
             domProps: { value: _vm.answer },
             on: {
               input: function($event) {
@@ -21799,6 +21804,14 @@ var render = function() {
               }
             }
           }),
+          _vm._v(" "),
+          _vm.errors.first("answer")
+            ? [
+                _c("small", { staticStyle: { color: "#f51000" } }, [
+                  _vm._v(_vm._s(_vm.errors.first("answer")))
+                ])
+              ]
+            : _vm._e(),
           _vm._v(" "),
           _c("input", {
             directives: [
