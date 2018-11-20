@@ -112,7 +112,7 @@ func Init() (*Config, error) {
 	fbytes, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Println("Cant start server without initial file\n"+
-			"Please creaate init file and put it to /etc/serv/", err)
+			"Please creaate init file and put it to "+iniPath, err)
 		return nil, err
 	}
 

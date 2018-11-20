@@ -11,7 +11,7 @@ var mapHttpParserStatuses = map[int]ResultInfo{
 	parser.NO_ERROR:        NewResultInfo("Ok", http.StatusOK, statusOK),
 	parser.INCORRECT_BODY:  NewResultInfo("Incorrect body", http.StatusBadRequest, statusError),
 	parser.INCORRECT_LEVEL: NewResultInfo("Incorrect level", http.StatusBadRequest, statusError),
-	parser.INCORRECT_TAGS:  NewResultInfo("Incorrect tags", http.StatusBadRequest, statusError),
+	parser.INCORRECT_TAGS:  NewResultInfo("Incorrect tags: ", http.StatusBadRequest, statusError),
 }
 
 func getAssociatedParserInfo(res result.Result) ResultInfo {

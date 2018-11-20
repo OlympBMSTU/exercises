@@ -3,7 +3,6 @@
 -- tag index - name, subject name
 -- 
 
-
 create table if not exists exercise (
     id serial, 
     author_id integer,

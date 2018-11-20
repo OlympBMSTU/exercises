@@ -78,10 +78,10 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	exId := uint(dbRes.GetData().(int))
-	senderRes := sender.SendAnswer(exId, exView.Answer)
+	exID := uint(dbRes.GetData().(int))
+	senderRes := sender.SendAnswer(exID, exView.Answer)
 	if senderRes.IsError() {
-		dbDelRes := db.DeleteExcerciese(exId, request.Context())
+		dbDelRes := db.DeleteExcerciese(exID, request.Context())
 		fmt.Print(dbDelRes)
 		//fsDelRes = fstorage.DeleteFile(filename)
 		WriteResponse(&writer, senderRes)
@@ -119,9 +119,9 @@ func GetExercise(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Incorrect path variable", http.StatusBadRequest)
 		return
 	}
-	exId := uint(id)
+	exID := uint(id)
 
-	dbRes := db.GetExercise(exId, request.Context())
+	dbRes := db.GetExercise(exID, request.Context())
 	WriteResponse(&writer, dbRes)
 }
 
@@ -189,14 +189,18 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 
 	// check order for quer
 	order := query["order"]
-	is_desc := false
+	isDesc := false
 	if len(order) > 0 && order[0] == "desc" {
-		is_desc = true
+		isDesc = true
 	}
 
 	// 1 - subject 2 - tag 3 - level
 	// query 1 - limit 2 - offset 3 - order
 
-	dbRes := db.GetExerciseList(tag, subject, level, limit, offset, is_desc, request.Context())
+	dbRes := db.GetExerciseList(tag, subject, level, limit, offset, isDesc, request.Context())
 	WriteResponse(&writer, dbRes)
+}
+
+func UpdateExercise(writer http.ResponseWriter, request *http.Request) {
+
 }
