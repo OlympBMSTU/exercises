@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OlympBMSTU/exercises/auth"
-	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/db"
 	"github.com/OlympBMSTU/exercises/fstorage"
 	"github.com/OlympBMSTU/exercises/parser"
@@ -17,24 +15,9 @@ import (
 )
 
 func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
-	OptionsCredentials(&writer)
-	if request.Method == "OPTIONS" {
-		writer.Write([]byte("hi"))
+	if !CheckMethodAndAuthenticate(writer, request, "POST") {
 		return
 	}
-
-	if request.Method != "POST" {
-		http.Error(writer, "Unsupported method", 405)
-		return
-	}
-
-	conf, _ := config.GetConfigInstance()
-	authRes := auth.AuthByUserCookie(request, conf.GetAuthCookieName())
-	if authRes.IsError() {
-		WriteResponse(&writer, authRes)
-		return
-	}
-	writer.Header().Set("Content-Type", "application/json")
 
 	var err error
 	if err = request.ParseMultipartForm(-1); err != nil {
@@ -63,13 +46,6 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 
 	exView.SetFileName(fsRes.GetData().(string))
 
-	// conf, _ := config.GetConfigInstance()
-	// if conf.GetTest() != "test" {
-	// 	exView.SetAuthor(authRes.GetData().(uint))
-	// } else {
-	// 	exView.SetAuthor(0)
-	// }
-
 	dbEx := exView.ToExEntity()
 	dbRes := db.SaveExercise(dbEx, request.Context())
 	if dbRes.IsError() {
@@ -92,23 +68,7 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func GetExercise(writer http.ResponseWriter, request *http.Request) {
-	OptionsCredentials(&writer)
-	if request.Method == "OPTIONS" {
-		writer.Write([]byte("hi"))
-		return
-	}
-
-	if request.Method != "GET" {
-		http.Error(writer, "Unsopported method", 405)
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-
-	conf, _ := config.GetConfigInstance()
-	authRes := auth.AuthByUserCookie(request, conf.GetAuthCookieName())
-	if authRes.IsError() {
-		WriteResponse(&writer, authRes)
+	if !CheckMethodAndAuthenticate(writer, request, "GET") {
 		return
 	}
 
@@ -125,23 +85,19 @@ func GetExercise(writer http.ResponseWriter, request *http.Request) {
 	WriteResponse(&writer, dbRes)
 }
 
+// GetExercises :
+// This controller searches exercises in database by sended params:
+// Path variables like /api/.../1/2/3
+// Where
+// 		1: subject
+// 		2: tag
+// 		3: level
+// Also query variables
+// 		1: limit
+// 		2: offset
+// 		3: order
 func GetExercises(writer http.ResponseWriter, request *http.Request) {
-	OptionsCredentials(&writer)
-	if request.Method == "OPTIONS" {
-		writer.Write([]byte("hi"))
-		return
-	}
-
-	if request.Method != "GET" {
-		http.Error(writer, "Unsopported method", 405)
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-
-	authRes := auth.AuthByUserCookie(request, "bmstuOlympAuth")
-	if authRes.IsError() {
-		WriteResponse(&writer, authRes)
+	if !CheckMethodAndAuthenticate(writer, request, "POST") {
 		return
 	}
 
@@ -188,19 +144,22 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 	// its fucking crutch maybe, todo refactor !!!!!!!!!
 
 	// check order for quer
-	order := query["order"]
+	order := query.Get("order")
 	isDesc := false
-	if len(order) > 0 && order[0] == "desc" {
+	if order != "" && order == "desc" {
 		isDesc = true
 	}
-
-	// 1 - subject 2 - tag 3 - level
-	// query 1 - limit 2 - offset 3 - order
 
 	dbRes := db.GetExerciseList(tag, subject, level, limit, offset, isDesc, request.Context())
 	WriteResponse(&writer, dbRes)
 }
 
 func UpdateExercise(writer http.ResponseWriter, request *http.Request) {
+	// todo update tags, update file for after
+	// update answer
+	// update is broken level subject
+	if !CheckMethodAndAuthenticate(writer, request, "POST") {
+		return
+	}
 
 }
