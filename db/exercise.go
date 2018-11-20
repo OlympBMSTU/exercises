@@ -158,3 +158,58 @@ func GetExerciseList(tag string, subject string, level int,
 
 	return result.OkResult(entities)
 }
+
+func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) result.DbResult {
+	// db := getDb(ctx)
+	// if db == nil {
+	// 	return result.ErrorResult(result.DB_CONN_ERROR, "")
+	// }
+
+	// // query := "UPDATE exercises SET "
+	// rows, err := db.Query(GET_EXERCISE_BY_ID, exEntity.GetId())
+	// defer rows.Close()
+
+	// if err != nil {
+	// 	return result.ErrorResult(err)
+	// }
+
+	// var existingEntity *entities.ExerciseEntity
+	// for rows.Next() {
+	// 	excerciese, err = scanExercise(rows)
+	// }
+
+	// if err != nil {
+	// 	return result.ErrorResult(err)
+	// }
+
+	// var query bytes.Buffer
+	// query.WriteString(UPDATE_EXCERCISE)
+	// var args []interface{}
+
+	// fmt.Print(query)
+	// AuthorId uint
+	// FileName string
+	// Tags     []string
+	// Level    int
+	// Subject  string
+	// IsBroken bool
+	// if len(exEntity.FileName) > 0 && exEntity.FileName != existingEntity.FileName {
+	// 	args = append(args, exEntity.FileName)
+	// 	query.WriteString(fmt.Sprintf("filename=%d ", len(args))
+	// }
+
+	// if len(exEntity.Tags) > 0 {
+	// 	for i, tag := range exEntity.Tags {
+	// 		if tag != existingEntity.Tags[i] {
+	// 			args = append(args, exEntity.Tags)
+	// 			query.WriteString(fmt.Sprintf("tags=%d ", len(args))
+	// 			break
+	// 		}
+	// 	}
+	// }
+
+	// if exEntity.Level > 0 && exEntity.Level != existingEntity.Level {
+
+	// }
+	return result.OkResult(nil)
+}

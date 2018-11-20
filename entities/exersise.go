@@ -8,12 +8,12 @@ type ExerciseEntity struct {
 	AuthorId uint
 	FileName string
 	Tags     []string
-	Level    uint
+	Level    int
 	Subject  string
 	IsBroken bool
 }
 
-func NewExerciseEntity(author uint, filename string, tags []string, level uint, subject string) ExerciseEntity {
+func NewExerciseEntity(author uint, filename string, tags []string, level int, subject string) ExerciseEntity {
 	return ExerciseEntity{
 		AuthorId: author,
 		FileName: filename,
@@ -36,7 +36,7 @@ func (entity ExerciseEntity) GetFileName() string {
 	return entity.FileName
 }
 
-func (entity ExerciseEntity) GetLevel() uint {
+func (entity ExerciseEntity) GetLevel() int {
 	return entity.Level
 }
 
@@ -55,3 +55,16 @@ func (entity *ExerciseEntity) SetFileName(file_name string) {
 func (entity *ExerciseEntity) SetAuthor(author uint) {
 	entity.AuthorId = author
 }
+
+// func (entity *ExerciseEntity) UpdateExerciseEntity(other ExerciseEntity) bool {
+// 	// AuthorId uint
+// 	bool updated
+// 	if len(other.FileName) > 0 {
+
+// 	}
+// 	FileName string
+// 	Tags     []string
+// 	Level    int
+// 	Subject  string
+// 	IsBroken bool
+// }

@@ -805,3 +805,8 @@
 	// get_tags = "SELECT name FROM TAG WHERE subject=$1"
 
 	// get_tags_by_subject = "SELECT name FROM tag WHERE subject = $1"
+
+			// for _, fheaders := range request.MultipartForm.File {
+	// 	for _, hdr := range fheaders {
+	// file, header, err := request.FormFile("file")
+	// TODO as function

@@ -5,9 +5,6 @@ const (
 	INCORRECT_BODY  = 1
 	INCORRECT_TAGS  = 2
 	INCORRECT_LEVEL = 3
-	// INCORRECT_TAG_GRADE = 4
-	// INCORRECT_COUNT_TAGS= 5
-
 )
 
 type ParserStatus struct {

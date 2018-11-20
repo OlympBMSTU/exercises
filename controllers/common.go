@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/OlympBMSTU/exercises/auth"
@@ -8,10 +9,31 @@ import (
 	"github.com/OlympBMSTU/exercises/result"
 )
 
-func WriteResponse(writer *http.ResponseWriter, res result.Result) {
+func WriteResponseFromResult(writer *http.ResponseWriter, format string, res result.Result) {
 	httpRes := matcher.MatchResult(res)
 	(*writer).WriteHeader(httpRes.GetStatus())
 	(*writer).Write(httpRes.GetData())
+}
+
+// TODO for xml, other formats
+func WriteResponseFromMap(writer *http.ResponseWriter, format string, data map[string]interface{}, status int) {
+	val, err := json.Marshal(data)
+	if err != nil {
+		(*writer).WriteHeader(http.StatusInternalServerError)
+		(*writer).Write([]byte("Internal server error: cant create json"))
+		return
+	}
+
+	(*writer).WriteHeader(status)
+	(*writer).Write(val)
+}
+
+func WriteResponse(writer *http.ResponseWriter, format string, params ...interface{}) {
+	if len(params) == 0 {
+		WriteResponseFromResult(writer, format, params[0].(result.Result))
+	} else {
+		WriteResponseFromMap(writer, format, params[0].(map[string]interface{}), params[1].(int))
+	}
 }
 
 func OptionsCredentials(writer *http.ResponseWriter) {
@@ -27,16 +49,20 @@ func CheckMethodAndAuthenticate(writer http.ResponseWriter, req *http.Request, m
 		writer.Write([]byte("hi"))
 		return false
 	}
+	writer.Header().Set("Content-Type", "application/json")
 
 	if req.Method != method {
-		http.Error(writer, "Unsupported method", 405)
+		WriteResponse(&writer, "JSON", map[string]interface{}{
+			"Message": "Unsupported method",
+			"Status":  "Error",
+			"Data":    nil,
+		}, http.StatusMethodNotAllowed)
 		return false
 	}
-	writer.Header().Set("Content-Type", "application/json")
 
 	authRes := auth.AuthByUserCookie(req)
 	if authRes.IsError() {
-		WriteResponse(&writer, authRes)
+		WriteResponse(&writer, "JSON", authRes)
 		return false
 	}
 	return true
