@@ -8,7 +8,8 @@ import (
 )
 
 func GetSubjects(writer http.ResponseWriter, request *http.Request) {
-	if !CheckMethodAndAuthenticate(writer, request, "GET") {
+	userId := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userId == nil {
 		return
 	}
 
@@ -17,7 +18,8 @@ func GetSubjects(writer http.ResponseWriter, request *http.Request) {
 }
 
 func GetTags(writer http.ResponseWriter, request *http.Request) {
-	if !CheckMethodAndAuthenticate(writer, request, "GET") {
+	userId := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userId == nil {
 		return
 	}
 

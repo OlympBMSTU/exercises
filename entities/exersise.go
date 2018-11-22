@@ -56,15 +56,52 @@ func (entity *ExerciseEntity) SetAuthor(author uint) {
 	entity.AuthorId = author
 }
 
-// func (entity *ExerciseEntity) UpdateExerciseEntity(other ExerciseEntity) bool {
-// 	// AuthorId uint
-// 	bool updated
-// 	if len(other.FileName) > 0 {
+func (enity *ExerciseEntity) GetDataForUpdateEntity(other ExerciseEntity) map[string]interface{} {
+	updateMap := make(map[string]interface{}, 0)
+	if len(other.FileName) > 0 && other.FileName != enity.FileName {
+		updateMap["file_name"] = other.FileName
+	}
 
-// 	}
-// 	FileName string
-// 	Tags     []string
-// 	Level    int
-// 	Subject  string
-// 	IsBroken bool
-// }
+	// TODO normalize tags to lower
+	if len(other.Tags) > 0 {
+		if len(enity.Tags) == 0 {
+			enity.Tags = other.Tags
+			updateMap["tags_to_add"] = enity.Tags
+			updateMap["tags_to_remove"] = make([]string, 0)
+		} else {
+			// copy one to anotther
+			to_delete := make([]string, 0)
+			new_tags := other.Tags
+			for i := 0; i < len(enity.Tags); i += 1 {
+				exist := false
+				for j := 0; j < len(new_tags); j += 1 {
+					if enity.Tags[i] == new_tags[j] {
+						exist = true
+						// remove equal data from
+						new_tags = append(new_tags[:j], new_tags[(j+1):]...)
+						break
+					}
+				}
+				if !exist {
+					to_delete = append(to_delete, enity.Tags[i])
+				}
+			}
+			updateMap["tags_to_add"] = to_delete
+			updateMap["tags_to_remove"] = new_tags
+		}
+	}
+
+	if other.Level > 0 && other.Level != enity.Level {
+		updateMap["level"] = other.Level
+	}
+
+	if len(other.Subject) > 0 && other.Subject != enity.Subject {
+		updateMap["subject"] = other.Subject
+	}
+
+	if other.IsBroken != enity.IsBroken {
+		updateMap["is_broken"] = other.IsBroken
+	}
+
+	return updateMap
+}

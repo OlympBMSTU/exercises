@@ -6,6 +6,36 @@
 	// return result.ErrorResult(err)
 	// }
 
+// if len(other.Tags) == 0 {
+// 	enity.Tags = other.Tags
+// } else {
+// 	newTags := make([]string, 0)
+// 	for _, tagOld := range entity.Tags {
+// 		for _, tagInput := range other.Tags {
+// 			if strings.ToLower(tagOld) != strings.ToLower(tagInput) {
+// 				//newTags = append(newTags, tagInput)
+// 			}
+// 		}
+// 		//Output:
+
+// 	}
+// }
+
+// if other.Level == -1 || other.Level == e
+// func (entity *ExerciseEntity) UpdateExerciseEntity(other ExerciseEntity) bool {
+// 	// AuthorId uint
+// 	bool updated
+// 	if len(other.FileName) > 0 {
+
+// 	}
+// 	FileName string
+// 	Tags     []string
+// 	Level    int
+// 	Subject  string
+// 	IsBroken bool
+// }
+
+
 // func MatchDbResult(res result.Result) http_res.HttpResult {
 // 	var jsonRes output.ResultView
 // 	info := mapHttpDbStatuses[res.GetStatus().GetCode()]

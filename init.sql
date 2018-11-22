@@ -92,3 +92,70 @@ BEGIN
     RETURN count_deleted;
 END;
 $$ LANGUAGE plpgsql;
+
+
+-- if tags exist empty
+
+CREATE OR REPLACE FUNCTION update_exercise_tag(ex_id integer, tags_input varchar(255)[])
+RETURNS INTEGER AS $$a
+DECLARE size_existing_tags_arr integer;
+DECLARE size_input_tags_arr integer;
+DECLARE count_tag integer; 
+DECLARE tag_exist boolean;
+DECLARE tags_arr varchar(255)[];
+DECLARE moved_tags varchar(255)[];
+DECLARE new_tags varchar(255)[];
+BEGIN 
+    -- TODO for for search that not exist 
+    -- new tags - is new arr todo, create arr thhat contains tags that differs from 
+    -- input then and that new from input 
+    -- then delete differs, new add to tag
+    SELECT tags FROM exercise WHERE id = ex_id INTO tags_arr;
+
+    FOR i in 1..array_length(tags_arr, 1) LOOP
+        tag_exist = FALSE;
+        FOR j in 1..array_length(tags_input, 1) LOOP 
+            IF tags_arr[i] = tags_input[j] THEN
+                tag_exist = TRUE;
+                SELECT array_remove(new_tags, tags_arr[i]);
+                EXIT;
+            END IF;
+        END LOOP;
+        -- RAISE NOTICE '%' new_tags;
+        IF TAG_EXIST = FALSE THEN 
+            SELECT array_append(moved_tags, tags_arr[i]);
+            -- SELECT COUNT (*) FROM tag_exercise WHERE exercise_id = ex_id into count_tag;
+            -- IF count_tag == 0 THEN
+        END IF;
+    END LOOP;
+
+    RAISE NOTICE '%', moved_tags;
+    RAISE NOTICE '%', new_tags;
+
+    FOR 
+    -- FOR i in 1..array_length(moved_tags, 1) LOOP
+    --     SELECT id FROM tags where subject = subj and name = moved_tags[i] into tag_id;
+
+    --     DELETE FROM 
+    --     IF (SELECT COUNT(*) FROM tag_exercise where exercise_id == ex_id) = O THEN 
+    --         DELETE FROM tags 
+    -- END 
+    -- SE
+    RETURN 0;
+END;
+$$LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_exercise_tags(ex_id integer, tags_to_add varchar(255)[], tags_to_remove varchar(255)[])
+RETURNS INTEGER AS $$
+
+BEGIN 
+
+    RETURN 0;
+END;
+
+
+1 5 2 32 3 
+2 3 23
+
+1 5 32 - to delete 
+23 to add 

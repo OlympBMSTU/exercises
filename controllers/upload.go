@@ -18,12 +18,14 @@ import (
 // UploadExerciseHandler : Controller that takes multipart form data
 // parses it, saves exercise to db and sends answer to secret system
 func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
-	if !CheckMethodAndAuthenticate(writer, request, "POST") {
+	userId := CheckMethodAndAuthenticate(writer, request, "POST")
+	if userId == nil {
 		return
 	}
 
 	var err error
 	if err = request.ParseMultipartForm(-1); err != nil {
+		////////////////////////////////////////////////////
 		http.Error(writer, "Incorrect body", http.StatusBadRequest)
 		return
 	}
@@ -45,6 +47,7 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	exView.SetAuthor(*userId)
 	exView.SetFileName(fsRes.GetData().(string))
 	dbEx := exView.ToExEntity()
 	dbRes := db.SaveExercise(dbEx, request.Context())
@@ -73,7 +76,8 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 // GetExerciseHandler : controller that searches exercise in database
 // by presented exercise id as path variable (ex /api/../id)
 func GetExerciseHandler(writer http.ResponseWriter, request *http.Request) {
-	if !CheckMethodAndAuthenticate(writer, request, "GET") {
+	userId := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userId == nil {
 		return
 	}
 
@@ -101,7 +105,8 @@ func GetExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 // 		2: offset  - integer
 // 		3: order   - string
 func GetExercises(writer http.ResponseWriter, request *http.Request) {
-	if !CheckMethodAndAuthenticate(writer, request, "POST") {
+	userId := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userId == nil {
 		return
 	}
 
@@ -113,6 +118,7 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 	level := -1
 
 	if len(vars) == 0 || (len(vars) == 1 && vars[0] == "") {
+		///////////////////////////////////////
 		http.Error(writer, "Not enough parameter", 404)
 		return
 	}
@@ -129,6 +135,7 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 			var err error
 			level, err = strconv.Atoi(data)
 			if err != nil {
+				///////////////////////////////////////////////////////
 				http.Error(writer, "INCORRECT PATH", 404)
 			}
 		}
@@ -197,7 +204,8 @@ func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	// todo update tags, update file for after
 	// update answer
 	// update is broken level subject
-	if !CheckMethodAndAuthenticate(writer, request, "POST") {
+	userId := CheckMethodAndAuthenticate(writer, request, "POST")
+	if userId == nil {
 		return
 	}
 
@@ -208,52 +216,34 @@ func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 			"Status":  "Error",
 			"Data":    "",
 		}, http.StatusBadRequest)
-		// http.Error(writer, "Incorrect body", http.StatusBadRequest)
 		return
 	}
 
-	WriteResponse(&writer, "JSON", map[string]interface{}{
-		"Message": "Error parse form",
-		"Status":  "Error",
-		"Data":    nil,
-	}, http.StatusBadRequest)
-	return
-	// parseRes := parser.ParseExViewPostUpdateForm(request.Form)
-	// if parseRes.IsError() {
-	// 	WriteResponse(&writer, "JSON", parseRes)
-	// 	return
-	// }
+	// as i think that if body contains only by id its bad request, because we have no to do
+	// but if front copy all data from sended entity then what to do ???
+	// its all ok
 
-	// // exView := parseRes.GetData().(views.ExerciseView)
-	// //
-	// _, header, _ := request.FormFile("file")
-	// // newFileName := ""
+	parseRes := parser.ParseExViewPostUpdateForm(request.Form)
+	if parseRes.IsError() {
+		WriteResponse(&writer, "JSON", parseRes)
+		return
+	}
 
-	// if header != nil {
-	// 	fsRes := fstorage.WriteFile(header)
-	// 	if fsRes.IsError() {
-	// 		WriteResponse(&writer, "JSON", fsRes)
-	// 		return
-	// 	}
-	// 	newFileName = fsRes.GetData().(string)
-	// }
+	exView := parseRes.GetData().(views.ExerciseView)
 
-	// if exView.IsEmpty() && header == nil {
+	_, header, _ := request.FormFile("file")
+	if header != nil {
+		fsRes := fstorage.WriteFile(header)
+		if fsRes.IsError() {
+			WriteResponse(&writer, "JSON", fsRes)
+			return
+		}
+		exView.SetFileName(fsRes.GetData().(string))
+	}
 
-	// }
-
-	// exView.SetFileName(fsRes.GetData().(string))
-
-	//dbRes := db.UpdateExercise(id, exView)
-	// if dbRes.IsError() {
-	//
-	// return
-	//}
-
-	// if answer changed sedn to
-
-	// if send error
-
-	// return
+	entity := exView.ToExEntity()
+	entity.Id = (uint)(exView.ID)
+	dbRes := db.UpdateExercise(entity, request.Context())
+	fmt.Print(dbRes)
 
 }

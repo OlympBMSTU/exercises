@@ -29,7 +29,7 @@ func WriteResponseFromMap(writer *http.ResponseWriter, format string, data map[s
 }
 
 func WriteResponse(writer *http.ResponseWriter, format string, params ...interface{}) {
-	if len(params) == 0 {
+	if len(params) < 2 {
 		WriteResponseFromResult(writer, format, params[0].(result.Result))
 	} else {
 		WriteResponseFromMap(writer, format, params[0].(map[string]interface{}), params[1].(int))
@@ -43,7 +43,7 @@ func OptionsCredentials(writer *http.ResponseWriter) {
 	(*writer).Header().Set("Access-Control-Allow-Credentials", "true")
 }
 
-func CheckMethodAndAuthenticate(writer http.ResponseWriter, req *http.Request, method string) bool {
+func CheckMethod(writer http.ResponseWriter, req *http.Request, method string) bool {
 	OptionsCredentials(&writer)
 	if req.Method == "OPTIONS" {
 		writer.Write([]byte("hi"))
@@ -60,10 +60,23 @@ func CheckMethodAndAuthenticate(writer http.ResponseWriter, req *http.Request, m
 		return false
 	}
 
+	return true
+}
+
+func AuthenticateUser(writer http.ResponseWriter, req *http.Request) *uint {
 	authRes := auth.AuthByUserCookie(req)
 	if authRes.IsError() {
 		WriteResponse(&writer, "JSON", authRes)
-		return false
+		return nil
 	}
-	return true
+	userID := authRes.GetData().(uint)
+	return &userID
+}
+
+func CheckMethodAndAuthenticate(writer http.ResponseWriter, req *http.Request, method string) *uint {
+	if !CheckMethod(writer, req, method) {
+		return nil
+	}
+
+	return AuthenticateUser(writer, req)
 }
