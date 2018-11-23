@@ -7,6 +7,7 @@ type ExerciseRepresentation struct {
 	Tags     []string `json:"tags"`
 	Level    uint     `json:"level"`
 	Author   uint     `json:"author"`
+	IsBroken bool
 }
 
 func NewExRepresentation(ex ExerciseEntity) ExerciseRepresentation {
@@ -17,5 +18,6 @@ func NewExRepresentation(ex ExerciseEntity) ExerciseRepresentation {
 		Tags:     ex.Tags,
 		Level:    ex.Level,
 		Author:   ex.AuthorId,
+		IsBroken: false,
 	}
 }
