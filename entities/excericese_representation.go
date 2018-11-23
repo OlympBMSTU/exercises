@@ -8,6 +8,7 @@ type ExerciseRepresentation struct {
 	Level    uint     `json:"level"`
 	Author   uint     `json:"author"`
 	IsBroken bool
+	Answer   string
 }
 
 func NewExRepresentation(ex ExerciseEntity) ExerciseRepresentation {
@@ -19,5 +20,6 @@ func NewExRepresentation(ex ExerciseEntity) ExerciseRepresentation {
 		Level:    ex.Level,
 		Author:   ex.AuthorId,
 		IsBroken: false,
+		Answer: "",
 	}
 }
