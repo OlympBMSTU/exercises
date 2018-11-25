@@ -44,12 +44,15 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	exView := parseRes.GetData().(views.ExerciseView)
 
 	var fsRes result.Result
-	_, header, _ := request.FormFile("file")
-
-	fsRes = fstorage.WriteFile(header)
-	if fsRes.IsError() {
-		WriteResponse(&writer, "JSON", fsRes)
-		return
+	for _, fheaders := range request.MultipartForm.File {
+		for _, hdr := range fheaders {
+			//	_, header, _ := request.FormFile("file")
+			fsRes = fstorage.WriteFile(hdr)
+			if fsRes.IsError() {
+				WriteResponse(&writer, "JSON", fsRes)
+				return
+			}
+		}
 	}
 
 	exView.SetAuthor(*userID)
