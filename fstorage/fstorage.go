@@ -42,6 +42,7 @@ func ComputeName(filename string) string {
 // todo refactor close open work eith strings
 func WriteFile(fileHdr *multipart.FileHeader) result.FSResult {
 	if fileHdr == nil {
+		log.Print("No file sended")
 		return result.ErrorResult(errors.New("No file presented"))
 	}
 	conf, _ := config.GetConfigInstance()

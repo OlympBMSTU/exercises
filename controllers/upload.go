@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -25,6 +26,7 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 
 	var err error
 	if err = request.ParseMultipartForm(-1); err != nil {
+		log.Print("Parse error")
 		WriteResponse(&writer, "JSON", map[string]interface{}{
 			"Message": "Error parse form",
 			"Status":  "Error",
