@@ -38,6 +38,9 @@ func AuthByUserCookie(request *http.Request) result.AuthResult {
 	}
 
 	cookieName := conf.GetAuthCookieName()
+	log.Println("cookieName: ")
+	log.Println(cookieName)
+	log.Println("\n")
 
 	cookie, err := request.Cookie(cookieName)
 	if err != nil {
