@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
+	"log"
 	"github.com/OlympBMSTU/exercises/auth/result"
 	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/logger"
