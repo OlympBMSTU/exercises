@@ -79,6 +79,7 @@ func (enity *ExerciseEntity) GetDataForUpdateEntity(other ExerciseEntity) map[st
 		}
 	} else {
 		if len(other.Tags) > 0 {
+			// What to do chekc all tags for its order
 			updateMap["tags"] = other.Tags
 			if len(enity.Tags) == 0 {
 				enity.Tags = other.Tags

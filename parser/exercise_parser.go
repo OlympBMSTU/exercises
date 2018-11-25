@@ -135,6 +135,7 @@ func ParseExViewPostUpdateForm(form map[string][]string) result.ParserResult {
 	subjectArr := form["subject"]
 	levelStringArr := form["level"]
 	tagsJSONArr := form["tags"]
+	isBrokenArr := form["is_broken"]
 	// file := form["file"]
 	// fmt.Println(file)
 
@@ -148,7 +149,7 @@ func ParseExViewPostUpdateForm(form map[string][]string) result.ParserResult {
 		}
 	}
 
-	if len(answerArr) == 0 && len(subjectArr) == 0 && len(levelStringArr) == 0 && len(tagsJSONArr) == 0 {
+	if len(answerArr) == 0 && len(subjectArr) == 0 && len(levelStringArr) == 0 && len(tagsJSONArr) == 0 || len(isBrokenArr) == 0 {
 		return result.OkResult(views.ExerciseView{ID: id})
 		//return result.ErrorResult(result.INCORRECT_BODY, "Body has no data")
 	}
@@ -218,6 +219,13 @@ func ParseExViewPostUpdateForm(form map[string][]string) result.ParserResult {
 		Subject:  subjectArr[0],
 		Level:    level,
 		Tags:     tags,
+		IsBroken: func() bool {
+			if isBrokenArr[0] == "true" {
+				return true
+			} else {
+				return false
+			}
+		}(),
 	}
 
 	return result.OkResult(res)

@@ -10,7 +10,7 @@ create table if not exists exercise (
     file_name varchar(255),
     subject varchar(255),
     tags varchar(255)[],
-    is_wrong boolean default false
+    is_broken boolean default false
 );
 
 -- DELETE FROM TAGS WHERE id int (SELECT tag_id FROM tax_excercise te JOIN (SELECT id FROM tag WHERE tag_nmae = '' AND subject = '') WHERE C 
@@ -177,18 +177,18 @@ DECLARE tg_id integer;
 DECLARE tag_ex_id integer;
 BEGIN 
     -- SELECT subject from exercise WHERE id = ex_id INTO subj;
-    if new_subj IS NULL OR new_subj = "" THEN 
+    if new_subj IS NULL OR new_subj = '' THEN 
         new_subj = old_subj;
     END IF;
-    RAISE NOTICE '% %', old_subj, new_subj;
+    -- RAISE NOTICE '% %', old_subj, new_subj;
     -- RAISE NOTICE '%', subj;
     -- RAISE NOTICE '% %', tags_to_add, tags_to_remove;
     IF array_length(tags_to_remove, 1) IS NOT NULL AND array_length(tags_to_remove, 1) > 0 THEN
         FOR i in 1..array_length(tags_to_remove, 1) LOOP
-            RAISE NOTICE '% %', i, tags_to_remove[i];
+            -- RAISE NOTICE '% %', i, tags_to_remove[i];
 
             SELECT id FROM tag WHERE subject = old_subj AND name = tags_to_remove[i] INTO tg_id;
-            RAISE NOTICE '%', tg_id;
+            -- RAISE NOTICE '%', tg_id;
             DELETE FROM tag_exercise WHERE tag_id = tg_id and exercise_id = ex_id;
             IF (SELECT COUNT(*) FROM tag_exercise WHERE tag_id = tg_id) = 0 THEN
                 DELETE FROM tag WHERE id = tg_id;

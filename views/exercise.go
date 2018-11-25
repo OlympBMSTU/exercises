@@ -21,7 +21,7 @@ func (view ExerciseView) ToExEntity() entities.ExerciseEntity {
 		Tags:     view.Tags,
 		Level:    view.Level,
 		Subject:  view.Subject,
-		IsBroken: false,
+		IsBroken: view.IsBroken,
 	}
 }
 
