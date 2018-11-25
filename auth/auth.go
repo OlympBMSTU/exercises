@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
+	"log"
 	"github.com/OlympBMSTU/exercises/auth/result"
 	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/logger"
@@ -38,6 +38,9 @@ func AuthByUserCookie(request *http.Request) result.AuthResult {
 	}
 
 	cookieName := conf.GetAuthCookieName()
+	log.Println("cookieName: ")
+	log.Println(cookieName)
+	log.Println("\n")
 
 	cookie, err := request.Cookie(cookieName)
 	if err != nil {

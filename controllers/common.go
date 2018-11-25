@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-
+	"log"
 	"github.com/OlympBMSTU/exercises/auth"
 	matcher "github.com/OlympBMSTU/exercises/controllers/matcher_result"
 	"github.com/OlympBMSTU/exercises/result"
@@ -69,6 +69,12 @@ func checkMethod(writer http.ResponseWriter, req *http.Request, method string) b
 		return false
 	}
 	writer.Header().Set("Content-Type", "application/json")
+
+	log.Println("method: ")
+	log.Println(req.Method)
+	log.Println(" / ")
+	log.Println(method)
+	log.Println("\n")
 
 	if req.Method != method {
 		WriteResponse(&writer, "JSON", map[string]interface{}{
