@@ -110,8 +110,8 @@ func GetExerciseList(tag string, subject string, level int,
 		// query.WriteString(GET_EXERCISES_BY_SUBJECT)
 	}
 
-	args = append(args, isBroken)
-	query += fmt.Sprintf("AND is_broken =$%d ", len(args))
+	// args = append(args, isBroken)
+	// query += fmt.Sprintf("AND ex.is_broken =$%d ", len(args))
 	if level != -1 {
 		args = append(args, level)
 		query += fmt.Sprintf("AND ex.level = $%d ", len(args))
@@ -231,8 +231,9 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 
 	if updateData["tags_to_add"] != nil || updateData["tags_to_delete"] != nil {
 		_, err = tx.Exec(UPDATE_TAGS_BY_EX, exEntity.Id, existingEntity.Subject, exEntity.Subject, updateData["tags_to_add"], updateData["tags_to_remove"])
+
 		if err != nil {
-			log.Print("cant update tags")
+			log.Print("cant update tags", err)
 			return result.ErrorResult(err)
 		}
 		delete(updateData, "tags_to_add")
