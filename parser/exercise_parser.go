@@ -212,20 +212,30 @@ func ParseExViewPostUpdateForm(form map[string][]string) result.ParserResult {
 		}
 	}
 
-	res := views.ExerciseView{
-		ID:       id,
-		Answer:   answer,
-		FileName: "",
-		Subject:  subjectArr[0],
-		Level:    level,
-		Tags:     tags,
-		IsBroken: func() bool {
+	subject := ""
+	if len(subjectArr) > 0 {
+		subject = subjectArr[0]
+	}
+
+	isBroken := false
+	if len(isBrokenArr) > 0 {
+		isBroken = func() bool {
 			if isBrokenArr[0] == "true" {
 				return true
 			} else {
 				return false
 			}
-		}(),
+		}()
+	}
+
+	res := views.ExerciseView{
+		ID:       id,
+		Answer:   answer,
+		FileName: "",
+		Subject:  subject,
+		Level:    level,
+		Tags:     tags,
+		IsBroken: isBroken,
 	}
 
 	return result.OkResult(res)

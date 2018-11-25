@@ -43,6 +43,25 @@ func OptionsCredentials(writer *http.ResponseWriter) {
 	(*writer).Header().Set("Access-Control-Allow-Credentials", "true")
 }
 
+// OptionsCredentials(&writer)
+// 	if request.Method == "OPTIONS" {
+// 		writer.Write([]byte("hi"))
+// 		return
+// 	}
+
+// 	if request.Method != "POST" {
+// 		http.Error(writer, "Unsupported method", 405)
+// 		return
+// 	}
+
+// 	conf, _ := config.GetConfigInstance()
+// 	authRes := auth.AuthByUserCookie(request, conf.GetAuthCookieName())
+// 	if authRes.IsError() {
+// 		WriteResponse(&writer, authRes)
+// 		return
+// }
+
+// TODO return like state
 func checkMethod(writer http.ResponseWriter, req *http.Request, method string) bool {
 	OptionsCredentials(&writer)
 	if req.Method == "OPTIONS" {
