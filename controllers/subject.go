@@ -4,53 +4,29 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/OlympBMSTU/exercises/auth"
 	"github.com/OlympBMSTU/exercises/db"
 )
 
-func GetSubjects(writer http.ResponseWriter, request *http.Request) {
-	OptionsCredentials(&writer)
-	if request.Method == "OPTIONS" {
-		writer.Write([]byte("hi"))
-		return
-	}
-
-	if request.Method != "GET" {
-		http.Error(writer, "Unsupported method", 405)
-		return
-	}
-	writer.Header().Set("Content-Type", "application/json")
-
-	authRes := auth.AuthByUserCookie(request, "bmstuOlympAuth")
-	if authRes.IsError() {
-		WriteResponse(&writer, authRes)
+// GetSubjectsHandler : returns all olympyad subjects
+func GetSubjectsHandler(writer http.ResponseWriter, request *http.Request) {
+	userID := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userID == nil {
 		return
 	}
 
 	dbRes := db.GetSubjects(request.Context())
-	WriteResponse(&writer, dbRes)
+	WriteResponse(&writer, "JSON", dbRes)
 }
 
-func GetTags(writer http.ResponseWriter, request *http.Request) {
-	OptionsCredentials(&writer)
-	if request.Method == "OPTIONS" {
-		writer.Write([]byte("hi"))
-		return
-	}
-	if request.Method != "GET" {
-		http.Error(writer, "Unsupported method", 405)
-		return
-	}
-	writer.Header().Set("Content-Type", "application/json")
-
-	authRes := auth.AuthByUserCookie(request, "bmstuOlympAuth")
-	if authRes.IsError() {
-		WriteResponse(&writer, authRes)
+// GetTagsHandler : its return all tags, thats references to this subject
+func GetTagsHandler(writer http.ResponseWriter, request *http.Request) {
+	userID := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userID == nil {
 		return
 	}
 
 	subject := strings.TrimPrefix(request.URL.Path, "/api/exercises/tags/")
 	dbRes := db.GetTgasBySubect(subject, request.Context())
 
-	WriteResponse(&writer, dbRes)
+	WriteResponse(&writer, "JSON", dbRes)
 }

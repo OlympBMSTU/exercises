@@ -2,6 +2,7 @@ package fstorage
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -40,6 +41,9 @@ func ComputeName(filename string) string {
 
 // todo refactor close open work eith strings
 func WriteFile(fileHdr *multipart.FileHeader) result.FSResult {
+	if fileHdr == nil {
+		return result.ErrorResult(errors.New("No file presented"))
+	}
 	conf, _ := config.GetConfigInstance()
 
 	ext := filepath.Ext(fileHdr.Filename)

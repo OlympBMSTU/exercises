@@ -1,10 +1,138 @@
 
+
+// todo update tags, update file for after
+// update answer
+// update is broken level subject
+
+// as i think that if body contains only by id its bad request, because we have no to do
+// but if front copy all data from sended entity then what to do ???
+// its all ok
+
+// fmt.Print(dbRes)
+
+// firstly:
+// maybe id in view set
+// check new CheckMethodAndAuthenti
+
+// parse form as one?  for create for update
+// parse res new state that is not error, but empty maybe new method for view such as is empty
+// good variant id sended in view if no id -> error
+// if id exist, but no data ok then create file if no file and view is empty return error
+// but which error return ? as parse error, as new error as CreateResponse
+// maybe previous check that file exist and then parse form
+
+// now db
+// main prolem tags it could have
+// 1) send tags all old
+// 2) send tags all one or two changed its good variant
+// 3) if sended one tag then its need to create one ol one new
+// 4) isFalse its good
+// now check all data fields
+// thats not empty to db -> create query, fill array
+// when update if such tag doesnt exist then delete it and tag exercise id
+// else nothing to dospacspacesspaceses
+
+// also todo for generating
+// for subject
+// for tag by class
+// for firs level
+// secons ... upto 10
+// generate variant
+// db stores filepath id and tags maybe if its need
+// as array of part exercise
+// fields are filled by old values if its changed then send
+
+// frontend - list exercises
+// list one
+// also in list one you can change it
+
+// todo how to check all check is not empty and others and its ok
+// it's simply to check maybe we need to create function that returns map as changed values
+// for ex that copies
+// // query := "UPDATE exercises SET "
+// rows, err := db.Query(GET_EXERCISE_BY_ID, exEntity.GetId())
+// defer rows.Close()
+
+// if err != nil {
+// 	return result.ErrorResult(err)
+// }
+
+// var existingEntity *entities.ExerciseEntity
+// for rows.Next() {
+// 	excerciese, err = scanExercise(rows)
+// }
+
+// if err != nil {
+// 	return result.ErrorResult(err)
+// }
+
+// var query bytes.Buffer
+// query.WriteString(UPDATE_EXCERCISE)
+// var args []interface{}
+
+// fmt.Print(query)
+// AuthorId uint
+// FileName string
+// Tags     []string
+// Level    int
+// Subject  string
+// IsBroken bool
+// if len(exEntity.FileName) > 0 && exEntity.FileName != existingEntity.FileName {
+// 	args = append(args, exEntity.FileName)
+// 	query.WriteString(fmt.Sprintf("filename=%d ", len(args))
+// }
+
+// if len(exEntity.Tags) > 0 {
+// 	for i, tag := range exEntity.Tags {
+// 		if tag != existingEntity.Tags[i] {
+// 			args = append(args, exEntity.Tags)
+// 			query.WriteString(fmt.Sprintf("tags=%d ", len(args))
+// 			break
+// 		}
+// 	}
+// }
+
+// if exEntity.Level > 0 && exEntity.Level != existingEntity.Level {
+
+// }n
+
+
 	// tags, err := getTags(GET_TAGS_FOR_EXERCISE, pool, id)
 
 	// can tags be empyt ?
 	// if err != nil {
 	// return result.ErrorResult(err)
 	// }
+
+// if len(other.Tags) == 0 {
+// 	enity.Tags = other.Tags
+// } else {
+// 	newTags := make([]string, 0)
+// 	for _, tagOld := range entity.Tags {
+// 		for _, tagInput := range other.Tags {
+// 			if strings.ToLower(tagOld) != strings.ToLower(tagInput) {
+// 				//newTags = append(newTags, tagInput)
+// 			}
+// 		}
+// 		//Output:
+
+// 	}
+// }
+
+// if other.Level == -1 || other.Level == e
+// func (entity *ExerciseEntity) UpdateExerciseEntity(other ExerciseEntity) bool {
+// 	// AuthorId uint
+// 	bool updated
+// 	if len(other.FileName) > 0 {
+
+// 	}
+// 	FileName string
+// 	Tags     []string
+// 	Level    int
+// 	Subject  string
+// 	IsBroken bool
+// }
+
 
 // func MatchDbResult(res result.Result) http_res.HttpResult {
 // 	var jsonRes output.ResultView
@@ -805,3 +933,8 @@
 	// get_tags = "SELECT name FROM TAG WHERE subject=$1"
 
 	// get_tags_by_subject = "SELECT name FROM tag WHERE subject = $1"
+
+			// for _, fheaders := range request.MultipartForm.File {
+	// 	for _, hdr := range fheaders {
+	// file, header, err := request.FormFile("file")
+	// TODO as function

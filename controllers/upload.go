@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OlympBMSTU/exercises/auth"
 	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/db"
 	"github.com/OlympBMSTU/exercises/fstorage"
@@ -16,99 +15,72 @@ import (
 	"github.com/OlympBMSTU/exercises/views"
 )
 
+// UploadExerciseHandler : Controller that takes multipart form data
+// parses it, saves exercise to db and sends answer to secret system
 func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
-	OptionsCredentials(&writer)
-	if request.Method == "OPTIONS" {
-		writer.Write([]byte("hi"))
+	userID := CheckMethodAndAuthenticate(writer, request, "POST")
+	if userID == nil {
 		return
 	}
-
-	if request.Method != "POST" {
-		http.Error(writer, "Unsupported method", 405)
-		return
-	}
-
-	conf, _ := config.GetConfigInstance()
-	authRes := auth.AuthByUserCookie(request, conf.GetAuthCookieName())
-	if authRes.IsError() {
-		WriteResponse(&writer, authRes)
-		return
-	}
-	writer.Header().Set("Content-Type", "application/json")
 
 	var err error
 	if err = request.ParseMultipartForm(-1); err != nil {
-		http.Error(writer, "Incorrect body", http.StatusBadRequest)
+		WriteResponse(&writer, "JSON", map[string]interface{}{
+			"Message": "Error parse form",
+			"Status":  "Error",
+			"Data":    nil,
+		}, http.StatusBadRequest)
 		return
 	}
 
 	parseRes := parser.ParseExViewPostForm(request.Form)
 	if parseRes.IsError() {
-		WriteResponse(&writer, parseRes)
+		WriteResponse(&writer, "JSON", parseRes)
 		return
 	}
 
 	exView := parseRes.GetData().(views.ExerciseView)
 
 	var fsRes result.Result
-	for _, fheaders := range request.MultipartForm.File {
-		for _, hdr := range fheaders {
-			fsRes = fstorage.WriteFile(hdr)
-			if fsRes.IsError() {
-				WriteResponse(&writer, fsRes)
-				return
-			}
-		}
+	_, header, _ := request.FormFile("file")
+
+	fsRes = fstorage.WriteFile(header)
+	if fsRes.IsError() {
+		WriteResponse(&writer, "JSON", fsRes)
+		return
 	}
 
+	exView.SetAuthor(*userID)
 	exView.SetFileName(fsRes.GetData().(string))
-
-	// conf, _ := config.GetConfigInstance()
-	// if conf.GetTest() != "test" {
-	// 	exView.SetAuthor(authRes.GetData().(uint))
-	// } else {
-	// 	exView.SetAuthor(0)
-	// }
-
 	dbEx := exView.ToExEntity()
 	dbRes := db.SaveExercise(dbEx, request.Context())
 	if dbRes.IsError() {
-		WriteResponse(&writer, dbRes)
+		WriteResponse(&writer, "JSON", dbRes)
 		// TODO delete file
 		return
 	}
 
-	exId := uint(dbRes.GetData().(int))
-	senderRes := sender.SendAnswer(exId, exView.Answer)
-	if senderRes.IsError() {
-		dbDelRes := db.DeleteExcerciese(exId, request.Context())
-		fmt.Print(dbDelRes)
-		//fsDelRes = fstorage.DeleteFile(filename)
-		WriteResponse(&writer, senderRes)
-		return
+	exID := uint(dbRes.GetData().(int))
+	conf, _ := config.GetConfigInstance()
+	if !conf.IsTest() {
+		senderRes := sender.SendAnswer(exID, exView.Answer)
+		if senderRes.IsError() {
+			dbDelRes := db.DeleteExcerciese(exID, request.Context())
+			fmt.Print(dbDelRes)
+			//fsDelRes = fstorage.DeleteFile(filename)
+			WriteResponse(&writer, "JSON", senderRes)
+			return
+		}
 	}
 
-	WriteResponse(&writer, dbRes)
+	WriteResponse(&writer, "JSON", dbRes)
 }
 
-func GetExercise(writer http.ResponseWriter, request *http.Request) {
-	OptionsCredentials(&writer)
-	if request.Method == "OPTIONS" {
-		writer.Write([]byte("hi"))
-		return
-	}
-
-	if request.Method != "GET" {
-		http.Error(writer, "Unsopported method", 405)
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-
-	conf, _ := config.GetConfigInstance()
-	authRes := auth.AuthByUserCookie(request, conf.GetAuthCookieName())
-	if authRes.IsError() {
-		WriteResponse(&writer, authRes)
+// GetExerciseHandler : controller that searches exercise in database
+// by presented exercise id as path variable (ex /api/../id)
+func GetExerciseHandler(writer http.ResponseWriter, request *http.Request) {
+	userID := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userID == nil {
 		return
 	}
 
@@ -116,32 +88,32 @@ func GetExercise(writer http.ResponseWriter, request *http.Request) {
 	idStr := strings.TrimPrefix(request.URL.Path, "/api/exercises/get/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(writer, "Incorrect path variable", http.StatusBadRequest)
+		WriteResponse(&writer, "JSON", map[string]interface{}{
+			"Message": "Incorrect path variable",
+			"Status":  "Error",
+			"Data":    nil,
+		}, http.StatusBadRequest)
 		return
 	}
-	exId := uint(id)
+	exID := uint(id)
 
-	dbRes := db.GetExercise(exId, request.Context())
-	WriteResponse(&writer, dbRes)
+	dbRes := db.GetExercise(exID, request.Context())
+	WriteResponse(&writer, "JSON", dbRes)
 }
 
+// GetExercises : controller that searches exercises in database by presented conditio params:
+// Path variables like /api/.../subject/tag/level
+// Where
+// 		1: subject - string
+// 		2: tag 	   - string
+// 		3: level   - integer
+// Also query variables
+// 		1: limit   - integer
+// 		2: offset  - integer
+// 		3: order   - string
 func GetExercises(writer http.ResponseWriter, request *http.Request) {
-	OptionsCredentials(&writer)
-	if request.Method == "OPTIONS" {
-		writer.Write([]byte("hi"))
-		return
-	}
-
-	if request.Method != "GET" {
-		http.Error(writer, "Unsopported method", 405)
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-
-	authRes := auth.AuthByUserCookie(request, "bmstuOlympAuth")
-	if authRes.IsError() {
-		WriteResponse(&writer, authRes)
+	userID := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userID == nil {
 		return
 	}
 
@@ -153,7 +125,11 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 	level := -1
 
 	if len(vars) == 0 || (len(vars) == 1 && vars[0] == "") {
-		http.Error(writer, "Not enough parameter", 404)
+		WriteResponse(&writer, "JSON", map[string]interface{}{
+			"Message": "Not enough parameters for request",
+			"Status":  "Error",
+			"Data":    nil,
+		}, http.StatusBadRequest)
 		return
 	}
 
@@ -169,7 +145,12 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 			var err error
 			level, err = strconv.Atoi(data)
 			if err != nil {
-				http.Error(writer, "INCORRECT PATH", 404)
+				WriteResponse(&writer, "JSON", map[string]interface{}{
+					"Message": "Incorrect level variable",
+					"Status":  "Error",
+					"Data":    nil,
+				}, http.StatusBadRequest)
+				return
 			}
 		}
 	}
@@ -188,15 +169,72 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 	// its fucking crutch maybe, todo refactor !!!!!!!!!
 
 	// check order for quer
-	order := query["order"]
-	is_desc := false
-	if len(order) > 0 && order[0] == "desc" {
-		is_desc = true
+	order := query.Get("order")
+	isDesc := false
+	if order != "" && order == "desc" {
+		isDesc = true
 	}
 
-	// 1 - subject 2 - tag 3 - level
-	// query 1 - limit 2 - offset 3 - order
+	isBrokenStr := query.Get("is_broken")
+	isBroken := false
+	if isBrokenStr != "" && isBrokenStr == "true" {
+		isBroken = true
+	}
 
-	dbRes := db.GetExerciseList(tag, subject, level, limit, offset, is_desc, request.Context())
-	WriteResponse(&writer, dbRes)
+	dbRes := db.GetExerciseList(tag, subject, level, limit, offset, isDesc, isBroken, request.Context())
+	WriteResponse(&writer, "JSON", dbRes)
+}
+
+func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
+	userID := CheckMethodAndAuthenticate(writer, request, "POST")
+	if userID == nil {
+		return
+	}
+
+	var err error
+	if err = request.ParseMultipartForm(-1); err != nil {
+		WriteResponse(&writer, "JSON", map[string]interface{}{
+			"Message": "Error parse form",
+			"Status":  "Error",
+			"Data":    nil,
+		}, http.StatusBadRequest)
+		return
+	}
+
+	parseRes := parser.ParseExViewPostUpdateForm(request.Form)
+	if parseRes.IsError() {
+		WriteResponse(&writer, "JSON", parseRes)
+		return
+	}
+
+	// about id int or uint
+	exView := parseRes.GetData().(views.ExerciseView)
+
+	_, header, _ := request.FormFile("file")
+	if header != nil {
+		fsRes := fstorage.WriteFile(header)
+		if fsRes.IsError() {
+			WriteResponse(&writer, "JSON", fsRes)
+			return
+		}
+		exView.SetFileName(fsRes.GetData().(string))
+	}
+
+	// if old file == new file names doesnt mathc, so if update we need to send new file else no
+	entity := exView.ToExEntity()
+
+	dbRes := db.UpdateExercise(entity, request.Context())
+
+	// OR create additional error NOT_UPDATED and map
+	if dbRes.GetData() == nil && !dbRes.IsError() {
+		WriteResponse(&writer, "JSON",
+			map[string]interface{}{
+				"Message": "No new data added to exercise",
+				"Data":    nil,
+				"Status":  "Error",
+			}, http.StatusBadRequest)
+		return
+	}
+	// also here smtp
+	WriteResponse(&writer, "JSON", dbRes)
 }

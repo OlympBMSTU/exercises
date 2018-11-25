@@ -82,6 +82,7 @@ func MatchResult(res root_result.Result) http_res.HttpResult {
 		// return MatchSenderResult(res)
 	case parser_result.ParserResult:
 		infoRes = getAssociatedParserInfo(res)
+		infoRes.Message += res.GetStatus().GetDescription()
 		// return MatchParserResult(res)
 	default:
 		// coorect this

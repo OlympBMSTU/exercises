@@ -74,10 +74,10 @@ writer.WriteString(msg)
 writer.Write(val)
 
 err = smtp.SendMail(path,
-	NoAuth(),
-	from, []string{to}, writer.Bytes())
+    NoAuth(),
+    from, []string{to}, writer.Bytes())
 
 if err != nil {
-	logger.LogE.Println(err.Error())
-	return result.ErrorResult(err)
+    logger.LogE.Println(err.Error())
+    return result.ErrorResult(err)
 }*/

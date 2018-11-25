@@ -31,13 +31,13 @@ type JWTPayload struct {
 	Exp  uint   `json:"exp"`
 }
 
-func AuthByUserCookie(request *http.Request, cookieName string) result.AuthResult {
+func AuthByUserCookie(request *http.Request) result.AuthResult {
 	conf, _ := config.GetConfigInstance()
 	if conf.IsTest() {
 		return result.OkResult(1)
 	}
 
-	cookieName = conf.GetAuthCookieName()
+	cookieName := conf.GetAuthCookieName()
 
 	cookie, err := request.Cookie(cookieName)
 	if err != nil {
