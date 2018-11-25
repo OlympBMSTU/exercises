@@ -15,6 +15,7 @@ type ExerciseView struct {
 
 func (view ExerciseView) ToExEntity() entities.ExerciseEntity {
 	return entities.ExerciseEntity{
+		Id:       uint(view.ID),
 		AuthorId: view.Author,
 		FileName: view.FileName,
 		Tags:     view.Tags,

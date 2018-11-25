@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -136,8 +135,8 @@ func ParseExViewPostUpdateForm(form map[string][]string) result.ParserResult {
 	subjectArr := form["subject"]
 	levelStringArr := form["level"]
 	tagsJSONArr := form["tags"]
-	file := form["file"]
-	fmt.Println(file)
+	// file := form["file"]
+	// fmt.Println(file)
 
 	id := -1
 	if len(idStrArr) == 0 {

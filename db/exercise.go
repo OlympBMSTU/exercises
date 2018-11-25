@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/OlympBMSTU/exercises/db/result"
 	"github.com/OlympBMSTU/exercises/entities"
@@ -181,6 +182,10 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 		return result.ErrorResult(err)
 	}
 
+	if existingEntity == nil {
+		return result.ErrorResult(result.EMPTY_RESULT, "")
+	}
+
 	updateData := existingEntity.GetDataForUpdateEntity(exEntity)
 
 	if len(updateData) == 0 {
@@ -196,7 +201,8 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 		}
 
 		if cnt == 0 {
-			// return result.
+			log.Println("No subject in db")
+			return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
 		}
 		// search subject else no subject
 	}
@@ -208,26 +214,35 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 
 	// here starts transaction
 
-	if updateData["new_tags"] != nil {
-		tx.Exec("")
-		delete(updateData, "new_tags")
-		delete(updateData, "deleted_tags")
+	if updateData["tags_to_add"] != nil || updateData["tags_to_delete"] != nil {
+		_, err = tx.Exec(UPDATE_TAGS_BY_EX, exEntity.Id, existingEntity.Subject, exEntity.Subject, updateData["tags_to_add"], updateData["tags_to_remove"])
+		if err != nil {
+			return result.ErrorResult(err)
+		}
+		delete(updateData, "tags_to_add")
+		delete(updateData, "tags_to_remove")
 	}
 
 	// firstly work with tags
 
-	var query bytes.Buffer
-	args := make([]interface{}, 1)
+	query := UPDAET_EXERCISE
+	args := make([]interface{}, 0)
 	for k, v := range updateData {
 		args = append(args, v)
-		query.WriteString(fmt.Sprintf("%s=$%d ", k, len(args)))
+		query += fmt.Sprintf("%s=$%d,", k, len(args))
 	}
 
+	query = strings.TrimRight(query, ",")
 	// after another update
 	args = append(args, exEntity.Id)
-	fmt.Print(query.String())
-	query.WriteString(fmt.Sprintf("WHERE id=$", len(args)))
-	tx.Exec(query.String(), args)
+	query += fmt.Sprintf(" WHERE id=$%d", len(args))
+	_, err = tx.Exec(query, args...)
+	fmt.Print(query)
+	fmt.Print(err)
+
+	if err != nil {
+		return result.ErrorResult(err)
+	}
 	err = tx.Commit()
 
 	if err != nil {
@@ -236,53 +251,3 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 
 	return result.OkResult(existingEntity)
 }
-
-// todo how to check all check is not empty and others and its ok
-// it's simply to check maybe we need to create function that returns map as changed values
-// for ex that copies
-// // query := "UPDATE exercises SET "
-// rows, err := db.Query(GET_EXERCISE_BY_ID, exEntity.GetId())
-// defer rows.Close()
-
-// if err != nil {
-// 	return result.ErrorResult(err)
-// }
-
-// var existingEntity *entities.ExerciseEntity
-// for rows.Next() {
-// 	excerciese, err = scanExercise(rows)
-// }
-
-// if err != nil {
-// 	return result.ErrorResult(err)
-// }
-
-// var query bytes.Buffer
-// query.WriteString(UPDATE_EXCERCISE)
-// var args []interface{}
-
-// fmt.Print(query)
-// AuthorId uint
-// FileName string
-// Tags     []string
-// Level    int
-// Subject  string
-// IsBroken bool
-// if len(exEntity.FileName) > 0 && exEntity.FileName != existingEntity.FileName {
-// 	args = append(args, exEntity.FileName)
-// 	query.WriteString(fmt.Sprintf("filename=%d ", len(args))
-// }
-
-// if len(exEntity.Tags) > 0 {
-// 	for i, tag := range exEntity.Tags {
-// 		if tag != existingEntity.Tags[i] {
-// 			args = append(args, exEntity.Tags)
-// 			query.WriteString(fmt.Sprintf("tags=%d ", len(args))
-// 			break
-// 		}
-// 	}
-// }
-
-// if exEntity.Level > 0 && exEntity.Level != existingEntity.Level {
-
-// }n

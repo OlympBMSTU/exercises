@@ -7,9 +7,10 @@ import (
 	"github.com/OlympBMSTU/exercises/db"
 )
 
-func GetSubjects(writer http.ResponseWriter, request *http.Request) {
-	userId := CheckMethodAndAuthenticate(writer, request, "GET")
-	if userId == nil {
+// GetSubjectsHandler : returns all olympyad subjects
+func GetSubjectsHandler(writer http.ResponseWriter, request *http.Request) {
+	userID := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userID == nil {
 		return
 	}
 
@@ -17,9 +18,10 @@ func GetSubjects(writer http.ResponseWriter, request *http.Request) {
 	WriteResponse(&writer, "JSON", dbRes)
 }
 
-func GetTags(writer http.ResponseWriter, request *http.Request) {
-	userId := CheckMethodAndAuthenticate(writer, request, "GET")
-	if userId == nil {
+// GetTagsHandler : its return all tags, thats references to this subject
+func GetTagsHandler(writer http.ResponseWriter, request *http.Request) {
+	userID := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userID == nil {
 		return
 	}
 

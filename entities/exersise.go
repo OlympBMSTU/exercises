@@ -1,5 +1,7 @@
 package entities
 
+import "strings"
+
 // todo is active хранить инфу о о битом задании
 // написать Диме Кузнецову на какую почту что слать
 // слать заголовок задание и данные
@@ -63,40 +65,57 @@ func (enity *ExerciseEntity) GetDataForUpdateEntity(other ExerciseEntity) map[st
 	}
 
 	// TODO normalize tags to lower
-	if len(other.Tags) > 0 {
-		if len(enity.Tags) == 0 {
-			enity.Tags = other.Tags
-			updateMap["tags_to_add"] = enity.Tags
-			updateMap["tags_to_remove"] = make([]string, 0)
+
+	if len(other.Subject) > 0 && other.Subject != enity.Subject {
+		updateMap["subject"] = other.Subject
+		if len(other.Tags) > 0 {
+			updateMap["tags"] = other.Tags
+			updateMap["tags_to_add"] = other.Tags
+			updateMap["tags_to_remove"] = enity.Tags
 		} else {
-			// copy one to anotther
-			to_delete := make([]string, 0)
-			new_tags := other.Tags
-			for i := 0; i < len(enity.Tags); i += 1 {
-				exist := false
-				for j := 0; j < len(new_tags); j += 1 {
-					if enity.Tags[i] == new_tags[j] {
-						exist = true
-						// remove equal data from
-						new_tags = append(new_tags[:j], new_tags[(j+1):]...)
-						break
+			updateMap["tags"] = enity.Tags
+			updateMap["tags_to_add"] = enity.Tags
+			updateMap["tags_to_remove"] = enity.Tags
+		}
+	} else {
+		if len(other.Tags) > 0 {
+			updateMap["tags"] = other.Tags
+			if len(enity.Tags) == 0 {
+				enity.Tags = other.Tags
+				updateMap["tags_to_add"] = enity.Tags
+				updateMap["tags_to_remove"] = make([]string, 0)
+			} else {
+				// copy one to anotther
+				toDelete := make([]string, 0)
+				// var newTags []string
+				// newTags := other.Tags
+				newTags := make([]string, len(other.Tags))
+				copy(newTags, other.Tags)
+				for i := 0; i < len(enity.Tags); i += 1 {
+					exist := false
+					for j := 0; j < len(newTags); j += 1 {
+						if strings.ToLower(enity.Tags[i]) == strings.ToLower(newTags[j]) {
+							exist = true
+							// remove equal data from
+							newTags = append(newTags[:j], newTags[(j+1):]...)
+							break
+						}
+					}
+					if !exist {
+						toDelete = append(toDelete, enity.Tags[i])
 					}
 				}
-				if !exist {
-					to_delete = append(to_delete, enity.Tags[i])
+				if len(newTags) > 0 || len(toDelete) > 0 {
+					updateMap["tags_to_add"] = newTags
+					updateMap["tags_to_remove"] = toDelete
 				}
+				// }
 			}
-			updateMap["tags_to_add"] = to_delete
-			updateMap["tags_to_remove"] = new_tags
 		}
 	}
 
 	if other.Level > 0 && other.Level != enity.Level {
 		updateMap["level"] = other.Level
-	}
-
-	if len(other.Subject) > 0 && other.Subject != enity.Subject {
-		updateMap["subject"] = other.Subject
 	}
 
 	if other.IsBroken != enity.IsBroken {

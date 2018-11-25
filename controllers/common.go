@@ -9,14 +9,14 @@ import (
 	"github.com/OlympBMSTU/exercises/result"
 )
 
-func WriteResponseFromResult(writer *http.ResponseWriter, format string, res result.Result) {
+func writeResponseFromResult(writer *http.ResponseWriter, format string, res result.Result) {
 	httpRes := matcher.MatchResult(res)
 	(*writer).WriteHeader(httpRes.GetStatus())
 	(*writer).Write(httpRes.GetData())
 }
 
 // TODO for xml, other formats
-func WriteResponseFromMap(writer *http.ResponseWriter, format string, data map[string]interface{}, status int) {
+func writeResponseFromMap(writer *http.ResponseWriter, format string, data map[string]interface{}, status int) {
 	val, err := json.Marshal(data)
 	if err != nil {
 		(*writer).WriteHeader(http.StatusInternalServerError)
@@ -30,9 +30,9 @@ func WriteResponseFromMap(writer *http.ResponseWriter, format string, data map[s
 
 func WriteResponse(writer *http.ResponseWriter, format string, params ...interface{}) {
 	if len(params) < 2 {
-		WriteResponseFromResult(writer, format, params[0].(result.Result))
+		writeResponseFromResult(writer, format, params[0].(result.Result))
 	} else {
-		WriteResponseFromMap(writer, format, params[0].(map[string]interface{}), params[1].(int))
+		writeResponseFromMap(writer, format, params[0].(map[string]interface{}), params[1].(int))
 	}
 }
 
@@ -43,7 +43,7 @@ func OptionsCredentials(writer *http.ResponseWriter) {
 	(*writer).Header().Set("Access-Control-Allow-Credentials", "true")
 }
 
-func CheckMethod(writer http.ResponseWriter, req *http.Request, method string) bool {
+func checkMethod(writer http.ResponseWriter, req *http.Request, method string) bool {
 	OptionsCredentials(&writer)
 	if req.Method == "OPTIONS" {
 		writer.Write([]byte("hi"))
@@ -63,7 +63,7 @@ func CheckMethod(writer http.ResponseWriter, req *http.Request, method string) b
 	return true
 }
 
-func AuthenticateUser(writer http.ResponseWriter, req *http.Request) *uint {
+func authenticateUser(writer http.ResponseWriter, req *http.Request) *uint {
 	authRes := auth.AuthByUserCookie(req)
 	if authRes.IsError() {
 		WriteResponse(&writer, "JSON", authRes)
@@ -74,9 +74,9 @@ func AuthenticateUser(writer http.ResponseWriter, req *http.Request) *uint {
 }
 
 func CheckMethodAndAuthenticate(writer http.ResponseWriter, req *http.Request, method string) *uint {
-	if !CheckMethod(writer, req, method) {
+	if !checkMethod(writer, req, method) {
 		return nil
 	}
 
-	return AuthenticateUser(writer, req)
+	return authenticateUser(writer, req)
 }

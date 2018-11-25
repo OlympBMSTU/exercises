@@ -18,15 +18,18 @@ import (
 // UploadExerciseHandler : Controller that takes multipart form data
 // parses it, saves exercise to db and sends answer to secret system
 func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
-	userId := CheckMethodAndAuthenticate(writer, request, "POST")
-	if userId == nil {
+	userID := CheckMethodAndAuthenticate(writer, request, "POST")
+	if userID == nil {
 		return
 	}
 
 	var err error
 	if err = request.ParseMultipartForm(-1); err != nil {
-		////////////////////////////////////////////////////
-		http.Error(writer, "Incorrect body", http.StatusBadRequest)
+		WriteResponse(&writer, "JSON", map[string]interface{}{
+			"Message": "Error parse form",
+			"Status":  "Error",
+			"Data":    nil,
+		}, http.StatusBadRequest)
 		return
 	}
 
@@ -47,7 +50,7 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	exView.SetAuthor(*userId)
+	exView.SetAuthor(*userID)
 	exView.SetFileName(fsRes.GetData().(string))
 	dbEx := exView.ToExEntity()
 	dbRes := db.SaveExercise(dbEx, request.Context())
@@ -76,8 +79,8 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 // GetExerciseHandler : controller that searches exercise in database
 // by presented exercise id as path variable (ex /api/../id)
 func GetExerciseHandler(writer http.ResponseWriter, request *http.Request) {
-	userId := CheckMethodAndAuthenticate(writer, request, "GET")
-	if userId == nil {
+	userID := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userID == nil {
 		return
 	}
 
@@ -85,7 +88,11 @@ func GetExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	idStr := strings.TrimPrefix(request.URL.Path, "/api/exercises/get/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(writer, "Incorrect path variable", http.StatusBadRequest)
+		WriteResponse(&writer, "JSON", map[string]interface{}{
+			"Message": "Incorrect path variable",
+			"Status":  "Error",
+			"Data":    nil,
+		}, http.StatusBadRequest)
 		return
 	}
 	exID := uint(id)
@@ -105,8 +112,8 @@ func GetExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 // 		2: offset  - integer
 // 		3: order   - string
 func GetExercises(writer http.ResponseWriter, request *http.Request) {
-	userId := CheckMethodAndAuthenticate(writer, request, "GET")
-	if userId == nil {
+	userID := CheckMethodAndAuthenticate(writer, request, "GET")
+	if userID == nil {
 		return
 	}
 
@@ -118,8 +125,11 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 	level := -1
 
 	if len(vars) == 0 || (len(vars) == 1 && vars[0] == "") {
-		///////////////////////////////////////
-		http.Error(writer, "Not enough parameter", 404)
+		WriteResponse(&writer, "JSON", map[string]interface{}{
+			"Message": "Not enough parameters for request",
+			"Status":  "Error",
+			"Data":    nil,
+		}, http.StatusBadRequest)
 		return
 	}
 
@@ -135,8 +145,12 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 			var err error
 			level, err = strconv.Atoi(data)
 			if err != nil {
-				///////////////////////////////////////////////////////
-				http.Error(writer, "INCORRECT PATH", 404)
+				WriteResponse(&writer, "JSON", map[string]interface{}{
+					"Message": "Incorrect level variable",
+					"Status":  "Error",
+					"Data":    nil,
+				}, http.StatusBadRequest)
+				return
 			}
 		}
 	}
@@ -165,63 +179,21 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 	WriteResponse(&writer, "JSON", dbRes)
 }
 
-// firstly:
-// maybe id in view set
-// check new CheckMethodAndAuthenti
-
-// parse form as one?  for create for update
-// parse res new state that is not error, but empty maybe new method for view such as is empty
-// good variant id sended in view if no id -> error
-// if id exist, but no data ok then create file if no file and view is empty return error
-// but which error return ? as parse error, as new error as CreateResponse
-// maybe previous check that file exist and then parse form
-
-// now db
-// main prolem tags it could have
-// 1) send tags all old
-// 2) send tags all one or two changed its good variant
-// 3) if sended one tag then its need to create one ol one new
-// 4) isFalse its good
-// now check all data fields
-// thats not empty to db -> create query, fill array
-// when update if such tag doesnt exist then delete it and tag exercise id
-// else nothing to dospacspacesspaceses
-
-// also todo for generating
-// for subject
-// for tag by class
-// for firs level
-// secons ... upto 10
-// generate variant
-// db stores filepath id and tags maybe if its need
-// as array of part exercise
-// fields are filled by old values if its changed then send
-
-// frontend - list exercises
-// list one
-// also in list one you can change it
 func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
-	// todo update tags, update file for after
-	// update answer
-	// update is broken level subject
-	userId := CheckMethodAndAuthenticate(writer, request, "POST")
-	if userId == nil {
+	userID := CheckMethodAndAuthenticate(writer, request, "POST")
+	if userID == nil {
 		return
 	}
 
 	var err error
 	if err = request.ParseMultipartForm(-1); err != nil {
-		WriteResponse(&writer, "JSON", map[string]string{
+		WriteResponse(&writer, "JSON", map[string]interface{}{
 			"Message": "Error parse form",
 			"Status":  "Error",
-			"Data":    "",
+			"Data":    nil,
 		}, http.StatusBadRequest)
 		return
 	}
-
-	// as i think that if body contains only by id its bad request, because we have no to do
-	// but if front copy all data from sended entity then what to do ???
-	// its all ok
 
 	parseRes := parser.ParseExViewPostUpdateForm(request.Form)
 	if parseRes.IsError() {
@@ -229,6 +201,7 @@ func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	// about id int or uint
 	exView := parseRes.GetData().(views.ExerciseView)
 
 	_, header, _ := request.FormFile("file")
@@ -241,9 +214,21 @@ func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 		exView.SetFileName(fsRes.GetData().(string))
 	}
 
+	// if old file == new file names doesnt mathc, so if update we need to send new file else no
 	entity := exView.ToExEntity()
-	entity.Id = (uint)(exView.ID)
-	dbRes := db.UpdateExercise(entity, request.Context())
-	fmt.Print(dbRes)
 
+	dbRes := db.UpdateExercise(entity, request.Context())
+
+	// OR create additional error NOT_UPDATED and map
+	if dbRes.GetData() == nil && !dbRes.IsError() {
+		WriteResponse(&writer, "JSON",
+			map[string]interface{}{
+				"Message": "No new data added to exercise",
+				"Data":    nil,
+				"Status":  "Error",
+			}, http.StatusBadRequest)
+		return
+	}
+	// also here smtp
+	WriteResponse(&writer, "JSON", dbRes)
 }

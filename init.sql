@@ -13,6 +13,8 @@ create table if not exists exercise (
     is_wrong boolean default false
 );
 
+-- DELETE FROM TAGS WHERE id int (SELECT tag_id FROM tax_excercise te JOIN (SELECT id FROM tag WHERE tag_nmae = '' AND subject = '') WHERE C 
+
 create table if not exists tag (
     id serial,
     subject varchar(255),
@@ -59,6 +61,7 @@ BEGIN
             INSERT INTO TAG(subject, name) VALUES(subj, tags[i]) RETURNING id INTO t_id;
         end if;
 
+        -- whats haooens here if tag is duplicated ???
         SELECT id FROM tag_exercise where exercise_id = ex_id AND tag_id = t_id into tag_ex_id;
         IF tag_ex_id IS NULL THEN 
             INSERT INTO TAG_EXERCISE(tag_id, exercise_id) VALUES(t_id, ex_id);         
@@ -94,68 +97,134 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+-- CREATE OR REPLACE PROCEDURE fix_tags() 
+-- DECLARE subj varchar(255);
+-- DECLARE to_add, to_remove varchar(255)[];
+-- BEGIN 
+--     if new_subj is null then
+--         select array(select unnest(old) except select unnest(new)) into to_remove;
+--         select array(select unnest(new) except select unnest(old])) into to_add;
+--         subj = ex.subj;
+--     else 
+--         to_remove = old; -- with subj
+--         select array(select unnest(new) except select unnest(old])) into to_add;
+--         subj = new_subj;
+--     end if;
+
+
+
 -- if tags exist empty
 
-CREATE OR REPLACE FUNCTION update_exercise_tag(ex_id integer, tags_input varchar(255)[])
-RETURNS INTEGER AS $$a
-DECLARE size_existing_tags_arr integer;
-DECLARE size_input_tags_arr integer;
-DECLARE count_tag integer; 
-DECLARE tag_exist boolean;
-DECLARE tags_arr varchar(255)[];
-DECLARE moved_tags varchar(255)[];
-DECLARE new_tags varchar(255)[];
-BEGIN 
-    -- TODO for for search that not exist 
-    -- new tags - is new arr todo, create arr thhat contains tags that differs from 
-    -- input then and that new from input 
-    -- then delete differs, new add to tag
-    SELECT tags FROM exercise WHERE id = ex_id INTO tags_arr;
+-- CREATE OR REPLACE FUNCTION update_exercise_tag(ex_id integer, tags_input varchar(255)[])
+-- RETURNS INTEGER AS $$a
+-- DECLARE size_existing_tags_arr integer;
+-- DECLARE size_input_tags_arr integer;
+-- DECLARE count_tag integer; 
+-- DECLARE tag_exist boolean;
+-- DECLARE tags_arr varchar(255)[];
+-- DECLARE moved_tags varchar(255)[];
+-- DECLARE new_tags varchar(255)[];
+-- BEGIN 
+--     -- TODO for for search that not exist 
+--     -- new tags - is new arr todo, create arr thhat contains tags that differs from 
+--     -- input then and that new from input 
+--     -- then delete differs, new add to tag
+--     SELECT tags FROM exercise WHERE id = ex_id INTO tags_arr;
 
-    FOR i in 1..array_length(tags_arr, 1) LOOP
-        tag_exist = FALSE;
-        FOR j in 1..array_length(tags_input, 1) LOOP 
-            IF tags_arr[i] = tags_input[j] THEN
-                tag_exist = TRUE;
-                SELECT array_remove(new_tags, tags_arr[i]);
-                EXIT;
+--     FOR i in 1..array_length(tags_arr, 1) LOOP
+--         tag_exist = FALSE;
+--         FOR j in 1..array_length(tags_input, 1) LOOP 
+--             IF tags_arr[i] = tags_input[j] THEN
+--                 tag_exist = TRUE;
+--                 SELECT array_remove(new_tags, tags_arr[i]);
+--                 EXIT;
+--             END IF;
+--         END LOOP;
+--         -- RAISE NOTICE '%' new_tags;
+--         IF TAG_EXIST = FALSE THEN 
+--             SELECT array_append(moved_tags, tags_arr[i]);
+--             -- SELECT COUNT (*) FROM tag_exercise WHERE exercise_id = ex_id into count_tag;
+--             -- IF count_tag == 0 THEN
+--         END IF;
+--     END LOOP;
+
+--     RAISE NOTICE '%', moved_tags;
+--     RAISE NOTICE '%', new_tags;
+
+--     FOR 
+--     -- FOR i in 1..array_length(moved_tags, 1) LOOP
+--     --     SELECT id FROM tags where subject = subj and name = moved_tags[i] into tag_id;
+
+--     --     DELETE FROM 
+--     --     IF (SELECT COUNT(*) FROM tag_exercise where exercise_id == ex_id) = O THEN 
+--     --         DELETE FROM tags 
+--     -- END 
+--     -- SE
+--     RETURN 0;
+-- END;
+-- $$LANGUAGE plpgsql;
+
+-- TRIGGER FOR UPDATE 
+-- delete old tags - also delete counter
+-- delete tags with 0
+-- insert new tags
+-- also if new entity exist new subject 
+
+CREATE OR REPLACE FUNCTION update_exercise_tags(ex_id integer, old_subj varchar(255), new_subj varchar(255), tags_to_add varchar(255)[], tags_to_remove varchar(255)[])
+RETURNS INTEGER AS $$
+DECLARE subj varchar(255);
+DECLARE tg_id integer;
+DECLARE tag_ex_id integer;
+BEGIN 
+    -- SELECT subject from exercise WHERE id = ex_id INTO subj;
+    if new_subj IS NULL OR new_subj = "" THEN 
+        new_subj = old_subj;
+    END IF;
+    RAISE NOTICE '% %', old_subj, new_subj;
+    -- RAISE NOTICE '%', subj;
+    -- RAISE NOTICE '% %', tags_to_add, tags_to_remove;
+    IF array_length(tags_to_remove, 1) IS NOT NULL AND array_length(tags_to_remove, 1) > 0 THEN
+        FOR i in 1..array_length(tags_to_remove, 1) LOOP
+            RAISE NOTICE '% %', i, tags_to_remove[i];
+
+            SELECT id FROM tag WHERE subject = old_subj AND name = tags_to_remove[i] INTO tg_id;
+            RAISE NOTICE '%', tg_id;
+            DELETE FROM tag_exercise WHERE tag_id = tg_id and exercise_id = ex_id;
+            IF (SELECT COUNT(*) FROM tag_exercise WHERE tag_id = tg_id) = 0 THEN
+                DELETE FROM tag WHERE id = tg_id;
             END IF;
         END LOOP;
-        -- RAISE NOTICE '%' new_tags;
-        IF TAG_EXIST = FALSE THEN 
-            SELECT array_append(moved_tags, tags_arr[i]);
-            -- SELECT COUNT (*) FROM tag_exercise WHERE exercise_id = ex_id into count_tag;
-            -- IF count_tag == 0 THEN
-        END IF;
-    END LOOP;
+    END IF;
 
-    RAISE NOTICE '%', moved_tags;
-    RAISE NOTICE '%', new_tags;
+    IF array_length(tags_to_add, 1) IS NOT NULL AND array_length(tags_to_add, 1) > 0 THEN
+        FOR i in 1..array_length(tags_to_add, 1) LOOP 
+            SELECT id from tag where subject = new_subj and name = tags_to_add[i] into tg_id;
+            if tg_id IS null then 
+                INSERT INTO TAG(subject, name) VALUES(new_subj, tags_to_add[i]) RETURNING id INTO tg_id;
+            end if;
 
-    FOR 
-    -- FOR i in 1..array_length(moved_tags, 1) LOOP
-    --     SELECT id FROM tags where subject = subj and name = moved_tags[i] into tag_id;
+            --- or check
+            
+            SELECT id FROM tag_exercise where exercise_id = ex_id AND tag_id = tg_id into tag_ex_id;
+            
+            -- we've checked this at back, but new tag subject
+            IF tag_ex_id IS NULL THEN 
+                INSERT INTO TAG_EXERCISE(tag_id, exercise_id) VALUES(tg_id, ex_id);         
+            END IF;
+        END LOOP;
+    END IF;
 
-    --     DELETE FROM 
-    --     IF (SELECT COUNT(*) FROM tag_exercise where exercise_id == ex_id) = O THEN 
-    --         DELETE FROM tags 
-    -- END 
-    -- SE
     RETURN 0;
 END;
 $$LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION update_exercise_tags(ex_id integer, tags_to_add varchar(255)[], tags_to_remove varchar(255)[])
-RETURNS INTEGER AS $$
 
-BEGIN 
+insert into subject(name) values('mathematic'), ('physics');
 
-    RETURN 0;
-END;
+-- del fr tag_ex where ex_id = and id in (select id from  not in join)) 
 
+-- 1 5 2 32 3 
+-- 2 3 23
 
-1 5 2 32 3 
-2 3 23
-
-1 5 32 - to delete 
-23 to add 
+-- 1 5 32 - to delete 
+-- 23 to add 
