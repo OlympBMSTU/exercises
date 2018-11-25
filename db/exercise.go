@@ -1,7 +1,6 @@
 package db
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -90,31 +89,40 @@ func GetExercise(id uint, ctx context.Context) result.DbResult {
 }
 
 func GetExerciseList(tag string, subject string, level int,
-	limit int, offset int, order_level bool, ctx context.Context) result.DbResult {
+	limit int, offset int, order_level bool, isBroken bool, ctx context.Context) result.DbResult {
 
 	db := getDb(ctx)
 	if db == nil {
 		return result.ErrorResult(result.DB_CONN_ERROR, "")
 	}
 
-	var query bytes.Buffer
+	// var query bytes.Buffer
+	query := ""
 
 	var args []interface{}
 	if tag != "" {
-		query.WriteString(GET_EXERCISE_BY_SUBJECT_AND_TAG)
+		query = GET_EXERCISE_BY_SUBJECT_AND_TAG
+		// query.WriteString(GET_EXERCISE_BY_SUBJECT_AND_TAG)
 		args = append(args, subject, tag, subject)
 	} else {
 		args = append(args, subject)
-		query.WriteString(GET_EXERCISES_BY_SUBJECT)
+		query = GET_EXERCISES_BY_SUBJECT
+		// query.WriteString(GET_EXERCISES_BY_SUBJECT)
 	}
 
+	args = append(args, isBroken)
+	query += fmt.Sprintf("AND is_broken =$%d ", len(args))
 	if level != -1 {
 		args = append(args, level)
-		query.WriteString(fmt.Sprintf("AND ex.level = $%d ", len(args)))
+		query += fmt.Sprintf("AND ex.level = $%d ", len(args))
+		// query.WriteString(fmt.Sprintf("AND ex.level = $%d ", len(args)))
 	} else {
-		query.WriteString("ORDER BY ex.level ")
+		query += "ORDER BY ex.level "
+
+		// query.WriteString("ORDER BY ex.level ")
 		if order_level {
-			query.WriteString("DESC ")
+			query += "DESC "
+			//query.WriteString("DESC ")
 		}
 	}
 
@@ -123,23 +131,25 @@ func GetExerciseList(tag string, subject string, level int,
 	}
 
 	args = append(args, limit)
-	query.WriteString(fmt.Sprintf("LIMIT $%d ", len(args)))
+	query += fmt.Sprintf("LIMIT $%d ", len(args))
+	// query.WriteString(fmt.Sprintf("LIMIT $%d ", len(args)))
 
 	if offset == -1 {
 		offset = DEFAULT_OFFSET
 	}
 
 	args = append(args, offset)
-	query.WriteString(fmt.Sprintf("OFFSET $%d ", len(args)))
+	query += fmt.Sprintf("OFFSET $%d ", len(args))
+	// query.WriteString(fmt.Sprintf("OFFSET $%d ", len(args)))
 
-	rows, err := db.Query(query.String(), args...)
+	rows, err := db.Query(query, args...)
 	defer rows.Close()
 
 	if err != nil {
 		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
-
+	fmt.Print(query)
 	// need to send tags with excercieses,
 	// or front will do request for this
 	var entities []entities.ExerciseEntity
@@ -163,6 +173,7 @@ func GetExerciseList(tag string, subject string, level int,
 func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) result.DbResult {
 	db := getDb(ctx)
 	if db == nil {
+		log.Print("No db specified")
 		return result.ErrorResult(result.DB_CONN_ERROR, "")
 	}
 
@@ -179,16 +190,19 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 	}
 
 	if err != nil {
+		log.Println("cant read rows:", err)
 		return result.ErrorResult(err)
 	}
 
 	if existingEntity == nil {
+		log.Println("No such entity with id " + string(exEntity.Id))
 		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
 
 	updateData := existingEntity.GetDataForUpdateEntity(exEntity)
 
 	if len(updateData) == 0 {
+		log.Print("Nothing to update")
 		return result.OkResult(nil)
 	}
 
@@ -209,6 +223,7 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 
 	tx, err := db.Begin()
 	if err != nil {
+		log.Print("Cant create transaction: ", err)
 		return result.ErrorResult(err)
 	}
 
@@ -217,6 +232,7 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 	if updateData["tags_to_add"] != nil || updateData["tags_to_delete"] != nil {
 		_, err = tx.Exec(UPDATE_TAGS_BY_EX, exEntity.Id, existingEntity.Subject, exEntity.Subject, updateData["tags_to_add"], updateData["tags_to_remove"])
 		if err != nil {
+			log.Print("cant update tags")
 			return result.ErrorResult(err)
 		}
 		delete(updateData, "tags_to_add")
@@ -237,15 +253,17 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 	args = append(args, exEntity.Id)
 	query += fmt.Sprintf(" WHERE id=$%d", len(args))
 	_, err = tx.Exec(query, args...)
-	fmt.Print(query)
-	fmt.Print(err)
+	// fmt.Print(query)
 
 	if err != nil {
+		log.Print("Query: ", query)
+		log.Print("Error: ", err)
 		return result.ErrorResult(err)
 	}
 	err = tx.Commit()
 
 	if err != nil {
+		log.Print("Error: ", err)
 		return result.ErrorResult(err)
 	}
 

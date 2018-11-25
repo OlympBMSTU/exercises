@@ -175,7 +175,13 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 		isDesc = true
 	}
 
-	dbRes := db.GetExerciseList(tag, subject, level, limit, offset, isDesc, request.Context())
+	isBrokenStr := query.Get("is_broken")
+	isBroken := false
+	if isBrokenStr != "" && isBrokenStr == "true" {
+		isBroken = true
+	}
+
+	dbRes := db.GetExerciseList(tag, subject, level, limit, offset, isDesc, isBroken, request.Context())
 	WriteResponse(&writer, "JSON", dbRes)
 }
 

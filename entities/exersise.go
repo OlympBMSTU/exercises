@@ -80,37 +80,52 @@ func (enity *ExerciseEntity) GetDataForUpdateEntity(other ExerciseEntity) map[st
 	} else {
 		if len(other.Tags) > 0 {
 			// What to do chekc all tags for its order
-			updateMap["tags"] = other.Tags
 			if len(enity.Tags) == 0 {
 				enity.Tags = other.Tags
+				updateMap["tags"] = other.Tags
 				updateMap["tags_to_add"] = enity.Tags
 				updateMap["tags_to_remove"] = make([]string, 0)
 			} else {
-				// copy one to anotther
-				toDelete := make([]string, 0)
-				// var newTags []string
-				// newTags := other.Tags
-				newTags := make([]string, len(other.Tags))
-				copy(newTags, other.Tags)
-				for i := 0; i < len(enity.Tags); i += 1 {
-					exist := false
-					for j := 0; j < len(newTags); j += 1 {
-						if strings.ToLower(enity.Tags[i]) == strings.ToLower(newTags[j]) {
-							exist = true
-							// remove equal data from
-							newTags = append(newTags[:j], newTags[(j+1):]...)
+				tagsUpdated := false
+				arrLen := len(enity.Tags)
+				if arrLen == len(other.Tags) {
+					for i := 0; i < arrLen && !tagsUpdated; i++ {
+						if strings.ToLower(enity.Tags[i]) != strings.ToLower(other.Tags[i]) {
+							tagsUpdated = true
 							break
 						}
 					}
-					if !exist {
-						toDelete = append(toDelete, enity.Tags[i])
+				} else {
+					tagsUpdated = true
+				}
+
+				if tagsUpdated {
+					updateMap["tags"] = other.Tags
+					// copy one to anotther
+					toDelete := make([]string, 0)
+					// var newTags []string
+					// newTags := other.Tags
+					newTags := make([]string, len(other.Tags))
+					copy(newTags, other.Tags)
+					for i := 0; i < len(enity.Tags); i += 1 {
+						exist := false
+						for j := 0; j < len(newTags); j += 1 {
+							if strings.ToLower(enity.Tags[i]) == strings.ToLower(newTags[j]) {
+								exist = true
+								// remove equal data from
+								newTags = append(newTags[:j], newTags[(j+1):]...)
+								break
+							}
+						}
+						if !exist {
+							toDelete = append(toDelete, enity.Tags[i])
+						}
+					}
+					if len(newTags) > 0 || len(toDelete) > 0 {
+						updateMap["tags_to_add"] = newTags
+						updateMap["tags_to_remove"] = toDelete
 					}
 				}
-				if len(newTags) > 0 || len(toDelete) > 0 {
-					updateMap["tags_to_add"] = newTags
-					updateMap["tags_to_remove"] = toDelete
-				}
-				// }
 			}
 		}
 	}
