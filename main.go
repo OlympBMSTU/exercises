@@ -58,6 +58,7 @@ func InitRouter(ctx context.Context) {
 	http.Handle("/api/exercises/update", &ContextInjector{ctx, http.HandlerFunc(controllers.UpdateExerciseHandler)})
 	http.Handle("/api/exercises/subjects/", &ContextInjector{ctx, http.HandlerFunc(controllers.GetSubjectsHandler)})
 	http.Handle("/api/exercises/tags/", &ContextInjector{ctx, http.HandlerFunc(controllers.GetTagsHandler)})
+	http.Handle("/api/exercises/create_subject", &ContextInjector{ctx, http.HandlerFunc(controllers.CreateSubectHandler)})
 }
 
 func main() {

@@ -181,9 +181,13 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	isBrokenStr := query.Get("is_broken")
-	isBroken := false
-	if isBrokenStr != "" && isBrokenStr == "true" {
-		isBroken = true
+	var isBroken *bool
+	if isBrokenStr != "" {
+		flag := false
+		if isBrokenStr == "true" {
+			flag = true
+		}
+		isBroken = &flag
 	}
 
 	dbRes := db.GetExerciseList(tag, subject, level, limit, offset, isDesc, isBroken, request.Context())

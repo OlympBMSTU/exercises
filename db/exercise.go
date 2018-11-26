@@ -89,7 +89,7 @@ func GetExercise(id uint, ctx context.Context) result.DbResult {
 }
 
 func GetExerciseList(tag string, subject string, level int,
-	limit int, offset int, order_level bool, isBroken bool, ctx context.Context) result.DbResult {
+	limit int, offset int, orderLevel bool, isBroken *bool, ctx context.Context) result.DbResult {
 
 	db := getDb(ctx)
 	if db == nil {
@@ -110,17 +110,20 @@ func GetExerciseList(tag string, subject string, level int,
 		// query.WriteString(GET_EXERCISES_BY_SUBJECT)
 	}
 
-	// args = append(args, isBroken)
-	// query += fmt.Sprintf("AND ex.is_broken =$%d ", len(args))
+	if isBroken != nil {
+		args = append(args, *isBroken)
+		query += fmt.Sprintf("AND ex.is_broken =$%d ", len(args))
+	}
+
 	if level != -1 {
 		args = append(args, level)
 		query += fmt.Sprintf("AND ex.level = $%d ", len(args))
 		// query.WriteString(fmt.Sprintf("AND ex.level = $%d ", len(args)))
 	} else {
-		query += "ORDER BY ex.level "
+		query += "ORDER BY ex.level, ex.id "
 
 		// query.WriteString("ORDER BY ex.level ")
-		if order_level {
+		if orderLevel {
 			query += "DESC "
 			//query.WriteString("DESC ")
 		}
@@ -145,11 +148,12 @@ func GetExerciseList(tag string, subject string, level int,
 	rows, err := db.Query(query, args...)
 	defer rows.Close()
 
+	// fmt.Print(query)
 	if err != nil {
 		log.Println(err.Error())
 		return result.ErrorResult(err)
 	}
-	fmt.Print(query)
+	// fmt.Print(query)
 	// need to send tags with excercieses,
 	// or front will do request for this
 	var entities []entities.ExerciseEntity

@@ -76,3 +76,21 @@ func GetTgasBySubect(subject string, ctx context.Context) result.DbResult {
 
 	return result.OkResult(data)
 }
+
+func SaveSubject(subject string, ctx context.Context) result.DbResult {
+	db := getDb(ctx)
+	if db == nil {
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
+
+	row := db.QueryRow(ADD_SUBJECT, subject)
+
+	var subjID int
+	err := row.Scan(&subjID)
+
+	if err != nil {
+		return result.ErrorResult(err)
+	}
+
+	return result.OkResult(subjID)
+}
