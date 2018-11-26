@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	DEFAULT_LIMIT  = 20
+	DEFAULT_LIMIT  = 300
 	DEFAULT_OFFSET = 0
 )
 
@@ -117,7 +117,7 @@ func GetExerciseList(tag string, subject string, level int,
 		query += fmt.Sprintf("AND ex.level = $%d ", len(args))
 		// query.WriteString(fmt.Sprintf("AND ex.level = $%d ", len(args)))
 	} else {
-		query += "ORDER BY ex.level "
+		query += "ORDER BY ex.level, ex.id "
 
 		// query.WriteString("ORDER BY ex.level ")
 		if order_level {
