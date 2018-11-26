@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	DEFAULT_LIMIT  = 20
+	DEFAULT_LIMIT  = 300
 	DEFAULT_OFFSET = 0
 )
 
