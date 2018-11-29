@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -9,6 +10,7 @@ import (
 	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/controllers"
 	"github.com/jackc/pgx"
+	"github.com/valyala/fasthttp"
 )
 
 type ContextInjector struct {
@@ -62,6 +64,8 @@ func InitRouter(ctx context.Context) {
 }
 
 func main() {
+	var c fasthttp.Cookie
+	fmt.Print(c)
 	pool, err := Init()
 	if err != nil {
 		log.Println(err.Error())
