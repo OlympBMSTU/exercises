@@ -7,6 +7,16 @@ import (
 	"strings"
 )
 
+const (
+	CONSOLE = "console"
+	FILE = "file"
+	BOTH = "console_and_file"
+	FULL_LOG = 2 
+	
+	MIN_LOG = 0
+)
+
+
 var (
 	LogE = log.New(LogWriter{}, "ERROR: ", 0)
 	LogW = log.New(LogWriter{}, "WARN: ", 0)
@@ -47,6 +57,57 @@ func errorFunc() {
 	LogE.Println("error message")
 }
 
+type ILogger interface {
+	InfoString(string)
+	Info(...interface{})
+	WarnString(string)
+	Warn(...interface{}) 
+	Error(string, error)
+}
+
+type ConsoleLogger struct {
+}
+
+type FileLogger struct {
+}
+
+type BothLogger struct {
+	logger FileLogger
+	logger ConsoleLogger 
+
+}
+
+type Logger struct {
+	// file *os.File
+	// pathFile string
+	// level int
+	*logger ILogger 
+}
+
+func New(config config.Config) (Logger, error) {
+	if config.LoggerType() == BOTH {
+		
+	}
+
+	if config.LoggerType() == CONSOLE {
+
+	}
+
+	if config.LoggerType() == FILE {}
+}
+
+func (logger Logger) Warn(warn Stirng) {
+	if level == FULL_LOG {
+		logger.Warn()
+	}
+}
+
+func (logger Logger) Warn(warn string, args ...interface{} ) {
+	if level == FULL_LOG {
+		warnSting = 
+	}
+}
+}
 // import (
 // 	"io"
 // 	"log"
