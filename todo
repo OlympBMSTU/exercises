@@ -1,3 +1,11 @@
+1) Refactor upload exercise: 
+    1) Input type ex -> two parsers,
+    2) Save ex refactor function
+    3) refactor procedure
+    4) maybe as args entity
+    5) 
+
+
 2) Maybe scan simple data as one function, simply send query (no need now) refl 
 5) Routing needs refactor!!!
 9) TODO parseError in other packages

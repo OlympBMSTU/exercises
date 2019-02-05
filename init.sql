@@ -10,8 +10,16 @@ create table if not exists exercise (
     file_name varchar(255),
     subject varchar(255),
     tags varchar(255)[],
-    is_broken boolean default false
+    is_broken boolean default false,
+    class integer,
+    position INTEGER,
+    mark   INTEGER,
+    type_olymp INTEGER,
+    answer jsonb,
+    created timestamp default NOW()
 );
+
+-- [{id:1, input: "dfd", output: "fd"}, {id: 2, input: "ds", output: "df"}]
 
 -- DELETE FROM TAGS WHERE id int (SELECT tag_id FROM tax_excercise te JOIN (SELECT id FROM tag WHERE tag_nmae = '' AND subject = '') WHERE C 
 
@@ -39,7 +47,9 @@ create table if not exists subject(
 
 -- lower
 -- todo ON CONFLCIT делать и проверка на id tag 
-CREATE OR REPLACE FUNCTION add_exercise(auth_id integer, lev integer, f_name varchar(255), subj varchar(255), tags varchar(255)[])
+CREATE OR REPLACE FUNCTION add_exercise(auth_id integer, lev integer, f_name varchar(255),
+     subj varchar(255), tags varchar(255)[], cls integer, pos integer, mrk integer, typ_ol integer,
+    answ jsonb)
 RETURNS integer AS $$
 DECLARE ex_id integer;
 DECLARE t_id INTEGER;
@@ -54,7 +64,7 @@ BEGIN
         RETURN -1;
     END IF;
 
-    INSERT INTO EXERCISE(author_id, file_name, level, subject, tags) VALUES(auth_id, f_name, lev, subj, tags) RETURNING id INTO ex_id;
+    INSERT INTO EXERCISE(author_id, file_name, level, subject, tags, class, position, mark, tpye_olymp, answer) VALUES(auth_id, f_name, lev, subj, tags, cls, mrk, pos, typ_ol, answ) RETURNING id INTO ex_id;
     FOR i IN 1..array_length(tags, 1) LOOP
         SELECT id from tag where subject = subj and name = tags[i] into t_id;
         if t_id IS null then 

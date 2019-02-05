@@ -15,7 +15,26 @@ const (
 
 	GET_EXERCISE_BY_SUBJECT_AND_TAG = "SELECT ex.* FROM (SELECT * FROM EXERCISE WHERE subject=$1) ex join " +
 		"((SELECT id as t_id FROM tag WHERE name=$2 AND subject=$3) t join tag_EXERCISE tg on (tg.tag_id = t.t_id)) tgt on tgt.EXERCISE_id = ex.id "
+
+	GET_SEROND_ROUND_EX = ""
+
+	GET_LIST_SECOND_ROUND_EX = ""
+
+	ADD_SECOND_ROUND_EX = "SELECT add_exercise($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
 )
+
+// id serial,
+// author_id integer,
+// level integer,
+// file_name varchar(255),
+// subject varchar(255),
+// tags varchar(255)[],
+// is_broken boolean default false,
+// class integer,
+// position INTEGER,
+// mark   INTEGER,
+// type_olymp INTEGER,
+// answer jsonb
 
 // firstly sp - is hard way, because we have to check it and other;
 // also go slic - ref, so check it

@@ -6,13 +6,18 @@ import "strings"
 // написать Диме Кузнецову на какую почту что слать
 // слать заголовок задание и данные
 type ExerciseEntity struct {
-	Id       uint
-	AuthorId uint
-	FileName string
-	Tags     []string
-	Level    int
-	Subject  string
-	IsBroken bool
+	Id        uint
+	AuthorId  uint
+	FileName  string
+	Tags      []string
+	Level     int
+	Subject   string
+	IsBroken  bool
+	Class     int
+	Position  int
+	Mark      int
+	TypeOlymp int
+	Answers   []Answer
 }
 
 func NewExerciseEntity(author uint, filename string, tags []string, level int, subject string) ExerciseEntity {
@@ -56,6 +61,26 @@ func (entity *ExerciseEntity) SetFileName(file_name string) {
 
 func (entity *ExerciseEntity) SetAuthor(author uint) {
 	entity.AuthorId = author
+}
+
+func (entity *ExerciseEntity) GetClass() int {
+	return entity.Class
+}
+
+func (entity *ExerciseEntity) GetPosition() int {
+	return entity.Position
+}
+
+func (entity *ExerciseEntity) GetMark() int {
+	return entity.Mark
+}
+
+func (entity *ExerciseEntity) GetTypeOlymp() int {
+	return entity.TypeOlymp
+}
+
+func (entity *ExerciseEntity) GetAnswers() []Answer {
+	return entity.Answers
 }
 
 func (enity *ExerciseEntity) GetDataForUpdateEntity(other ExerciseEntity) map[string]interface{} {
