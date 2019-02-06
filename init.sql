@@ -64,7 +64,7 @@ BEGIN
         RETURN -1;
     END IF;
 
-    INSERT INTO EXERCISE(author_id, file_name, level, subject, tags, class, position, mark, tpye_olymp, answer) VALUES(auth_id, f_name, lev, subj, tags, cls, mrk, pos, typ_ol, answ) RETURNING id INTO ex_id;
+    INSERT INTO EXERCISE(author_id, file_name, level, subject, tags, class, position, mark, type_olymp, answer) VALUES(auth_id, f_name, lev, subj, tags, cls, mrk, pos, typ_ol, answ) RETURNING id INTO ex_id;
     FOR i IN 1..array_length(tags, 1) LOOP
         SELECT id from tag where subject = subj and name = tags[i] into t_id;
         if t_id IS null then 

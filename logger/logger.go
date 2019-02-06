@@ -57,31 +57,37 @@ func errorFunc() {
 	LogE.Println("error message")
 }
 
+// struct path_log
+
 type ILogger interface {
-	InfoString(string)
-	Info(...interface{})
-	WarnString(string)
-	Warn(...interface{}) 
-	Error(string, error)
+	// InfoString(string)
+	Info(string, ...interface{})
+	// WarnString(string)
+	Warn(string, ...interface{}) 
+	Error(string, error, ...interface{})
 }
 
 type ConsoleLogger struct {
+	int level
 }
+
+
+
+func 
 
 type FileLogger struct {
 }
 
 type BothLogger struct {
-	logger FileLogger
-	logger ConsoleLogger 
-
+	loggerF FileLogger
+	loggerC ConsoleLogger 
 }
 
 type Logger struct {
 	// file *os.File
 	// pathFile string
 	// level int
-	*logger ILogger 
+	logger *ILogger
 }
 
 func New(config config.Config) (Logger, error) {

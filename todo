@@ -3,7 +3,8 @@
     2) Save ex refactor function
     3) refactor procedure
     4) maybe as args entity
-    5) 
+    5) просмотр заданий но не важно
+    6) запрос на получение json 
 
 
 2) Maybe scan simple data as one function, simply send query (no need now) refl 
