@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OlympBMSTU/exercises/entities"
-
 	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/db"
 	"github.com/OlympBMSTU/exercises/fstorage"
@@ -69,7 +67,7 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 
 	exID := uint(dbRes.GetData().GetData().(int))
 	conf, _ := config.GetConfigInstance()
-	if !conf.IsTest() {
+	if !conf.IsTest() && exView.TypeOlymp == 1 {
 		senderRes := sender.SendAnswer(exID, exView.Answer)
 		if senderRes.IsError() {
 			dbDelRes := db.DeleteExcerciese(exID, request.Context())
@@ -248,29 +246,4 @@ func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 	// also here smtp
 	WriteResponse(&writer, "JSON", dbRes)
-}
-
-func TestNew(writer http.ResponseWriter, request *http.Request) {
-
-	entity := entities.ExerciseEntity{}
-	entity.AuthorId = 1
-	entity.Class = 8
-	answers := make([]entities.Answer, 2)
-	answers[0] = entities.Answer{1, []string{"5"}, []string{"6", "7"}}
-	answers[1] = entities.Answer{2, []string{"6"}, []string{"7"}}
-	entity.Answers = answers
-	entity.FileName = ".sfsef"
-	entity.Tags = []string{"hi", "sdf"}
-	entity.TypeOlymp = 2
-	entity.Subject = "mathematic"
-	entity.Position = 3
-	entity.Level = 0
-	entity.Mark = 5
-	dbRes := db.UploadExNew(entity, request.Context())
-	fmt.Print(dbRes)
-	WriteResponse(&writer, "JSON", map[string]interface{}{
-		"Message": "Error parse form",
-		"Status":  "Error",
-		"Data":    nil,
-	}, http.StatusBadRequest)
 }
