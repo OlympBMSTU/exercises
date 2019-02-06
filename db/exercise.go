@@ -3,12 +3,14 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
 
 	"github.com/OlympBMSTU/exercises/db/result"
 	"github.com/OlympBMSTU/exercises/entities"
+	"github.com/OlympBMSTU/exercises/logger"
 	"github.com/lib/pq"
 )
 
@@ -29,35 +31,35 @@ func DeleteExcerciese(exId uint, ctx context.Context) result.DbResult {
 	return result.CreateResult(nil, err)
 }
 
-func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
-	db := getDb(ctx)
-	if db == nil {
-		return result.ErrorResult(result.DB_CONN_ERROR, "")
-	}
+// func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
+// 	db := getDb(ctx)
+// 	if db == nil {
+// 		return result.ErrorResult(result.DB_CONN_ERROR, "")
+// 	}
 
-	row := db.QueryRow(INSERT_EXERCISE,
-		exercise.GetAuthorId(),
-		exercise.GetLevel(),
-		exercise.GetFileName(),
-		exercise.GetSubject(),
-		pq.Array(exercise.GetTags()),
-	)
+// 	row := db.QueryRow(INSERT_EXERCISE,
+// 		exercise.GetAuthorId(),
+// 		exercise.GetLevel(),
+// 		exercise.GetFileName(),
+// 		exercise.GetSubject(),
+// 		pq.Array(exercise.GetTags()),
+// 	)
 
-	var returnedId int
-	err := row.Scan(&returnedId)
+// 	var returnedId int
+// 	err := row.Scan(&returnedId)
 
-	if err != nil {
-		log.Println(err.Error())
-		return result.ErrorResult(err)
-	}
+// 	if err != nil {
+// 		log.Println(err.Error())
+// 		return result.ErrorResult(err)
+// 	}
 
-	if returnedId == -1 {
-		log.Println("No subject in db")
-		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
-	}
+// 	if returnedId == -1 {
+// 		log.Println("No subject in db")
+// 		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
+// 	}
 
-	return result.OkResult(returnedId, result.CREATED)
-}
+// 	return result.OkResult(returnedId, result.CREATED)
+// }
 
 func GetExercise(id uint, ctx context.Context) result.DbResult {
 	db := getDb(ctx)
@@ -276,31 +278,50 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 	return result.OkResult(existingEntity)
 }
 
-func UploadExNew(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
+// func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
+// 	db := getDb(ctx)
+// 	if db == nil {
+// 		return result.ErrorResult(result.DB_CONN_ERROR, "")
+// 	}
+
+// 	row := db.QueryRow(INSERT_EXERCISE,
+// 		exercise.GetAuthorId(),
+// 		exercise.GetLevel(),
+// 		exercise.GetFileName(),
+// 		exercise.GetSubject(),
+// 		pq.Array(exercise.GetTags()),
+// 	)
+
+// 	var returnedId int
+// 	err := row.Scan(&returnedId)
+
+// 	if err != nil {
+// 		log.Println(err.Error())
+// 		return result.ErrorResult(err)
+// 	}
+
+// 	if returnedId == -1 {
+// 		log.Println("No subject in db")
+// 		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
+// 	}
+
+// 	return result.OkResult(returnedId, result.CREATED)
+// }
+
+func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
 	db := getDb(ctx)
+	log := logger.GetLogger()
 	if db == nil {
-		log.Println("No db:")
+		log.Error("DB Error", errors.New("No db specified"))
 		return result.ErrorResult(result.DB_CONN_ERROR, "")
-	}
-	type ExerciseEntity struct {
-		Id         uint
-		AuthorId   uint
-		FileName   string
-		Tags       []string
-		Level      int
-		Subject    string
-		IsBroken   bool
-		class      int
-		position   int
-		mark       int
-		type_olymp int
-		answer     map[string][]string
 	}
 
 	answers, err := json.Marshal(exercise.GetAnswers())
 	if err != nil {
-
+		log.Error("DB error marshal answer", err)
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
 	}
+
 	row := db.QueryRow(ADD_SECOND_ROUND_EX,
 		exercise.GetAuthorId(),
 		exercise.GetLevel(),
@@ -314,19 +335,20 @@ func UploadExNew(exercise entities.ExerciseEntity, ctx context.Context) result.D
 		answers,
 	)
 
-	var returnedId int
-	err = row.Scan(&returnedId)
+	var returnedID int
+	err = row.Scan(&returnedID)
 
 	if err != nil {
-		log.Println(err.Error())
+		log.Error("Db Error scan", err)
 		return result.ErrorResult(err)
 	}
 
-	if returnedId == -1 {
-		log.Println("No subject in db")
+	if returnedID == -1 {
+		// log.Println("No subject in db")
+		log.Error("Db error", errors.New("No subject in db"))
 		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
 	}
 
-	return result.OkResult(returnedId, result.CREATED)
+	return result.OkResult(returnedID, result.CREATED)
 
 }
