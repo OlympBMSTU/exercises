@@ -6,7 +6,8 @@
     5) просмотр заданий но не важно
     6) запрос на получение json 
     7) var log 
-    8) 
+    8) Parser firstly show err.Error
+    9) Parser show data with msg in one line
 
 2) Maybe scan simple data as one function, simply send query (no need now) refl 
 5) Routing needs refactor!!!

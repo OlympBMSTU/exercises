@@ -1,10 +1,15 @@
 package result
 
 const (
-	NO_ERROR        = 0
-	INCORRECT_BODY  = 1
-	INCORRECT_TAGS  = 2
-	INCORRECT_LEVEL = 3
+	NO_ERROR             = 0
+	INCORRECT_BODY       = 1
+	INCORRECT_TAGS       = 2
+	INCORRECT_LEVEL      = 3
+	INCORRECT_ANSWER_ARR = 4
+	INCORRECT_MARK       = 5
+	INCORRECT_TYPE_OLYMP = 6
+	INCORRECT_CLASS      = 7
+	INCORRECT_POSITION   = 8
 )
 
 type ParserStatus struct {

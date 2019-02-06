@@ -36,18 +36,18 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	// maybe no need
 	if len(typeOlympArr) < 1 {
 		log.Warn("Type olymp is incorrect", typeOlympArr)
-		return result.ErrorResult(result.INCORRECT_BODY, "Empty type olymp")
+		return result.ErrorResult(result.INCORRECT_TYPE_OLYMP, "Empty type olymp")
 	}
 
 	typeOlymp, err := strconv.Atoi(typeOlympArr[0])
 	if err != nil {
 		log.Warn("Type olymp is incorrect", typeOlympArr)
-		return result.ErrorResult(result.INCORRECT_BODY, "Empty type olymp")
+		return result.ErrorResult(result.INCORRECT_TYPE_OLYMP, "Incorrect type olymp")
 	}
 
 	if typeOlymp != FIRST_ROUND && typeOlymp != SECOND_ROUND {
 		log.Warn("Type olymp incorrect round", typeOlymp)
-		return result.ErrorResult(result.INCORRECT_BODY, "Incorrect type olymp")
+		return result.ErrorResult(result.INCORRECT_TYPE_OLYMP, "Incorrect type olymp")
 	}
 
 	arrExist := func() bool {
@@ -66,7 +66,6 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	var rawTags []string
 	err = json.Unmarshal([]byte(tagsJsonArr[0]), &rawTags)
 	if err != nil {
-		// log.Println(err.Error())
 		log.Error("Error parse tags", err)
 		return result.ErrorResult(result.INCORRECT_TAGS, "Some tags array is broken")
 	}
@@ -87,7 +86,7 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 		if err != nil {
 			// fmt.Print(err.Error()) // To logger
 			log.Error("Error parse answers", err)
-			return result.ErrorResult(result.INCORRECT_BODY, "Some answers array is broken")
+			return result.ErrorResult(result.INCORRECT_ANSWER_ARR, "Some answers array is broken")
 		}
 	}
 
@@ -100,19 +99,19 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	var class int
 	if class, err = strconv.Atoi(classArr[0]); err != nil {
 		log.Error("Error parse class", err)
-		return result.ErrorResult(result.INCORRECT_LEVEL, "Class is broken")
+		return result.ErrorResult(result.INCORRECT_CLASS, "Class is broken")
 	}
 
 	var mark int
 	if mark, err = strconv.Atoi(classArr[0]); err != nil {
 		log.Error("Error parse mark", err)
-		return result.ErrorResult(result.INCORRECT_LEVEL, "Mark is broken")
+		return result.ErrorResult(result.INCORRECT_MARK, "Mark is broken")
 	}
 
 	var position int
 	if position, err = strconv.Atoi(classArr[0]); err != nil {
 		log.Error("Error parse position", err)
-		return result.ErrorResult(result.INCORRECT_LEVEL, "Position is broken")
+		return result.ErrorResult(result.INCORRECT_POSITION, "Position is broken")
 	}
 
 	res := views.ExerciseView{
