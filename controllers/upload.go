@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/db"
 	"github.com/OlympBMSTU/exercises/fstorage"
+	"github.com/OlympBMSTU/exercises/logger"
 	"github.com/OlympBMSTU/exercises/parser"
 	"github.com/OlympBMSTU/exercises/result"
 	"github.com/OlympBMSTU/exercises/sender"
@@ -19,6 +19,7 @@ import (
 // UploadExerciseHandler : Controller that takes multipart form data
 // parses it, saves exercise to db and sends answer to secret system
 func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
+	log := logger.GetLogger()
 	userID := CheckMethodAndAuthenticate(writer, request, "POST")
 	if userID == nil {
 		return
@@ -26,7 +27,7 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 
 	var err error
 	if err = request.ParseMultipartForm(-1); err != nil {
-		log.Print("Parse error")
+		log.Error("Parse error", err)
 		WriteResponse(&writer, "JSON", map[string]interface{}{
 			"Message": "Error parse form",
 			"Status":  "Error",
@@ -37,11 +38,13 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 
 	parseRes := parser.ParseExViewPostForm(request.Form)
 	if parseRes.IsError() {
+		log.Error("Parser err", nil, parseRes.GetStatus())
 		WriteResponse(&writer, "JSON", parseRes)
 		return
 	}
 
 	exView := parseRes.GetData().GetData().(views.ExerciseView)
+	log.Info("Parsed exercise: ", exView)
 
 	var fsRes result.Result
 	for _, fheaders := range request.MultipartForm.File {

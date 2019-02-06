@@ -344,7 +344,6 @@ func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.
 	}
 
 	if returnedID == -1 {
-		// log.Println("No subject in db")
 		log.Error("Db error", errors.New("No subject in db"))
 		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
 	}

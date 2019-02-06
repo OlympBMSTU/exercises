@@ -34,7 +34,7 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	log := logger.GetLogger()
 
 	// maybe no need
-	if len(typeOlympArr) < 0 {
+	if len(typeOlympArr) < 1 {
 		log.Warn("Type olymp is incorrect", typeOlympArr)
 		return result.ErrorResult(result.INCORRECT_BODY, "Empty type olymp")
 	}
@@ -52,13 +52,14 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 
 	arrExist := func() bool {
 		if typeOlymp == FIRST_ROUND {
-			return len(answerArr) < 1
+			return len(answerArr) > 0
 		}
-		return len(answersArr) < 1
+		return len(answersArr) > 0
 	}()
 
 	if len(subjectArr) < 1 || len(levelStringArr) < 1 || len(tagsJsonArr) < 1 ||
 		len(classArr) < 1 || len(positionArr) < 1 || len(markArr) < 1 || len(typeOlympArr) < 1 || !arrExist {
+		log.Error("Some fields in request empty", nil)
 		return result.ErrorResult(result.INCORRECT_BODY, "Some fileds is empty")
 	}
 
@@ -82,10 +83,10 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 		answer := strings.Trim(answerArr[0], " ")
 		answer = strings.Replace(answer, ",", ".", -1)
 	} else {
-		err := json.Unmarshal([]byte(answersArr[0]), &answers)
+		err = json.Unmarshal([]byte(answersArr[0]), &answers)
 		if err != nil {
+			// fmt.Print(err.Error()) // To logger
 			log.Error("Error parse answers", err)
-			//
 			return result.ErrorResult(result.INCORRECT_BODY, "Some answers array is broken")
 		}
 	}
