@@ -9,8 +9,8 @@ type SenderResult struct {
 	status SenderStatus
 }
 
-func (res SenderResult) GetData() interface{} {
-	return res.data.GetData()
+func (res SenderResult) GetData() result.Data {
+	return res.data
 }
 
 func (res SenderResult) GetStatus() result.Status {

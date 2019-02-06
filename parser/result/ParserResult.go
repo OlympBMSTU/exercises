@@ -7,8 +7,8 @@ type ParserResult struct {
 	status ParserStatus
 }
 
-func (res ParserResult) GetData() interface{} {
-	return res.data.GetData()
+func (res ParserResult) GetData() result.Data {
+	return res.data
 }
 
 func (res ParserResult) IsError() bool {

@@ -9,8 +9,8 @@ type FSResult struct {
 	status FSStatus
 }
 
-func (res FSResult) GetData() interface{} {
-	return res.data.GetData()
+func (res FSResult) GetData() result.Data {
+	return res.data
 }
 
 func (res FSResult) GetStatus() result.Status {
