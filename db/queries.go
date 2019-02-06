@@ -22,35 +22,3 @@ const (
 
 	ADD_SECOND_ROUND_EX = "SELECT add_exercise($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
 )
-
-// id serial,
-// author_id integer,
-// level integer,
-// file_name varchar(255),
-// subject varchar(255),
-// tags varchar(255)[],
-// is_broken boolean default false,
-// class integer,
-// position INTEGER,
-// mark   INTEGER,
-// type_olymp INTEGER,
-// answer jsonb
-
-// firstly sp - is hard way, because we have to check it and other;
-// also go slic - ref, so check it
-// also test when is empty now its return all to delete
-// todo fix procedure and parser
-// after that check all update
-// is borken request
-//SELECT * FROM (select unnest(tags), 'mathematic' subj  from exercise where id =1) tag_names join tag on (name=unnest, subject=subj);
-// array of two may fall on cycle
-// SELECT * FROM (select unnest(tags), 'mathematic' subj  from exercise where id =1) tag_names join tag on (name=unnest, subject=subj);
-
-// SELECT * FROM (select unnest(tags), 'mathematic' subj  from exercise where id =1) tn join tag on (tn.unnest=tag.name)
-
-// DELETE FROM tag_exercise where tag_id in (SELECT id FROM (select unnest(tags), 'methematic' subj  from exercise where id =1) tn join tag on (tn.unnest=tag.name and tn.subj=tag.subject)) and ex_id=1
-// DELETE FROM tag WHERE id in (SELECT t.id FROM tag t LEFT JOIN tag_exercise tg ON (t.id = tg.tag_id AND tg.exercise_id=1)  WHERE tag_id IS NULL);
-
-// DELETE FROM tags WHERE id in (SELECT t.id FROM tag t LEFT JOIN tag_exercise tg ON (t.id = tg.tag_id AND tg.exercise_id=1)  WHERE tag_id IS NULL)   ex_id = '' join SELECT id from tag where name='' and subj='')
-
-// INSERT TAGS

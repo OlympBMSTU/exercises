@@ -25,7 +25,7 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	answerArr := form["answer"]
 	subjectArr := form["subject"]
 	levelStringArr := form["level"]
-	tagsJsonArr := form["tags"]
+	tagsJSONArr := form["tags"]
 	classArr := form["class"]
 	positionArr := form["position"]
 	markArr := form["mark"]
@@ -34,6 +34,7 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	log := logger.GetLogger()
 
 	// maybe no need
+
 	if len(typeOlympArr) < 1 {
 		log.Warn("Type olymp is incorrect", typeOlympArr)
 		return result.ErrorResult(result.INCORRECT_TYPE_OLYMP, "Empty type olymp")
@@ -57,14 +58,14 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 		return len(answersArr) > 0
 	}()
 
-	if len(subjectArr) < 1 || len(levelStringArr) < 1 || len(tagsJsonArr) < 1 ||
+	if len(subjectArr) < 1 || len(levelStringArr) < 1 || len(tagsJSONArr) < 1 ||
 		len(classArr) < 1 || len(positionArr) < 1 || len(markArr) < 1 || len(typeOlympArr) < 1 || !arrExist {
 		log.Error("Some fields in request empty", nil)
 		return result.ErrorResult(result.INCORRECT_BODY, "Some fileds is empty")
 	}
 
 	var rawTags []string
-	err = json.Unmarshal([]byte(tagsJsonArr[0]), &rawTags)
+	err = json.Unmarshal([]byte(tagsJSONArr[0]), &rawTags)
 	if err != nil {
 		log.Error("Error parse tags", err)
 		return result.ErrorResult(result.INCORRECT_TAGS, "Some tags array is broken")
