@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/OlympBMSTU/exercises/config"
 )
@@ -94,9 +96,14 @@ func (logger Logger) getLogString(logData string, args ...interface{}) string {
 		return logData
 	} else {
 		for _, arg := range args {
-			bytes, _ := json.Marshal(arg)
-			logData += string(bytes)
-			logData += " "
+			if reflect.TypeOf(arg).Kind() != reflect.String {
+				bytes, _ := json.Marshal(arg)
+				logData += string(bytes)
+				logData += " "
+			} else {
+				logData += arg.(string)
+				logData += " "
+			}
 		}
 		return logData
 	}
@@ -107,7 +114,9 @@ func (logger Logger) Info(info string, args ...interface{}) {
 		additionalInfo := getFuncInfo()
 		args = append(args, additionalInfo)
 	}
-	logStr := "INFO: " + info + LINE_TERMINATOR
+	current := time.Now()
+	logStr := "Time: " + fmt.Sprintf("%s\n", current.String())
+	logStr += "INFO: " + info + LINE_TERMINATOR
 	str := logger.getLogString(logStr, args...)
 	logger.writer.Write(str)
 }
@@ -117,7 +126,9 @@ func (logger Logger) Warn(info string, args ...interface{}) {
 		additionalInfo := getFuncInfo()
 		args = append(args, additionalInfo)
 	}
-	logStr := "WARN: " + info + LINE_TERMINATOR
+	current := time.Now()
+	logStr := "Time: " + fmt.Sprintf("%s\n", current.String())
+	logStr += "WARN: " + info + LINE_TERMINATOR
 	str := logger.getLogString(logStr, args...)
 	logger.writer.Write(str)
 }
@@ -128,9 +139,12 @@ func (logger Logger) Error(msg string, err error, args ...interface{}) {
 		args = append(args, additionalInfo)
 	}
 
+	errMsg := err.Error() + "\n"
 	bytes, _ := json.Marshal(err)
-	errMsg := string(bytes)
-	logStr := "ERR: " + msg + LINE_TERMINATOR + errMsg + LINE_TERMINATOR
+	errMsg += string(bytes)
+	current := time.Now()
+	logStr := "Time: " + fmt.Sprintf("%s\n", current.String())
+	logStr += "ERR: " + msg + LINE_TERMINATOR + errMsg + LINE_TERMINATOR
 	str := logger.getLogString(logStr, args...)
 	logger.writer.Write(str)
 }

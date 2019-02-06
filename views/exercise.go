@@ -26,14 +26,28 @@ type ExerciseView struct {
 }
 
 func (view ExerciseView) ToExEntity() entities.ExerciseEntity {
+	answEntities := make([]entities.Answer, len(view.Answer))
+	for _, ans := range view.Answers {
+		// no need
+		answEntities = append(answEntities, entities.Answer{
+			ID:     ans.ID,
+			Input:  ans.Input,
+			Output: ans.Output,
+		})
+	}
 	return entities.ExerciseEntity{
-		Id:       uint(view.ID),
-		AuthorId: view.Author,
-		FileName: view.FileName,
-		Tags:     view.Tags,
-		Level:    view.Level,
-		Subject:  view.Subject,
-		IsBroken: view.IsBroken,
+		Id:        uint(view.ID),
+		AuthorId:  view.Author,
+		FileName:  view.FileName,
+		Tags:      view.Tags,
+		Level:     view.Level,
+		Subject:   view.Subject,
+		IsBroken:  view.IsBroken,
+		Class:     view.Class,
+		Mark:      view.Mark,
+		Position:  view.Position,
+		TypeOlymp: view.TypeOlymp,
+		Answers:   answEntities,
 	}
 }
 

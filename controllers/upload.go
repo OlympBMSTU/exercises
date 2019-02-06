@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -46,7 +48,21 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	exView := parseRes.GetData().GetData().(views.ExerciseView)
 	log.Info("Parsed exercise: ", exView)
 
+	bytes, err := json.Marshal(request.MultipartForm.File)
+	fmt.Print("fvyhvyh:", string(bytes))
+
 	var fsRes result.Result
+	// think how better
+	if len(request.MultipartForm.File) < 1 {
+		log.Error("Error read request", errors.New("No file"))
+		WriteResponse(&writer, "JSON", map[string]interface{}{
+			"Message": "Error no file sended",
+			"Status":  "Error",
+			"Data":    nil,
+		}, http.StatusBadRequest)
+		return
+	}
+
 	for _, fheaders := range request.MultipartForm.File {
 		for _, hdr := range fheaders {
 			//	_, header, _ := request.FormFile("file")
@@ -250,3 +266,13 @@ func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	// also here smtp
 	WriteResponse(&writer, "JSON", dbRes)
 }
+
+// if len(request.MultipartForm.File) < 1 || len(fheaders) < 1 {
+// 	log.Error("Error read request", errors.New("No file"))
+// 	WriteResponse(&writer, "JSON", map[string]interface{}{
+// 		"Message": "Error no file sended",
+// 		"Status":  "Error",
+// 		"Data":    nil,
+// 	}, http.StatusBadRequest)
+// 	return
+// }
