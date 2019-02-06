@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"net/http"
 	"log"
+	"net/http"
+
 	"github.com/OlympBMSTU/exercises/auth"
 	matcher "github.com/OlympBMSTU/exercises/controllers/matcher_result"
 	"github.com/OlympBMSTU/exercises/result"
@@ -94,7 +95,8 @@ func authenticateUser(writer http.ResponseWriter, req *http.Request) *uint {
 		WriteResponse(&writer, "JSON", authRes)
 		return nil
 	}
-	userID := authRes.GetData().(uint)
+	authData := authRes.GetData()
+	userID := authData.GetData().(uint)
 	return &userID
 }
 

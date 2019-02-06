@@ -7,8 +7,8 @@ type DbResult struct {
 	status DbStatus
 }
 
-func (res DbResult) GetData() interface{} {
-	return res.data.GetData()
+func (res DbResult) GetData() result.Data {
+	return res.data
 }
 
 func (res DbResult) IsError() bool {

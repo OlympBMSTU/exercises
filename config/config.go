@@ -1,104 +1,127 @@
 package config
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
 // config - one file
 
+const (
+	LOG_PATH   = "logPath"
+	LOG_LEVEL  = "logLevel"
+	LOG_OUTPUT = "logOutput"
+	TERMINATOR = "="
+)
+
 type Config struct {
-	fileStorageDir string
-	listenerHost   string
-	listenerPort   string
-	dbHost         string
-	dbPort         string
-	database       string
-	dbUser         string
-	dbPassword     string
-	smtpHost       string
-	smtpPort       string
-	smtpUser       string
-	smtpPassword   string
-	acceptorMail   string
-	mailSubject    string
-	testVersion    string
-	authCookieName string
-	authSecret     string
+	FileStorageDir string
+	ListenerHost   string
+	ListenerPort   string
+	DbHost         string
+	DbPort         string
+	Database       string
+	DbUser         string
+	DbPassword     string
+	SmtpHost       string
+	SmtpPort       string
+	SmtpUser       string
+	SmtpPassword   string
+	AcceptorMail   string
+	MailSubject    string
+	TestVersion    string
+	AuthCookieName string
+	AuthSecret     string
+	LogType        string
+	LogPath        string
+	LogLevel       int
+	// ILogger        *Logger
 }
 
 func (cfg Config) GetFileStorageName() string {
-	return cfg.fileStorageDir
+	return cfg.FileStorageDir
 }
 
 func (cfg Config) GetDBHost() string {
-	return cfg.dbHost
+	return cfg.DbHost
 }
 
 func (cfg Config) GetDBPort() string {
-	return cfg.dbPort
+	return cfg.DbPort
 }
 
 func (cfg *Config) GetDatabase() string {
-	return cfg.database
+	return cfg.Database
 }
 
 func (cfg Config) GetDBUser() string {
-	return cfg.dbUser
+	return cfg.DbUser
 }
 
 func (cfg Config) GetDBPassword() string {
-	return cfg.dbPassword
+	return cfg.DbPassword
 }
 
 func (cfg Config) GetSMTPHost() string {
-	return cfg.smtpHost
+	return cfg.SmtpHost
 }
 
 func (cfg Config) GetSMTPPort() string {
-	return cfg.smtpPort
+	return cfg.SmtpPort
 }
 
 func (cfg Config) GetSMTPUser() string {
-	return cfg.smtpUser
+	return cfg.SmtpUser
 }
 
 func (cfg Config) GetSMTPPassword() string {
-	return cfg.smtpPassword
+	return cfg.SmtpPassword
 }
 
 func (cfg Config) GetAcceptorMail() string {
-	return cfg.acceptorMail
+	return cfg.AcceptorMail
 }
 
 func (cfg Config) GetMailSubject() string {
-	return cfg.mailSubject
+	return cfg.MailSubject
 }
 
 func (cfg Config) IsTest() bool {
-	return cfg.testVersion == "test"
+	return cfg.TestVersion == "test"
 }
 
 func (cfg Config) GetAuthCookieName() string {
-	return cfg.authCookieName
+	return cfg.AuthCookieName
 }
 
 func (cfg Config) GetAuthSecret() string {
-	return cfg.authSecret
+	return cfg.AuthSecret
 }
 
 func (cfg Config) GetListenerHost() string {
-	return cfg.listenerHost
+	return cfg.ListenerHost
 }
 
 func (cfg Config) GetListenerPort() string {
-	return cfg.listenerPort
+	return cfg.ListenerPort
 }
 
-// const HASH_SECRET = "Любовь измеряется мерой прощения."
+func (cfg Config) GetLoggerPath() string {
+	return cfg.LogPath
+}
+
+func (cfg Config) GetLoggerType() string {
+	return cfg.LogType
+}
+
+func (cfg Config) GetLoggerLevel() int {
+	return cfg.LogLevel
+}
 
 // it works but need to get path to dir
 // error handling, maybe return struct string, err
@@ -122,6 +145,22 @@ func Init() (*Config, error) {
 	countFields := reflect.ValueOf(Config{}).NumField()
 	if len(configs) < countFields {
 		log.Println("Not enough fields")
+		return nil, errors.New("Not Enough fields for config")
+	}
+
+	// logExist := false
+	// for configLine := range config {
+
+	// 	if strings.Contains(configLine, logLevel) {
+
+	// 		level := strings.Split()
+	// 	}
+	// }
+
+	// if
+	logLevel, err := strconv.Atoi(configs[19])
+	if err != nil {
+		log.Print("Error logLevel, must be integer")
 		return nil, err
 	}
 
@@ -143,6 +182,9 @@ func Init() (*Config, error) {
 		configs[14],
 		configs[15],
 		configs[16],
+		configs[17],
+		configs[18],
+		logLevel,
 	}, nil
 }
 

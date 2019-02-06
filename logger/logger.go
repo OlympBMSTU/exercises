@@ -1,32 +1,143 @@
 package logger
 
 import (
-	"log"
+	"encoding/json"
+	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/OlympBMSTU/exercises/config"
+)
+
+/// Trash
+var loggerInstance *Logger = nil
+
+func InitLogger(cfg config.Config) error {
+	// if logger == nil {
+	logger, err := New(cfg)
+	loggerInstance = logger
+	return err
+	// }
+	// return
+}
+
+// cant as ILogger ...
+func GetLogger() *Logger { //cfg config.Config) (*Logger, error) {
+	// if logger == nil {
+	// logger, err := New(cfg)
+	// return logger, err
+	// }
+
+	return loggerInstance
+}
+
+////
+
+// LOGGER constants for create logger
+const (
+	CONSOLE      = "console"
+	FILE         = "file"
+	BOTH         = "console_and_file"
+	FULL_LOG     = 2
+	EXTENDED_LOG = 1
+	MIN_LOG      = 0
 )
 
 const (
-	CONSOLE = "console"
-	FILE = "file"
-	BOTH = "console_and_file"
-	FULL_LOG = 2 
-	
-	MIN_LOG = 0
+	SKIP_FUNCTION_STACK = 2
+	LINE_TERMINATOR     = "\n"
 )
 
+// logger logs sended data
+// if level 0 - only requred parameters
+// if level 1 - all parameters
+// if level 2 appends string that tell where log writed line func file
+type ILogger interface {
+	Info(string, ...interface{})
+	Warn(string, ...interface{})
+	Error(string, error, ...interface{})
+}
 
-var (
-	LogE = log.New(LogWriter{}, "ERROR: ", 0)
-	LogW = log.New(LogWriter{}, "WARN: ", 0)
-	LogI = log.New(LogWriter{}, "INFO: ", 0)
-)
+type Logger struct {
+	level  int
+	writer LogWriter
+}
 
-type LogWriter struct{}
+func New(config config.Config) (*Logger, error) {
+	writer := LogWriter{[]*os.File{os.Stdout}}
+	if config.GetLoggerType() == FILE {
+		file, err := os.OpenFile(config.GetLoggerPath(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+		if err != nil {
+			return nil, err
+		}
+		writer = LogWriter{[]*os.File{file}}
+	}
 
-func (f LogWriter) Write(p []byte) (n int, err error) {
-	pc, file, line, ok := runtime.Caller(4)
+	if config.GetLoggerType() == BOTH {
+		file, err := os.OpenFile(config.GetLoggerPath(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+		if err != nil {
+			return nil, err
+		}
+		writer = LogWriter{[]*os.File{os.Stdout, file}}
+	}
+
+	return &Logger{
+		level:  config.GetLoggerLevel(),
+		writer: writer,
+	}, nil
+}
+
+func (logger Logger) getLogString(logData string, args ...interface{}) string {
+	if logger.level == 0 {
+		return logData
+	} else {
+		for _, arg := range args {
+			bytes, _ := json.Marshal(arg)
+			logData += string(bytes)
+			logData += " "
+		}
+		return logData
+	}
+}
+
+func (logger Logger) Info(info string, args ...interface{}) {
+	if logger.level == 2 {
+		additionalInfo := getFuncInfo()
+		args = append(args, additionalInfo)
+	}
+	logStr := "INFO: " + info + LINE_TERMINATOR
+	str := logger.getLogString(logStr, args...)
+	logger.writer.Write(str)
+}
+
+func (logger Logger) Warn(info string, args ...interface{}) {
+	if logger.level == 2 {
+		additionalInfo := getFuncInfo()
+		args = append(args, additionalInfo)
+	}
+	logStr := "WARN: " + info + LINE_TERMINATOR
+	str := logger.getLogString(logStr, args...)
+	logger.writer.Write(str)
+}
+
+func (logger Logger) Error(msg string, err error, args ...interface{}) {
+	if logger.level == 2 {
+		additionalInfo := getFuncInfo()
+		args = append(args, additionalInfo)
+	}
+
+	bytes, _ := json.Marshal(err)
+	errMsg := string(bytes)
+	logStr := "ERR: " + msg + LINE_TERMINATOR + errMsg + LINE_TERMINATOR
+	str := logger.getLogString(logStr, args...)
+	logger.writer.Write(str)
+}
+
+func getFuncInfo() string {
+	additionalInfo := ""
+	pc, file, line, ok := runtime.Caller(SKIP_FUNCTION_STACK) // 2
 	if !ok {
 		file = "?"
 		line = 0
@@ -41,138 +152,6 @@ func (f LogWriter) Write(p []byte) (n int, err error) {
 		fnName = strings.TrimLeft(dotName, ".") + "()"
 	}
 
-	log.Printf("%s:%d %s: %s", filepath.Base(file), line, fnName, string(p))
-	return len(p), nil
+	additionalInfo = fmt.Sprintf("File: %s Func: %s Line: %d", filepath.Base(file), fnName, line)
+	return additionalInfo + LINE_TERMINATOR
 }
-
-func infoFunc() {
-	LogI.Println("information message")
-}
-
-func warnFunc() {
-	LogW.Println("warning message")
-}
-
-func errorFunc() {
-	LogE.Println("error message")
-}
-
-// struct path_log
-
-type ILogger interface {
-	// InfoString(string)
-	Info(string, ...interface{})
-	// WarnString(string)
-	Warn(string, ...interface{}) 
-	Error(string, error, ...interface{})
-}
-
-type ConsoleLogger struct {
-	int level
-}
-
-
-
-func 
-
-type FileLogger struct {
-}
-
-type BothLogger struct {
-	loggerF FileLogger
-	loggerC ConsoleLogger 
-}
-
-type Logger struct {
-	// file *os.File
-	// pathFile string
-	// level int
-	logger *ILogger
-}
-
-func New(config config.Config) (Logger, error) {
-	if config.LoggerType() == BOTH {
-		
-	}
-
-	if config.LoggerType() == CONSOLE {
-
-	}
-
-	if config.LoggerType() == FILE {}
-}
-
-func (logger Logger) Warn(warn Stirng) {
-	if level == FULL_LOG {
-		logger.Warn()
-	}
-}
-
-func (logger Logger) Warn(warn string, args ...interface{} ) {
-	if level == FULL_LOG {
-		warnSting = 
-	}
-}
-}
-// import (
-// 	"io"
-// 	"log"
-// 	"path/filepath"
-// 	"runtime"
-// 	"strings"
-// )
-
-// const (
-// 	LOG_ERROR  = 0
-// 	LOG_WARING = 1
-// 	LOG_INFO   = 2
-// )
-
-// var (
-// 	LogE *log.Logger
-// 	LogW *log.Logger
-// 	LogI *log.Logger
-// )
-
-// func InitLogger(out io.Writer, prefix string, level int, typeLog int) *log.Logger {
-// 	return log.New(out, prefix, level)
-// }
-
-// func GetLogger
-
-// type LogWriter struct{}
-
-// func (f LogWriter) Write(p []byte) (n int, err error) {
-// 	pc, file, line, ok := runtime.Caller(4)
-// 	if !ok {
-// 		file = "?"
-// 		line = 0
-// 	}
-
-// 	fn := runtime.FuncForPC(pc)
-// 	var fnName string
-// 	if fn == nil {
-// 		fnName = "?()"
-// 	} else {
-// 		dotName := filepath.Ext(fn.Name())
-// 		fnName = strings.TrimLeft(dotName, ".") + "()"
-// 	}
-
-// 	log.Printf("%s:%d %s: %s", filepath.Base(file), line, fnName, p)
-// 	return len(p), nil
-// }
-
-// func LogError(err error, params ...interface{}) {
-
-// }
-// func infoFunc() {
-// 	LogI.Println("information message")
-// }
-
-// func warnFunc() {
-// 	LogW.Println("warning message")
-// }
-
-// func errorFunc() {
-// 	LogE.Println("error message")
-// }

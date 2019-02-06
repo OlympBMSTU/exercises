@@ -43,7 +43,7 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	exView := parseRes.GetData().(views.ExerciseView)
+	exView := parseRes.GetData().GetData().(views.ExerciseView)
 
 	var fsRes result.Result
 	for _, fheaders := range request.MultipartForm.File {
@@ -58,7 +58,7 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	exView.SetAuthor(*userID)
-	exView.SetFileName(fsRes.GetData().(string))
+	exView.SetFileName(fsRes.GetData().GetData().(string))
 	dbEx := exView.ToExEntity()
 	dbRes := db.SaveExercise(dbEx, request.Context())
 	if dbRes.IsError() {
@@ -67,7 +67,7 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	exID := uint(dbRes.GetData().(int))
+	exID := uint(dbRes.GetData().GetData().(int))
 	conf, _ := config.GetConfigInstance()
 	if !conf.IsTest() {
 		senderRes := sender.SendAnswer(exID, exView.Answer)
@@ -219,7 +219,7 @@ func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// about id int or uint
-	exView := parseRes.GetData().(views.ExerciseView)
+	exView := parseRes.GetData().GetData().(views.ExerciseView)
 
 	_, header, _ := request.FormFile("file")
 	if header != nil {
@@ -228,7 +228,7 @@ func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 			WriteResponse(&writer, "JSON", fsRes)
 			return
 		}
-		exView.SetFileName(fsRes.GetData().(string))
+		exView.SetFileName(fsRes.GetData().GetData().(string))
 	}
 
 	// if old file == new file names doesnt mathc, so if update we need to send new file else no

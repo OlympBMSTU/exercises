@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/OlympBMSTU/exercises/logger"
 
 	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/controllers"
@@ -24,6 +27,13 @@ func Init() (*pgx.ConnPool, error) {
 	conf, err := config.GetConfigInstance()
 	if err != nil {
 		log.Println(err)
+		return nil, err
+	}
+
+	err = logger.InitLogger(*conf)
+	if err != nil {
+		bytes, _ := json.Marshal(err)
+		log.Print("Error occoured when create logger: ", string(bytes))
 		return nil, err
 	}
 

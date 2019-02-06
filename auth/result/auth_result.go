@@ -7,8 +7,8 @@ type AuthResult struct {
 	status AuthStatus
 }
 
-func (res AuthResult) GetData() interface{} {
-	return res.data.GetData()
+func (res AuthResult) GetData() result.Data {
+	return res.data
 }
 
 func (res AuthResult) IsError() bool {
