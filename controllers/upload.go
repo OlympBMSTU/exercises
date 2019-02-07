@@ -100,6 +100,8 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	WriteResponse(&writer, "JSON", dbRes)
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
 // GetExerciseHandler : controller that searches exercise in database
 // by presented exercise id as path variable (ex /api/../id)
 func GetExerciseHandler(writer http.ResponseWriter, request *http.Request) {
@@ -124,6 +126,8 @@ func GetExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	dbRes := db.GetExercise(exID, request.Context())
 	WriteResponse(&writer, "JSON", dbRes)
 }
+
+///////////////////////////////////////////////////////////////////////////
 
 // GetExercises : controller that searches exercises in database by presented conditio params:
 // Path variables like /api/.../subject/tag/level
@@ -212,6 +216,8 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 	dbRes := db.GetExerciseList(tag, subject, level, limit, offset, isDesc, isBroken, request.Context())
 	WriteResponse(&writer, "JSON", dbRes)
 }
+
+////////////////////////////////////////////////////////////////////
 
 func UpdateExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 	userID := CheckMethodAndAuthenticate(writer, request, "POST")

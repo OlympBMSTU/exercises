@@ -18,6 +18,7 @@ type ExerciseEntity struct {
 	Mark      int
 	TypeOlymp int
 	Answers   []Answer
+	Created   string
 }
 
 func NewExerciseEntity(author uint, filename string, tags []string, level int, subject string) ExerciseEntity {

@@ -67,7 +67,7 @@ func MatchResult(res root_result.Result) http_res.HttpResult {
 	switch res.(type) {
 	case db_result.DbResult:
 		if !res.IsError() {
-			bodyData = res.GetData()
+			bodyData = res.GetData().GetData()
 		}
 		infoRes = getAssociatedDbInfo(res)
 		// return MatchDbResult(res)

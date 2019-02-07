@@ -3,8 +3,10 @@ package db
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/OlympBMSTU/exercises/entities"
+	"github.com/OlympBMSTU/exercises/logger"
 	"github.com/jackc/pgx"
 )
 
@@ -19,7 +21,10 @@ func getDb(ctx context.Context) *pgx.ConnPool {
 }
 
 func scanExercise(rows *pgx.Rows) (*entities.ExerciseEntity, error) {
+	log := logger.GetLogger()
 	var exercise entities.ExerciseEntity
+	var answers []byte
+	var data time.Time
 	err := rows.Scan(
 		&exercise.Id,
 		&exercise.AuthorId,
@@ -28,11 +33,18 @@ func scanExercise(rows *pgx.Rows) (*entities.ExerciseEntity, error) {
 		&exercise.Subject,
 		&exercise.Tags,
 		&exercise.IsBroken,
+		&exercise.Class,
+		&exercise.Position,
+		&exercise.Mark,
+		&exercise.TypeOlymp,
+		&answers,
+		&data,
 	)
+	exercise.Created = data.String()
 
 	if err != nil {
 		// fmt.Print(err.Error())
-		log.Println(err.Error())
+		log.Error("Error parse exercise", err)
 		return nil, err
 	}
 

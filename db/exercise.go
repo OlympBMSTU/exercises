@@ -31,39 +31,56 @@ func DeleteExcerciese(exId uint, ctx context.Context) result.DbResult {
 	return result.CreateResult(nil, err)
 }
 
-// func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
-// 	db := getDb(ctx)
-// 	if db == nil {
-// 		return result.ErrorResult(result.DB_CONN_ERROR, "")
-// 	}
+func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
+	db := getDb(ctx)
+	log := logger.GetLogger()
+	if db == nil {
+		log.Error("DB Error", errors.New("No db specified"))
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
 
-// 	row := db.QueryRow(INSERT_EXERCISE,
-// 		exercise.GetAuthorId(),
-// 		exercise.GetLevel(),
-// 		exercise.GetFileName(),
-// 		exercise.GetSubject(),
-// 		pq.Array(exercise.GetTags()),
-// 	)
+	answers, err := json.Marshal(exercise.GetAnswers())
+	if err != nil {
+		log.Error("DB error marshal answer", err)
+		return result.ErrorResult(result.DB_CONN_ERROR, "")
+	}
 
-// 	var returnedId int
-// 	err := row.Scan(&returnedId)
+	row := db.QueryRow(INSERT_EXERCISE,
+		exercise.GetAuthorId(),
+		exercise.GetLevel(),
+		exercise.GetFileName(),
+		exercise.GetSubject(),
+		pq.Array(exercise.GetTags()),
+		exercise.GetClass(),
+		exercise.GetPosition(),
+		exercise.GetMark(),
+		exercise.GetTypeOlymp(),
+		answers,
+	)
 
-// 	if err != nil {
-// 		log.Println(err.Error())
-// 		return result.ErrorResult(err)
-// 	}
+	var returnedID int
+	err = row.Scan(&returnedID)
 
-// 	if returnedId == -1 {
-// 		log.Println("No subject in db")
-// 		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
-// 	}
+	if err != nil {
+		log.Error("Db Error scan", err)
+		return result.ErrorResult(err)
+	}
 
-// 	return result.OkResult(returnedId, result.CREATED)
-// }
+	if returnedID == -1 {
+		log.Error("Db error", errors.New("No subject in db"))
+		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
+	}
+
+	return result.OkResult(returnedID, result.CREATED)
+}
+
+//////////////////////////////////////////////////////////
 
 func GetExercise(id uint, ctx context.Context) result.DbResult {
 	db := getDb(ctx)
+	log := logger.GetLogger()
 	if db == nil {
+		log.Error("Db not set", nil)
 		return result.ErrorResult(result.DB_CONN_ERROR, "")
 	}
 
@@ -71,6 +88,7 @@ func GetExercise(id uint, ctx context.Context) result.DbResult {
 	defer rows.Close()
 
 	if err != nil {
+		log.Error("Error run query", err)
 		return result.ErrorResult(err)
 	}
 
@@ -80,17 +98,20 @@ func GetExercise(id uint, ctx context.Context) result.DbResult {
 	}
 
 	if err != nil {
+		log.Error("Error get exerxise", err)
 		return result.ErrorResult(err)
 	}
 
 	if excerciese == nil {
-		log.Println("Result set is empty")
+		log.Warn("Result set is empy")
 		return result.ErrorResult(result.EMPTY_RESULT, "")
 	}
 
 	return result.OkResult(entities.NewExRepresentation(*excerciese))
 }
 
+///////////////////////////////////////////////////////////
+// todo also send position and class
 func GetExerciseList(tag string, subject string, level int,
 	limit int, offset int, orderLevel bool, isBroken *bool, ctx context.Context) result.DbResult {
 
@@ -176,6 +197,8 @@ func GetExerciseList(tag string, subject string, level int,
 
 	return result.OkResult(entities)
 }
+
+////////////////////////////////////////////////////////////////////////
 
 func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) result.DbResult {
 	db := getDb(ctx)
@@ -276,78 +299,4 @@ func UpdateExercise(exEntity entities.ExerciseEntity, ctx context.Context) resul
 	}
 
 	return result.OkResult(existingEntity)
-}
-
-// func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
-// 	db := getDb(ctx)
-// 	if db == nil {
-// 		return result.ErrorResult(result.DB_CONN_ERROR, "")
-// 	}
-
-// 	row := db.QueryRow(INSERT_EXERCISE,
-// 		exercise.GetAuthorId(),
-// 		exercise.GetLevel(),
-// 		exercise.GetFileName(),
-// 		exercise.GetSubject(),
-// 		pq.Array(exercise.GetTags()),
-// 	)
-
-// 	var returnedId int
-// 	err := row.Scan(&returnedId)
-
-// 	if err != nil {
-// 		log.Println(err.Error())
-// 		return result.ErrorResult(err)
-// 	}
-
-// 	if returnedId == -1 {
-// 		log.Println("No subject in db")
-// 		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
-// 	}
-
-// 	return result.OkResult(returnedId, result.CREATED)
-// }
-
-func SaveExercise(exercise entities.ExerciseEntity, ctx context.Context) result.DbResult {
-	db := getDb(ctx)
-	log := logger.GetLogger()
-	if db == nil {
-		log.Error("DB Error", errors.New("No db specified"))
-		return result.ErrorResult(result.DB_CONN_ERROR, "")
-	}
-
-	answers, err := json.Marshal(exercise.GetAnswers())
-	if err != nil {
-		log.Error("DB error marshal answer", err)
-		return result.ErrorResult(result.DB_CONN_ERROR, "")
-	}
-
-	row := db.QueryRow(ADD_SECOND_ROUND_EX,
-		exercise.GetAuthorId(),
-		exercise.GetLevel(),
-		exercise.GetFileName(),
-		exercise.GetSubject(),
-		pq.Array(exercise.GetTags()),
-		exercise.GetClass(),
-		exercise.GetPosition(),
-		exercise.GetMark(),
-		exercise.GetTypeOlymp(),
-		answers,
-	)
-
-	var returnedID int
-	err = row.Scan(&returnedID)
-
-	if err != nil {
-		log.Error("Db Error scan", err)
-		return result.ErrorResult(err)
-	}
-
-	if returnedID == -1 {
-		log.Error("Db error", errors.New("No subject in db"))
-		return result.ErrorResult(result.NO_SUBJECT_ERROR, "There is no subject in db")
-	}
-
-	return result.OkResult(returnedID, result.CREATED)
-
 }

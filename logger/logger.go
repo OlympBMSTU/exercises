@@ -138,8 +138,10 @@ func (logger Logger) Error(msg string, err error, args ...interface{}) {
 		additionalInfo := getFuncInfo()
 		args = append(args, additionalInfo)
 	}
-
-	errMsg := err.Error() + "\n"
+	errMsg := ""
+	if err != nil {
+		errMsg = err.Error() + "\n"
+	}
 	bytes, _ := json.Marshal(err)
 	errMsg += string(bytes)
 	current := time.Now()
