@@ -38,6 +38,8 @@ func UploadExerciseHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	log.Info("Upload request: ", request.Method, request.RemoteAddr, request.URL, request.Form)
+
 	parseRes := parser.ParseExViewPostForm(request.Form)
 	if parseRes.IsError() {
 		log.Error("Parser err", nil, parseRes.GetStatus())
