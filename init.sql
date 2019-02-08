@@ -229,7 +229,7 @@ END;
 $$LANGUAGE plpgsql;
 
 
-insert into subject(name) values('mathematic'), ('physics');
+-- insert into subject(name) values('mathematic'), ('physics');
 
 -- del fr tag_ex where ex_id = and id in (select id from  not in join)) 
 

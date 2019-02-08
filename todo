@@ -9,6 +9,8 @@
     8) Parser firstly show err.Error
     9) Parser show data with msg in one line
 
+
+psql --host="127.0.0.1" --port="9255" --username="exerusr" --dbname="exer_sec"
 2) Maybe scan simple data as one function, simply send query (no need now) refl 
 5) Routing needs refactor!!!
 9) TODO parseError in other packages

@@ -20,26 +20,27 @@ const (
 )
 
 type Config struct {
-	FileStorageDir string
-	ListenerHost   string
-	ListenerPort   string
-	DbHost         string
-	DbPort         string
-	Database       string
-	DbUser         string
-	DbPassword     string
-	SmtpHost       string
-	SmtpPort       string
-	SmtpUser       string
-	SmtpPassword   string
-	AcceptorMail   string
-	MailSubject    string
-	TestVersion    string
-	AuthCookieName string
-	AuthSecret     string
-	LogType        string
-	LogPath        string
-	LogLevel       int
+	FileStorageDir    string
+	ListenerHost      string
+	ListenerPort      string
+	DbHost            string
+	DbPort            string
+	Database          string
+	DbUser            string
+	DbPassword        string
+	SmtpHost          string
+	SmtpPort          string
+	SmtpUser          string
+	SmtpPassword      string
+	AcceptorMail      string
+	MailSubject       string
+	TestVersion       string
+	AuthCookieName    string
+	AuthSecret        string
+	LogType           string
+	LogPath           string
+	LogLevel          int
+	IgnoreAnswersMark string
 	// ILogger        *Logger
 }
 
@@ -123,6 +124,10 @@ func (cfg Config) GetLoggerLevel() int {
 	return cfg.LogLevel
 }
 
+func (cfg Config) IgnoreTestMark() bool {
+	return cfg.IgnoreAnswersMark == "ignore"
+}
+
 // it works but need to get path to dir
 // error handling, maybe return struct string, err
 // check
@@ -185,6 +190,7 @@ func Init() (*Config, error) {
 		configs[17],
 		configs[18],
 		logLevel,
+		configs[20],
 	}, nil
 }
 

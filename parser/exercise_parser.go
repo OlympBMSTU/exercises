@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/OlympBMSTU/exercises/config"
 	"github.com/OlympBMSTU/exercises/logger"
 	"github.com/OlympBMSTU/exercises/parser/result"
 	"github.com/OlympBMSTU/exercises/views"
@@ -22,6 +23,10 @@ var gradeArr = []string{"11 класс", "10 класс", "9 класс"}
 
 func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	var err error
+	// newForm := make(map[string]string)
+	// for k, v := range form {
+	// 	newForm[k] = v[0]
+	// }
 	answerArr := form["answer"]
 	subjectArr := form["subject"]
 	levelStringArr := form["level"]
@@ -32,7 +37,12 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 	typeOlympArr := form["type_olymp"]
 	answersArr := form["answers"]
 	log := logger.GetLogger()
+	// delete
+	// delete(form, "answersArr")
 
+	// bytes, err := json.Marshal(newForm)
+	// var exercise views.ExerciseView
+	// err = json.Unmarshal(bytes, &exercise)
 	// maybe no need
 
 	if len(typeOlympArr) < 1 {
@@ -77,6 +87,12 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 		tags = append(tags, trimTag)
 	}
 
+	var mark int
+	if mark, err = strconv.Atoi(markArr[0]); err != nil {
+		log.Error("Error parse mark", err)
+		return result.ErrorResult(result.INCORRECT_MARK, "Mark is broken")
+	}
+
 	var answers []views.AnswerView
 	answer := ""
 	if typeOlymp == FIRST_ROUND {
@@ -88,6 +104,17 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 			// fmt.Print(err.Error()) // To logger
 			log.Error("Error parse answers", err)
 			return result.ErrorResult(result.INCORRECT_ANSWER_ARR, "Some answers array is broken")
+		}
+
+		totalMark := 0
+		for _, ans := range answers {
+			totalMark += ans.Mark
+		}
+
+		cfg, _ := config.GetConfigInstance()
+		if totalMark != mark && !cfg.IgnoreTestMark() {
+			log.Error("Mark in exersize doesn't equals sum marks in answers", nil)
+			return result.ErrorResult(result.INCORRECT_MARK_IN_ANSWERS, "Mark in exersize doesn't equals sum marks in answers")
 		}
 	}
 
@@ -103,14 +130,8 @@ func ParseExViewPostForm(form map[string][]string) result.ParserResult {
 		return result.ErrorResult(result.INCORRECT_CLASS, "Class is broken")
 	}
 
-	var mark int
-	if mark, err = strconv.Atoi(classArr[0]); err != nil {
-		log.Error("Error parse mark", err)
-		return result.ErrorResult(result.INCORRECT_MARK, "Mark is broken")
-	}
-
 	var position int
-	if position, err = strconv.Atoi(classArr[0]); err != nil {
+	if position, err = strconv.Atoi(positionArr[0]); err != nil {
 		log.Error("Error parse position", err)
 		return result.ErrorResult(result.INCORRECT_POSITION, "Position is broken")
 	}

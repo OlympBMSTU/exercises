@@ -52,10 +52,11 @@ func scanExercise(rows *pgx.Rows) (*entities.ExerciseEntity, error) {
 }
 
 func getTags(query string, pool *pgx.ConnPool, args ...interface{}) (*[]string, error) {
+	log := logger.GetLogger()
 	rows, err := pool.Query(query, args[0])
 	defer rows.Close()
 	if err != nil {
-		log.Println(err.Error())
+		log.Error("Error get tags", err)
 		return nil, err
 	}
 
@@ -65,7 +66,8 @@ func getTags(query string, pool *pgx.ConnPool, args ...interface{}) (*[]string, 
 		var tag string
 		err := rows.Scan(&tag)
 		if err != nil {
-			log.Println(err.Error())
+			log.Warn("Error scan tags", err.Error())
+			// log.Wanr("Error scan tag", err)
 			continue
 		}
 		tags = append(tags, tag)

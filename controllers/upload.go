@@ -145,6 +145,8 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	log := logger.GetLogger()
+
 	query := request.URL.Query()
 	pathVariablesStr := strings.TrimPrefix(request.URL.Path, "/api/exercises/list/")
 	vars := strings.Split(pathVariablesStr, "/")
@@ -153,6 +155,7 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 	level := -1
 
 	if len(vars) == 0 || (len(vars) == 1 && vars[0] == "") {
+		log.Error("Incorrect path variables count", nil)
 		WriteResponse(&writer, "JSON", map[string]interface{}{
 			"Message": "Not enough parameters for request",
 			"Status":  "Error",
@@ -161,18 +164,22 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	///////////////////////////////////////////////////////
 	// its very scary !!!!!  // use reflect and refactor level
 	for i, data := range vars {
 		if i == 0 {
+			// subject need to check
 			subject = vars[i]
 		}
 		if i == 1 {
+			// also here
 			tag = vars[i]
 		}
 		if i == 2 && data != "" {
 			var err error
 			level, err = strconv.Atoi(data)
 			if err != nil {
+				log.Error("Incorrect level", err)
 				WriteResponse(&writer, "JSON", map[string]interface{}{
 					"Message": "Incorrect level variable",
 					"Status":  "Error",
@@ -183,16 +190,86 @@ func GetExercises(writer http.ResponseWriter, request *http.Request) {
 		}
 	}
 
-	limitArr := query["limit"]
+	///////////////////////////////////////////////////
+	// Parse query
+	var err error
+	isAllFlag := query.Get("all")
+	isAll := false
+	if len(isAllFlag) > 0 {
+		if isAllFlag == "true" {
+			isAll = true
+		}
+	}
+
 	limit := -1
-	if len(limitArr) > 0 {
-		limit, _ = strconv.Atoi(limitArr[0])
-	}
-	offsetArr := query["offset"]
 	offset := -1
-	if len(offsetArr) > 0 {
-		offset, _ = strconv.Atoi(offsetArr[0])
+	if !isAll {
+		// limitArr := query["limit"]
+		// if len(limitArr) > 0 {
+		// 	limit, err = strconv.Atoi(limitArr[0])
+		// }
+		// offsetArr := query["offset"]
+		// if len(offsetArr) > 0 {
+		// 	offset, err = strconv.Atoi(offsetArr[0])
+		// }
+		limitStr := query.Get("limit")
+		if len(limitStr) > 0 {
+			if limit, err = strconv.Atoi(limitStr); err != nil {
+				log.Error("Incorrect limit", err)
+				WriteResponse(&writer, "JSON", map[string]interface{}{
+					"Message": "Incorrect limit variable",
+					"Status":  "Error",
+					"Data":    nil,
+				}, http.StatusBadRequest)
+				return
+			}
+		}
+
+		offsetStr := query.Get("offset")
+		if len(offsetStr) > 0 {
+			if offset, err = strconv.Atoi(offsetStr); err != nil {
+				log.Error("Incorrect offset", err)
+				WriteResponse(&writer, "JSON", map[string]interface{}{
+					"Message": "Incorrect offset variable",
+					"Status":  "Error",
+					"Data":    nil,
+				}, http.StatusBadRequest)
+				return
+			}
+		}
 	}
+
+	position := -1
+	positionArr := query.Get("position")
+	if len(positionArr) > 0 {
+		if position, err = strconv.Atoi(positionArr); err != nil {
+			log.Error("Incorrect position", err)
+			WriteResponse(&writer, "JSON", map[string]interface{}{
+				"Message": "Incorrect position variable",
+				"Status":  "Error",
+				"Data":    nil,
+			}, http.StatusBadRequest)
+			return
+		}
+	}
+
+	class := -1
+	classArr := query.Get("class")
+	if len(classArr) > 0 {
+		if class, err = strconv.Atoi(classArr); err != nil {
+			log.Error("Incorrect class", err)
+			WriteResponse(&writer, "JSON", map[string]interface{}{
+				"Message": "Incorrect class variable",
+				"Status":  "Error",
+				"Data":    nil,
+			}, http.StatusBadRequest)
+			return
+		}
+	}
+
+	// try convert
+
+	fmt.Print(position, class)
 
 	// its fucking crutch maybe, todo refactor !!!!!!!!!
 

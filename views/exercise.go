@@ -33,6 +33,7 @@ func (view ExerciseView) ToExEntity() entities.ExerciseEntity {
 			ID:     ans.ID,
 			Input:  ans.Input,
 			Output: ans.Output,
+			Mark:   ans.Mark,
 		})
 	}
 	return entities.ExerciseEntity{
